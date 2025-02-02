@@ -1,4 +1,5 @@
 {
+  "User.NotFound": "User not found",
   "AuthMessages.LoginSuccess": "Login successful.",
   "AuthMessages.LoginFailed": "Login failed.",
   "AuthMessages.LogoutSuccess": "Logout successful.",

@@ -13,6 +13,7 @@ services:
       - ecommerce.redis
     ports:
       - 4000:8080
+      - 4001:8081
 
   ecommerce.authserver:
     build:

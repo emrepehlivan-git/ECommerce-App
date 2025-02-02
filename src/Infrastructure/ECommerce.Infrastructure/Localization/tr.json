@@ -1,8 +1,9 @@
 {
+  "User.NotFound": "Kullanıcı bulunamadı.",
   "AuthMessages.LoginSuccess": "Giriş başarılı.",
   "AuthMessages.LoginFailed": "Giriş başarısız.",
   "AuthMessages.LogoutSuccess": "Çıkış başarılı.",
-  "AuthMessages.EmailConfirmationSent": "Email doğrulama linki gönderildi.",
+  "AuthMessages.EmailConfirmationSent": "Email doğrulama linki gnderildi.",
   "AuthMessages.EmailConfirmed": "Email başarıyla doğrulandı.",
   "AuthMessages.PasswordResetLinkSent": "Şifre sıfırlama linki gönderildi.",
   "AuthMessages.PasswordChanged": "Şifre başarıyla değiştirildi."

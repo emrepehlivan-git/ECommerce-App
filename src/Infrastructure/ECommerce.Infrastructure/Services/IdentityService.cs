@@ -1,6 +1,8 @@
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using ECommerce.Persistence.Contexts;
 
 namespace ECommerce.Infrastructure.Services;
 
@@ -8,11 +10,16 @@ public sealed class IdentityService : IIdentityService
 {
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
+    private readonly RoleManager<Role> _roleManager;
 
-    public IdentityService(SignInManager<User> signInManager, UserManager<User> userManager)
+    public IdentityService(
+        SignInManager<User> signInManager,
+        UserManager<User> userManager,
+        RoleManager<Role> roleManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;
+        _roleManager = roleManager;
     }
 
     public async Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure)
@@ -30,7 +37,13 @@ public sealed class IdentityService : IIdentityService
 
     public Task<User?> FindByIdAsync(string userId) => _userManager.FindByIdAsync(userId);
 
-    public Task<IdentityResult> CreateAsync(User user, string password) => _userManager.CreateAsync(user, password);
+    public async Task<IdentityResult> CreateAsync(User user, string password)
+    {
+        var result = await _userManager.CreateAsync(user, password);
+        if (result.Succeeded)
+            await _userManager.AddToRoleAsync(user, "USER");
+        return result;
+    }
 
     public Task<IdentityResult> UpdateAsync(User user) => _userManager.UpdateAsync(user);
 

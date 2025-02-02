@@ -70,10 +70,9 @@ public sealed class AccountController : Controller
             var user = UserEntity.Create(model.Email, model.FirstName, model.LastName);
 
             var result = await _identityService.CreateAsync(user, model.Password);
+
             if (result.Succeeded)
             {
-                await _identityService.AddToRoleAsync(user, "User");
-
                 await _identityService.PasswordSignInAsync(model.Email, model.Password, false, false);
                 return RedirectToLocal(returnUrl ?? "/");
             }

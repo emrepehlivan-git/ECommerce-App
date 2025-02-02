@@ -2,14 +2,13 @@ namespace ECommerce.Application.Features.Users.Constants;
 
 public static class UserMessages
 {
-    public const string NotFound = "Kullanıcı bulunamadı.";
-    public const string AlreadyExists = "Bu email adresi ile kayıtlı bir kullanıcı zaten mevcut.";
-    public const string Created = "Kullanıcı başarıyla oluşturuldu.";
-    public const string Updated = "Kullanıcı bilgileri başarıyla güncellendi.";
-    public const string Deleted = "Kullanıcı başarıyla silindi.";
-    public const string Activated = "Kullanıcı hesabı aktifleştirildi.";
-    public const string Deactivated = "Kullanıcı hesabı deaktif edildi.";
-    public const string InvalidCredentials = "Geçersiz email veya şifre.";
-    public const string AccountLocked = "Hesabınız kilitlendi. Lütfen daha sonra tekrar deneyin.";
-    public const string EmailNotConfirmed = "Email adresiniz henüz doğrulanmamış.";
+    public const string NotFound = "User.NotFound";
+    public const string AlreadyExists = "User.AlreadyExists";
+    public const string Created = "User.Created";
+    public const string Updated = "User.Updated";
+    public const string Activated = "User.Activated";
+    public const string Deactivated = "User.Deactivated";
+    public const string InvalidCredentials = "User.InvalidCredentials";
+    public const string AccountLocked = "User.AccountLocked";
+    public const string EmailNotConfirmed = "User.EmailNotConfirmed";
 }

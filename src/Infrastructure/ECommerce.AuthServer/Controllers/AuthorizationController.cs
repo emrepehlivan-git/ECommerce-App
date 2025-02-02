@@ -4,6 +4,7 @@ using ECommerce.AuthServer.Helpers;
 using ECommerce.AuthServer.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -41,7 +42,7 @@ public sealed class AuthorizationController : Controller
         if (!result.Succeeded)
         {
             return Challenge(
-                authenticationSchemes: IdentityConstants.ApplicationScheme,
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                 properties: new AuthenticationProperties
                 {
                     RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
@@ -56,7 +57,7 @@ public sealed class AuthorizationController : Controller
         if (user == null)
         {
             return Challenge(
-                authenticationSchemes: IdentityConstants.ApplicationScheme,
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                 properties: new AuthenticationProperties
                 {
                     RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
@@ -155,7 +156,7 @@ public sealed class AuthorizationController : Controller
         if (!result.Succeeded)
         {
             return Challenge(
-                authenticationSchemes: IdentityConstants.ApplicationScheme,
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                 properties: new AuthenticationProperties
                 {
                     RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
@@ -170,7 +171,7 @@ public sealed class AuthorizationController : Controller
         if (user == null)
         {
             return Challenge(
-                authenticationSchemes: IdentityConstants.ApplicationScheme,
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                 properties: new AuthenticationProperties
                 {
                     RedirectUri = Request.PathBase + Request.Path + QueryString.Create(

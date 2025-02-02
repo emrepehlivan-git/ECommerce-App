@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Log in";
+    Layout = "_AuthLayout";
 }
 
 <div class="row justify-content-center">
@@ -39,8 +40,4 @@
             </div>
         </div>
     </div>
-</div>
-
-@section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-} 
+</div> 
