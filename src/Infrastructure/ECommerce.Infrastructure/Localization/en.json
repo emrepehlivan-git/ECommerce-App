@@ -1,0 +1,9 @@
+{
+  "AuthMessages.LoginSuccess": "Login successful.",
+  "AuthMessages.LoginFailed": "Login failed.",
+  "AuthMessages.LogoutSuccess": "Logout successful.",
+  "AuthMessages.EmailConfirmationSent": "Email confirmation link has been sent.",
+  "AuthMessages.EmailConfirmed": "Email has been successfully confirmed.",
+  "AuthMessages.PasswordResetLinkSent": "Password reset link has been sent.",
+  "AuthMessages.PasswordChanged": "Password changed successfully."
+}

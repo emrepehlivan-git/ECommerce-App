@@ -1,0 +1,30 @@
+@model ECommerce.AuthServer.Models.ConsentViewModel
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="text-center">Authorization Request</h1>
+            </div>
+            <div class="card-body">
+                <p class="text-center">
+                    <strong>@Model.ApplicationName</strong> is requesting your permission to access your data.
+                </p>
+
+                <form asp-controller="Authorization" asp-action="Consent" method="post">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="scope" value="@Model.Scope" checked>
+                        <label class="form-check-label">
+                            @Model.Scope
+                            </label>
+                    </div>
+
+                    <div class="form-group mt-4 text-center">
+                        <button name="submit.Accept" value="true" type="submit" class="btn btn-success me-2">Accept</button>
+                        <button name="submit.Deny" value="true" type="submit" class="btn btn-danger">Deny</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,9 @@
+{
+  "AuthMessages.LoginSuccess": "Giriş başarılı.",
+  "AuthMessages.LoginFailed": "Giriş başarısız.",
+  "AuthMessages.LogoutSuccess": "Çıkış başarılı.",
+  "AuthMessages.EmailConfirmationSent": "Email doğrulama linki gönderildi.",
+  "AuthMessages.EmailConfirmed": "Email başarıyla doğrulandı.",
+  "AuthMessages.PasswordResetLinkSent": "Şifre sıfırlama linki gönderildi.",
+  "AuthMessages.PasswordChanged": "Şifre başarıyla değiştirildi."
+}

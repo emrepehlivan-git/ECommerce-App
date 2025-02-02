@@ -1,0 +1,123 @@
+language: C#
+framework: .NET 8
+
+architecture: Onion Architecture
+layers:
+  - Core:
+      - ECommerce.Domain
+      - ECommerce.Application
+  - Infrastructure:
+      - ECommerce.Infrastructure
+      - ECommerce.Persistence
+  - Presentation:
+      - ECommerce.WebAPI
+
+# Coding Standards
+conventions:
+  - Use strict mode in all code files
+  - Default to private access modifier unless explicitly required
+  - Follow SOLID principles and DDD practices
+  - Use async/await for all I/O operations
+  - Use meaningful and descriptive names for variables, methods, and classes
+  - Use fluent api for entity configurations
+  - Request handler classes should be internal sealed
+  - Use MediatR for request/response handling
+  - Use FluentValidation for request validation
+  - Use record types for value objects
+  - Use DTOs for data transfer between layers
+  - DTOs should be record sealed
+  - Use BaseApiController for all controllers
+  - Controllers should be sealed
+
+validation:
+  framework: FluentValidation
+  location: ECommerce.Application/Behaviors
+  conventions:
+    - Use ValidationBehavior for MediatR pipeline
+    - Keep validation messages in dedicated constants files
+    - Implement IValidator interface for all request objects
+
+database:
+  orm: Entity Framework Core
+  patterns:
+    - Repository Pattern
+    - Unit of Work Pattern
+  conventions:
+    - Use Fluent API for entity configurations
+    - Keep configurations in separate files
+    - Use migrations for schema changes
+    - Use LINQ for queries
+
+logging:
+  framework: Serilog
+  sinks:
+    - Console
+    - File
+    - Database
+  conventions:
+    - Use structured logging
+    - Include correlation IDs
+    - Log all exceptions and important events
+
+error_handling:
+  - Global exception middleware
+  - Standardized API responses
+  - Custom domain exceptions
+  - Validation error responses
+
+api:
+  style: RESTful
+  documentation: Swagger/OpenAPI
+  versioning: true
+  responses:
+    success: application/json
+    error: ProblemDetails format
+
+testing:
+  frameworks:
+    - xUnit
+    - Moq
+    - FluentAssertions
+  types:
+    - Unit Tests
+    - Integration Tests
+    - Behavior Tests
+
+# Performance
+performance:
+  caching:
+    provider: Redis
+    scenarios:
+      - Frequently accessed data
+      - Session state
+      - Distributed caching
+  optimization:
+    - Async operations
+    - Efficient LINQ queries
+    - Proper indexing
+
+# Dependencies
+dependency_injection:
+  framework: Microsoft.Extensions.DependencyInjection
+  registration:
+    - Scoped for business services
+    - Singleton for utilities
+    - Transient when required
+
+# File Organization
+file_structure:
+  entities: src/Core/ECommerce.Domain/Entities
+  interfaces: src/Core/ECommerce.Domain/Interfaces
+  services: src/Core/ECommerce.Application/Services
+  controllers: src/Presentation/ECommerce.WebAPI/Controllers
+  configurations: src/Infrastructure/ECommerce.Persistence/Configurations
+
+# Naming Conventions
+naming:
+  entities: Singular (e.g., User, Role)
+  controllers: PluralController (e.g., UsersController)
+  interfaces: IServiceName
+  commands: VerbNounCommand
+  queries: VerbNounQuery
+  validators: EntityValidator
+  constants: PascalCase

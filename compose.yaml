@@ -1,0 +1,49 @@
+﻿version: "3.8"
+
+services:
+  ecommerce.webapi:
+    build:
+      context: .
+      dockerfile: src/Presentation/ECommerce.WebAPI/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=ecommerce.db;Database=ecommerce;Username=postgres;Password=postgres
+      - ConnectionStrings__Redis=ecommerce.redis:6379
+    depends_on:
+      - ecommerce.db
+      - ecommerce.redis
+    ports:
+      - 4000:8080
+
+  ecommerce.authserver:
+    build:
+      context: .
+      dockerfile: src/Infrastructure/ECommerce.AuthServer/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=ecommerce.db;Database=ecommerce;Username=postgres;Password=postgres
+    depends_on:
+      - ecommerce.db
+    ports:
+      - 5001:8080
+      - 5002:8081
+
+  ecommerce.db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ecommerce
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  ecommerce.redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  redisdata:
