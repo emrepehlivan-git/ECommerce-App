@@ -27,6 +27,13 @@ builder.Services.AddOpenIddict()
                .SetUserInfoEndpointUris("/connect/userinfo")
                .SetEndSessionEndpointUris("/connect/logout");
 
+        options.RegisterScopes(
+            Scopes.Email,
+            Scopes.Profile,
+            Scopes.Roles,
+            Scopes.OpenId,
+            "api");
+
         options.AllowAuthorizationCodeFlow()
                .AllowRefreshTokenFlow()
                .RequireProofKeyForCodeExchange();
@@ -83,7 +90,7 @@ using (var scope = app.Services.CreateScope())
         RedirectUris =
         {
             new Uri("https://oauth.pstmn.io/v1/callback"),
-            new Uri("http://localhost:3000/api/auth/openiddict/callback")
+            new Uri("http://localhost:3000/api/auth/callback/openiddict")
         },
         PostLogoutRedirectUris = { new Uri("http://localhost:3000/") },
         Permissions =

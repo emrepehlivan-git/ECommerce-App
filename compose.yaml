@@ -8,6 +8,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=ecommerce.db;Database=ecommerce;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=ecommerce.redis:6379
+      - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - ecommerce.db
       - ecommerce.redis
@@ -21,6 +22,12 @@ services:
       dockerfile: src/Infrastructure/ECommerce.AuthServer/Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Host=ecommerce.db;Database=ecommerce;Username=postgres;Password=postgres
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ASPNETCORE_HTTPS_PORT=8081
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Authentication__UseHttps=true
+      - Authentication__Authority=https://ecommerce.authserver:8081
+      - Authentication__RequireHttpsMetadata=true
     depends_on:
       - ecommerce.db
     ports:

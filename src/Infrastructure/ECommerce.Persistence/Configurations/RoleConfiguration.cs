@@ -26,12 +26,10 @@ internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
         var userRole = Role.Create("USER");
         userRole.GetType().GetProperty("Id")?.SetValue(userRole, UserRoleId);
         userRole.GetType().GetProperty("NormalizedName")?.SetValue(userRole, "USER");
-        userRole.GetType().GetProperty("ConcurrencyStamp")?.SetValue(userRole, "485A6D2F-69F6-4120-83C1-F488DF5441F9");
 
         var adminRole = Role.Create("ADMIN");
         adminRole.GetType().GetProperty("Id")?.SetValue(adminRole, AdminRoleId);
         adminRole.GetType().GetProperty("NormalizedName")?.SetValue(adminRole, "ADMIN");
-        adminRole.GetType().GetProperty("ConcurrencyStamp")?.SetValue(adminRole, "1F9D5202-2FB4-4F90-9C9D-31876CC43702");
 
         builder.HasData(userRole, adminRole);
     }

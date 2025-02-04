@@ -21,4 +21,6 @@ public sealed record FullName
 
         return new FullName(firstName.Trim(), lastName.Trim());
     }
+
+    public override string ToString() => $"{FirstName} {LastName}";
 }

@@ -1,12 +1,11 @@
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using ECommerce.Persistence.Contexts;
+using ECommerce.SharedKernel;
 
 namespace ECommerce.Infrastructure.Services;
 
-public sealed class IdentityService : IIdentityService
+public sealed class IdentityService : IIdentityService, IScopedDependency
 {
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
@@ -22,6 +21,8 @@ public sealed class IdentityService : IIdentityService
         _roleManager = roleManager;
     }
 
+    public IQueryable<User> Users => _userManager.Users;
+
     public async Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -31,7 +32,10 @@ public sealed class IdentityService : IIdentityService
         return await _signInManager.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
     }
 
-    public Task SignOutAsync() => _signInManager.SignOutAsync();
+    public async Task SignOutAsync()
+    {
+        await _signInManager.SignOutAsync();
+    }
 
     public Task<User?> FindByEmailAsync(string email) => _userManager.FindByEmailAsync(email);
 
@@ -41,13 +45,21 @@ public sealed class IdentityService : IIdentityService
     {
         var result = await _userManager.CreateAsync(user, password);
         if (result.Succeeded)
-            await _userManager.AddToRoleAsync(user, "USER");
+            await AddToRoleAsync(user, "USER");
         return result;
     }
 
-    public Task<IdentityResult> UpdateAsync(User user) => _userManager.UpdateAsync(user);
-
-    public Task<IdentityResult> DeleteAsync(User user) => _userManager.DeleteAsync(user);
+    public async Task<IdentityResult> UpdateAsync(User user)
+    {
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+        {
+            await _userManager.UpdateSecurityStampAsync(user);
+            await _signInManager.SignOutAsync();
+            await _signInManager.SignInAsync(user, isPersistent: false);
+        }
+        return result;
+    }
 
     public Task<bool> CheckPasswordAsync(User user, string password) => _userManager.CheckPasswordAsync(user, password);
 
@@ -57,11 +69,28 @@ public sealed class IdentityService : IIdentityService
 
     public Task<string> GeneratePasswordResetTokenAsync(User user) => _userManager.GeneratePasswordResetTokenAsync(user);
 
-    public Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword) => _userManager.ResetPasswordAsync(user, token, newPassword);
+    public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword)
+    {
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        if (result.Succeeded)
+        {
+            await _userManager.UpdateSecurityStampAsync(user);
+            await _signInManager.SignOutAsync();
+            await _signInManager.SignInAsync(user, isPersistent: false);
+        }
+        return result;
+    }
 
     public Task<IList<string>> GetRolesAsync(User user) => _userManager.GetRolesAsync(user);
 
-    public Task<IdentityResult> AddToRoleAsync(User user, string role) => _userManager.AddToRoleAsync(user, role);
+    public async Task<IdentityResult> AddToRoleAsync(User user, string role)
+    {
+        var foundRole = await _roleManager.FindByNameAsync(role);
+        if (foundRole is null)
+            return IdentityResult.Failed();
+
+        return await _userManager.AddToRoleAsync(user, foundRole.Name!);
+    }
 
     public Task<IdentityResult> RemoveFromRoleAsync(User user, string role) => _userManager.RemoveFromRoleAsync(user, role);
 }

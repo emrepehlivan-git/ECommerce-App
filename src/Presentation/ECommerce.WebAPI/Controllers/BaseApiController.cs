@@ -1,5 +1,5 @@
 using ECommerce.Application.Common.Helpers;
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.SharedKernel;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +7,10 @@ namespace ECommerce.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class BaseApiController : ControllerBase
+public abstract class BaseApiController : ControllerBase
 {
-    protected IMediator Mediator => HttpContext.RequestServices.GetRequiredService<IMediator>();
-    protected ILocalizationService LocalizationService => HttpContext.RequestServices.GetRequiredService<ILocalizationService>();
-    protected L L => HttpContext.RequestServices.GetRequiredService<L>();
+    private ILazyServiceProvider LazyServiceProvider => HttpContext.RequestServices.GetRequiredService<ILazyServiceProvider>();
+    protected ISender Mediator => LazyServiceProvider.LazyGetRequiredService<ISender>();
+    protected L L => LazyServiceProvider.LazyGetRequiredService<L>();
 }
+

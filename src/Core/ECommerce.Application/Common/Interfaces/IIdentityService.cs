@@ -5,6 +5,7 @@ namespace ECommerce.Application.Common.Interfaces;
 
 public interface IIdentityService
 {
+    IQueryable<User> Users { get; }
     Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure);
     Task SignOutAsync();
     Task<User?> FindByEmailAsync(string email);

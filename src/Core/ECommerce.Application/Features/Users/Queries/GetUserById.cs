@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Common.Interfaces;
 using ECommerce.Application.Features.Users.DTOs;
 using ECommerce.Domain.Entities;
 using MediatR;
@@ -13,16 +14,16 @@ public sealed record GetUserByIdQuery(Guid UserId) : IRequest<Result<UserDto>>;
 
 internal sealed class GetUserByIdQueryHandler : BaseHandler<GetUserByIdQuery, Result<UserDto>>
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IIdentityService _identityService;
 
-    public GetUserByIdQueryHandler(UserManager<User> userManager, L l) : base(l)
+    public GetUserByIdQueryHandler(IIdentityService identityService, L l) : base(l)
     {
-        _userManager = userManager;
+        _identityService = identityService;
     }
 
     public override async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByIdAsync(query.UserId.ToString());
+        var user = await _identityService.FindByIdAsync(query.UserId.ToString());
 
         if (user is null)
             return Result.NotFound(_l["User.NotFound"]);

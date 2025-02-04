@@ -1,5 +1,4 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -24,4 +23,16 @@ RUN dotnet publish "ECommerce.AuthServer.csproj" -c $BUILD_CONFIGURATION -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Generate development certificate
+RUN apt-get update && \
+    apt-get install -y openssl && \
+    openssl req -x509 -newkey rsa:4096 -keyout /app/auth.key -out /app/auth.crt -days 365 -nodes -subj "/CN=localhost" && \
+    openssl pkcs12 -export -out /app/auth.pfx -inkey /app/auth.key -in /app/auth.crt -passout pass:YourSecurePassword
+
+ENV ASPNETCORE_URLS=http://+:8080;https://+:8081
+ENV ASPNETCORE_HTTPS_PORT=8081
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/auth.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword
+
 ENTRYPOINT ["dotnet", "ECommerce.AuthServer.dll"]
