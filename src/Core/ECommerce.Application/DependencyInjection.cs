@@ -1,5 +1,4 @@
 using ECommerce.Application.Behaviors;
-using ECommerce.Application.Common.Helpers;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,6 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(assembly);
-
         services.AddServicesRegistration([assembly]);
 
         return services;

@@ -3,6 +3,9 @@ using UserEntity = ECommerce.Domain.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ECommerce.AuthServer.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace ECommerce.AuthServer.Controllers;
 
@@ -32,7 +35,30 @@ public sealed class AccountController : Controller
             var result = await _identityService.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
             if (result.Succeeded)
             {
-                return RedirectToLocal(returnUrl ?? "/");
+                var user = await _identityService.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+                    identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
+                    identity.AddClaim(new Claim(ClaimTypes.Email, user.Email!));
+
+                    var roles = await _identityService.GetRolesAsync(user);
+                    foreach (var role in roles)
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                    }
+
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                        new AuthenticationProperties
+                        {
+                            IsPersistent = model.RememberMe,
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(50)
+                        });
+
+                    return RedirectToLocal(returnUrl ?? "/");
+                }
             }
             if (result.RequiresTwoFactor)
             {

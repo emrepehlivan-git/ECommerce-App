@@ -13,8 +13,6 @@ public sealed class CurrentUserService : ICurrentUserService, IScopedDependency
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string? UserId => GetUserId();
-
-    private string? GetUserId()
-     => _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    public string? UserId
+        => _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }

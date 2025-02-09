@@ -29,6 +29,7 @@ public static class DependencyInjection
                 new AcceptLanguageHeaderRequestCultureProvider()
             ];
         });
+        services.AddServicesRegistration([typeof(DependencyInjection).Assembly]);
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
@@ -38,7 +39,6 @@ public static class DependencyInjection
         services.AddPersistence(configuration);
         services.AddHttpContextAccessor();
 
-        services.AddServicesRegistration([typeof(DependencyInjection).Assembly]);
 
         return services;
     }

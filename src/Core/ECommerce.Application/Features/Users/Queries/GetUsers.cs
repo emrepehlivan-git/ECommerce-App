@@ -1,13 +1,11 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Extensions;
-using ECommerce.Application.Common.Helpers;
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Users.DTOs;
-using ECommerce.Domain.Entities;
+using ECommerce.SharedKernel;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Application.Features.Users.Queries;
@@ -18,7 +16,8 @@ internal sealed class GetUsersQueryHandler : BaseHandler<GetUsersQuery, PagedRes
 {
     private readonly IIdentityService _identityService;
 
-    public GetUsersQueryHandler(IIdentityService identityService, L l) : base(l)
+    public GetUsersQueryHandler(IIdentityService identityService, ILazyServiceProvider lazyServiceProvider)
+        : base(lazyServiceProvider)
     {
         _identityService = identityService;
     }

@@ -1,5 +1,5 @@
-using Ardalis.Result;
 using ECommerce.Application.Common.Helpers;
+using ECommerce.SharedKernel;
 using MediatR;
 
 namespace ECommerce.Application.Common.CQRS;
@@ -7,11 +7,17 @@ namespace ECommerce.Application.Common.CQRS;
 public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    protected readonly L _l;
-    public BaseHandler(L l)
+    protected ILazyServiceProvider LazyServiceProvider { get; }
+
+    protected L Localizer => LazyServiceProvider.LazyGetRequiredService<L>();
+
+    protected BaseHandler(ILazyServiceProvider lazyServiceProvider)
     {
-        _l = l;
+        LazyServiceProvider = lazyServiceProvider;
     }
 
+
+
     public abstract Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
+
 }

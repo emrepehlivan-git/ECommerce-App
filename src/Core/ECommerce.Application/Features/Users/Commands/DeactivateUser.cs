@@ -1,7 +1,9 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Common.Interfaces;
 using ECommerce.Domain.Entities;
+using ECommerce.SharedKernel;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -11,25 +13,26 @@ public sealed record DeactivateUserCommand(Guid UserId) : IRequest<Result>;
 
 internal sealed class DeactivateUserCommandHandler : BaseHandler<DeactivateUserCommand, Result>
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IIdentityService _identityService;
 
-    public DeactivateUserCommandHandler(UserManager<User> userManager, L l) : base(l)
+    public DeactivateUserCommandHandler(IIdentityService identityService, ILazyServiceProvider lazyServiceProvider)
+        : base(lazyServiceProvider)
     {
-        _userManager = userManager;
+        _identityService = identityService;
     }
 
     public override async Task<Result> Handle(DeactivateUserCommand command, CancellationToken cancellationToken)
     {
-        var user = await _userManager.FindByIdAsync(command.UserId.ToString());
+        var user = await _identityService.FindByIdAsync(command.UserId.ToString());
 
         if (user is null)
-            return Result.NotFound(_l["User.NotFound"]);
+            return Result.NotFound(Localizer["User.NotFound"]);
 
         if (!user.IsActive)
             return Result.Success();
 
         user.Deactivate();
-        var result = await _userManager.UpdateAsync(user);
+        var result = await _identityService.UpdateAsync(user);
 
         return result.Succeeded
             ? Result.Success()

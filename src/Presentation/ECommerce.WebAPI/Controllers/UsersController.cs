@@ -21,14 +21,15 @@ public sealed class UsersController : BaseApiController
         return Ok(result);
     }
 
-    [HttpPost("activate")]
+    [HttpPost("activate/{id}")]
     public async Task<IActionResult> ActivateUser(Guid id, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new ActivateUserCommand(id), cancellationToken);
         return Ok(result);
     }
 
-    [HttpPost("deactivate")]
+
+    [HttpPost("deactivate/{id}")]
     public async Task<IActionResult> DeactivateUser(Guid id, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new DeactivateUserCommand(id), cancellationToken);
