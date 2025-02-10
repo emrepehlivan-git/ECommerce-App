@@ -14,17 +14,15 @@ builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, cookieOptions =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
-.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-{
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
+    cookieOptions.LoginPath = "/Account/Login";
+    cookieOptions.LogoutPath = "/Account/Logout";
 });
+
+
+
 
 builder.Services.AddOpenIddict()
     .AddCore(options =>
