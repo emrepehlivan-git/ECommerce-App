@@ -1,6 +1,8 @@
 using ECommerce.Application.Behaviors;
+using ECommerce.Application.Common.CQRS;
 using ECommerce.SharedKernel;
 using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Application;

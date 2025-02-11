@@ -98,8 +98,7 @@ public sealed class AuthorizationController : Controller
                 identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
                 identity.AddClaim(new Claim(Claims.Email, user.Email!));
                 identity.AddClaim(new Claim(Claims.Name, user.UserName!));
-                identity.AddClaim(new Claim(Claims.GivenName, user.FullName.FirstName));
-                identity.AddClaim(new Claim(Claims.FamilyName, user.FullName.LastName));
+                identity.AddClaim(new Claim("fullName", user.FullName.ToString()));
 
                 var roles = await _identityService.GetRolesAsync(user);
                 foreach (var role in roles)
@@ -200,9 +199,7 @@ public sealed class AuthorizationController : Controller
             identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
             identity.AddClaim(new Claim(Claims.Email, user.Email!));
             identity.AddClaim(new Claim(Claims.Name, user.UserName!));
-            identity.AddClaim(new Claim(Claims.GivenName, user.FullName.FirstName));
-            identity.AddClaim(new Claim(Claims.FamilyName, user.FullName.LastName));
-
+            identity.AddClaim(new Claim("fullName", user.FullName.ToString()));
             var roles = await _identityService.GetRolesAsync(user);
             foreach (var role in roles)
             {
@@ -269,7 +266,8 @@ public sealed class AuthorizationController : Controller
                     .SetClaim(Claims.Email, user.Email!)
                     .SetClaim(Claims.Name, user.UserName!)
                     .SetClaim(Claims.PreferredUsername, user.UserName!)
-                    .SetClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
+                    .SetClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)])
+                    .SetClaim("fullName", user.FullName.ToString());
 
             identity.SetDestinations(GetDestinations);
 

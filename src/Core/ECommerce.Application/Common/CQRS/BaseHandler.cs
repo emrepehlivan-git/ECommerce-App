@@ -16,8 +16,6 @@ public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler<TReques
         LazyServiceProvider = lazyServiceProvider;
     }
 
-
-
     public abstract Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
 
 }

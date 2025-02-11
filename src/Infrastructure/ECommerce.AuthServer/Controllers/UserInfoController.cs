@@ -21,7 +21,7 @@ public sealed class UserInfoController : Controller
     public async Task<IActionResult> UserInfo()
     {
 
-        var user = await _identityService.FindByIdAsync(User.GetClaim(Claims.Subject));
+        var user = await _identityService.FindByIdAsync(User.GetClaim(Claims.Subject) ?? string.Empty);
         if (user is null)
 
         {
@@ -38,10 +38,9 @@ public sealed class UserInfoController : Controller
         var claims = new Dictionary<string, object>
         {
             [Claims.Subject] = user.Id,
-            [Claims.Name] = user.UserName!,
             [Claims.Email] = user.Email!,
             [Claims.Role] = await _identityService.GetRolesAsync(user),
-            [Claims.Scope] = "api",
+            [Claims.Scope] = "api openid profile email",
             [Claims.Audience] = "api",
             ["fullName"] = user.FullName.ToString(),
         };
