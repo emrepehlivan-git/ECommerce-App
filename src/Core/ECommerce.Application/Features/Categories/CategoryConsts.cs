@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Features.Categories.Constants;
+namespace ECommerce.Application.Features.Categories;
 
 public static class CategoryConsts
 {

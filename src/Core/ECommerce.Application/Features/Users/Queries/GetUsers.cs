@@ -5,6 +5,7 @@ using ECommerce.Application.Common.Interfaces;
 using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Users.DTOs;
 using ECommerce.SharedKernel;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,11 +28,7 @@ internal sealed class GetUsersQueryHandler : BaseHandler<GetUsersQuery, PagedRes
     {
         return await _identityService.Users
             .AsNoTracking()
-            .Select(u => new UserDto(
-                u.Id,
-                u.Email!,
-                u.FullName.ToString(),
-                u.IsActive))
+            .ProjectToType<UserDto>()
             .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);
     }
 }

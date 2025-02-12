@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Features.Users.Constants;
+namespace ECommerce.Application.Features.Users;
 
 public static class UserConsts
 {

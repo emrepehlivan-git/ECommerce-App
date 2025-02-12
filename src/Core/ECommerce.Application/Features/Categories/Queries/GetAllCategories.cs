@@ -26,7 +26,7 @@ internal sealed class GetAllCategoriesQueryHandler : BaseHandler<GetAllCategorie
     public override async Task<PagedResult<List<CategoryDto>>> Handle(GetAllCategoriesQuery query, CancellationToken cancellationToken)
     {
         return await _categoryRepository.Query()
-            .Select(x => x.Adapt<CategoryDto>())
+            .ProjectToType<CategoryDto>()
             .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);
 
     }

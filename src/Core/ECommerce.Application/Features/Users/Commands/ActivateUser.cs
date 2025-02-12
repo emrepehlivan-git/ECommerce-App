@@ -1,7 +1,6 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Interfaces;
-using ECommerce.Application.Features.Users.Constants;
 using ECommerce.SharedKernel;
 using MediatR;
 
