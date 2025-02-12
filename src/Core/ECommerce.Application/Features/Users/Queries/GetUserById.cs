@@ -1,6 +1,7 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Features.Users.Constants;
 using ECommerce.Application.Features.Users.DTOs;
 using ECommerce.SharedKernel;
 using MediatR;
@@ -25,7 +26,7 @@ internal sealed class GetUserByIdQueryHandler : BaseHandler<GetUserByIdQuery, Re
         var user = await _identityService.FindByIdAsync(query.UserId.ToString());
 
         if (user is null)
-            return Result.NotFound(Localizer["User.NotFound"]);
+            return Result.NotFound(Localizer[UserConsts.NotFound]);
 
         return Result.Success(new UserDto(
             user.Id,

@@ -10,9 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Application.Features.Users.Queries;
 
-public sealed record GetUsersQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<ICollection<UserDto>>>;
+public sealed record GetUsersQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<List<UserDto>>>;
 
-internal sealed class GetUsersQueryHandler : BaseHandler<GetUsersQuery, PagedResult<ICollection<UserDto>>>
+internal sealed class GetUsersQueryHandler : BaseHandler<GetUsersQuery, PagedResult<List<UserDto>>>
 {
     private readonly IIdentityService _identityService;
 
@@ -22,7 +22,7 @@ internal sealed class GetUsersQueryHandler : BaseHandler<GetUsersQuery, PagedRes
         _identityService = identityService;
     }
 
-    public override async Task<PagedResult<ICollection<UserDto>>> Handle(GetUsersQuery query,
+    public override async Task<PagedResult<List<UserDto>>> Handle(GetUsersQuery query,
     CancellationToken cancellationToken)
     {
         return await _identityService.Users

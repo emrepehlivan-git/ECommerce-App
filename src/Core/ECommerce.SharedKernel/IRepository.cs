@@ -11,7 +11,7 @@ public interface IRepository<TEntity>
         Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         bool isTracking = false);
 
-    Task<PagedResult<ICollection<TEntity>>> GetPagedAsync(
+    Task<PagedResult<List<TEntity>>> GetPagedAsync(
         Expression<Func<TEntity, bool>>? predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
@@ -20,7 +20,7 @@ public interface IRepository<TEntity>
         bool isTracking = false,
         CancellationToken cancellationToken = default);
 
-    PagedResult<ICollection<TEntity>> GetPaged(
+    PagedResult<List<TEntity>> GetPaged(
         Expression<Func<TEntity, bool>>? predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,

@@ -1,11 +1,9 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
-using ECommerce.Application.Common.Helpers;
 using ECommerce.Application.Common.Interfaces;
-using ECommerce.Domain.Entities;
+using ECommerce.Application.Features.Users.Constants;
 using ECommerce.SharedKernel;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace ECommerce.Application.Features.Users.Commands;
 
@@ -26,7 +24,7 @@ internal sealed class DeactivateUserCommandHandler : BaseHandler<DeactivateUserC
         var user = await _identityService.FindByIdAsync(command.UserId.ToString());
 
         if (user is null)
-            return Result.NotFound(Localizer["User.NotFound"]);
+            return Result.NotFound(Localizer[UserConsts.NotFound]);
 
         if (!user.IsActive)
             return Result.Success();

@@ -31,6 +31,11 @@ public class Category : BaseEntity
 
         return name;
     }
+
+    public void UpdateName(string name)
+    {
+        Name = ValidateName(name);
+    }
 }
 
 
