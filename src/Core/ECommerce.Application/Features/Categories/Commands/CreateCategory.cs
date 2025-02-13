@@ -1,8 +1,8 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Common.Repositories;
 using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Categories.Commands;
 
 public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>;
 
-public sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
+internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {
     public CreateCategoryCommandValidator(ICategoryRepository categoryRepository, L localizer)
     {
