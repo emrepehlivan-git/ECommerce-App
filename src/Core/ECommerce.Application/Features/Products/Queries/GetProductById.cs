@@ -11,20 +11,13 @@ namespace ECommerce.Application.Features.Products.Queries;
 
 public sealed record GetProductByIdQuery(Guid Id) : IRequest<Result<ProductDto>>;
 
-internal sealed class GetProductByIdQueryHandler : BaseHandler<GetProductByIdQuery, Result<ProductDto>>
+internal sealed class GetProductByIdQueryHandler(
+    IProductRepository productRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetProductByIdQuery, Result<ProductDto>>(lazyServiceProvider)
 {
-    private readonly IProductRepository _productRepository;
-
-    public GetProductByIdQueryHandler(
-        IProductRepository productRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _productRepository = productRepository;
-    }
-
     public override async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.Query()
+        var product = await productRepository.Query()
             .Include(x => x.Category)
             .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
 

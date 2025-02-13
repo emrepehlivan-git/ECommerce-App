@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
-using ECommerce.Application.Common.Repositories;
+using ECommerce.Application.Repositories;
 using ECommerce.SharedKernel;
 using MediatR;
 
@@ -8,25 +8,18 @@ namespace ECommerce.Application.Features.Categories.Commands;
 
 public sealed record DeleteCategoryCommand(Guid Id) : IRequest<Result>;
 
-internal sealed class DeleteCategoryCommandHandler : BaseHandler<DeleteCategoryCommand, Result>
+internal sealed class DeleteCategoryCommandHandler(
+    ICategoryRepository categoryRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<DeleteCategoryCommand, Result>(lazyServiceProvider)
 {
-    private readonly ICategoryRepository _categoryRepository;
-
-    public DeleteCategoryCommandHandler(
-        ICategoryRepository categoryRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _categoryRepository = categoryRepository;
-    }
-
     public override async Task<Result> Handle(DeleteCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = await _categoryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
+        var category = await categoryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
 
         if (category is null)
             return Result.NotFound(Localizer[CategoryConsts.NotFound]);
 
-        _categoryRepository.Delete(category);
+        categoryRepository.Delete(category);
 
         return Result.Success();
     }

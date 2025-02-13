@@ -13,20 +13,13 @@ namespace ECommerce.Application.Features.Products.Queries;
 
 public sealed record GetAllProductsQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<List<ProductDto>>>;
 
-internal sealed class GetAllProductsQueryHandler : BaseHandler<GetAllProductsQuery, PagedResult<List<ProductDto>>>
+internal sealed class GetAllProductsQueryHandler(
+    IProductRepository productRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllProductsQuery, PagedResult<List<ProductDto>>>(lazyServiceProvider)
 {
-    private readonly IProductRepository _productRepository;
-
-    public GetAllProductsQueryHandler(
-        IProductRepository productRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _productRepository = productRepository;
-    }
-
     public override async Task<PagedResult<List<ProductDto>>> Handle(GetAllProductsQuery query, CancellationToken cancellationToken)
     {
-        return await _productRepository.Query()
+        return await productRepository.Query()
             .Include(x => x.Category)
             .ProjectToType<ProductDto>()
             .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);

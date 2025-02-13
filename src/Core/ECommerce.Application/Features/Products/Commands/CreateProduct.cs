@@ -44,17 +44,10 @@ internal sealed class CreateProductCommandValidator : AbstractValidator<CreatePr
     }
 }
 
-internal sealed class CreateProductCommandHandler : BaseHandler<CreateProductCommand, Result<Guid>>
+internal sealed class CreateProductCommandHandler(
+    IProductRepository productRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<CreateProductCommand, Result<Guid>>(lazyServiceProvider)
 {
-    private readonly IProductRepository _productRepository;
-
-    public CreateProductCommandHandler(
-        IProductRepository productRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _productRepository = productRepository;
-    }
-
     public override Task<Result<Guid>> Handle(CreateProductCommand command, CancellationToken cancellationToken)
     {
         var product = Product.Create(
@@ -63,7 +56,7 @@ internal sealed class CreateProductCommandHandler : BaseHandler<CreateProductCom
             command.Price,
             command.CategoryId);
 
-        _productRepository.Add(product);
+        productRepository.Add(product);
 
         return Task.FromResult(Result.Success(product.Id));
     }

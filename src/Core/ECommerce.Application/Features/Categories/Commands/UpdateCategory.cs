@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
-using ECommerce.Application.Common.Repositories;
+using ECommerce.Application.Repositories;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
@@ -28,23 +28,16 @@ internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateC
     }
 }
 
-internal sealed class UpdateCategoryCommandHandler : BaseHandler<UpdateCategoryCommand, Result>
+internal sealed class UpdateCategoryCommandHandler(
+    ICategoryRepository categoryRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<UpdateCategoryCommand, Result>(lazyServiceProvider)
 {
-    private readonly ICategoryRepository _categoryRepository;
-
-    public UpdateCategoryCommandHandler(
-        ICategoryRepository categoryRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _categoryRepository = categoryRepository;
-    }
-
     public override async Task<Result> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = await _categoryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
+        var category = await categoryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
         category!.UpdateName(command.Name);
 
-        _categoryRepository.Update(category);
+        categoryRepository.Update(category);
 
         return Result.Success();
     }

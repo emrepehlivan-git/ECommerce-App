@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
-using ECommerce.Application.Common.Repositories;
+using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.SharedKernel;
 using FluentValidation;
@@ -27,22 +27,15 @@ internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateC
     }
 }
 
-internal sealed class CreateCategoryCommandHandler : BaseHandler<CreateCategoryCommand, Result<Guid>>
+internal sealed class CreateCategoryCommandHandler(
+    ICategoryRepository categoryRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<CreateCategoryCommand, Result<Guid>>(lazyServiceProvider)
 {
-    private readonly ICategoryRepository _categoryRepository;
-
-    public CreateCategoryCommandHandler(
-        ICategoryRepository categoryRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _categoryRepository = categoryRepository;
-    }
-
     public override Task<Result<Guid>> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
         var category = Category.Create(command.Name);
 
-        _categoryRepository.Add(category);
+        categoryRepository.Add(category);
 
         return Task.FromResult(Result.Success(category.Id));
     }

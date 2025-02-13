@@ -8,19 +8,13 @@ namespace ECommerce.Application.Features.Users.Commands;
 
 public record ActivateUserCommand(Guid UserId) : IRequest<Result>;
 
-internal sealed class ActivateUserCommandHandler : BaseHandler<ActivateUserCommand, Result>
+internal sealed class ActivateUserCommandHandler(
+    IIdentityService identityService,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<ActivateUserCommand, Result>(lazyServiceProvider)
 {
-    private readonly IIdentityService _identityService;
-
-    public ActivateUserCommandHandler(IIdentityService identityService, ILazyServiceProvider lazyServiceProvider)
-        : base(lazyServiceProvider)
-    {
-        _identityService = identityService;
-    }
-
     public override async Task<Result> Handle(ActivateUserCommand command, CancellationToken cancellationToken)
     {
-        var user = await _identityService.FindByIdAsync(command.UserId.ToString());
+        var user = await identityService.FindByIdAsync(command.UserId.ToString());
 
         if (user is null)
             return Result.NotFound(Localizer[UserConsts.NotFound]);
@@ -29,7 +23,7 @@ internal sealed class ActivateUserCommandHandler : BaseHandler<ActivateUserComma
             return Result.Success();
 
         user.Activate();
-        var result = await _identityService.UpdateAsync(user);
+        var result = await identityService.UpdateAsync(user);
 
         return result.Succeeded
             ? Result.Success()

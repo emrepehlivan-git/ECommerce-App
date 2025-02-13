@@ -48,27 +48,20 @@ internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdatePr
     }
 }
 
-internal sealed class UpdateProductCommandHandler : BaseHandler<UpdateProductCommand, Result>
+internal sealed class UpdateProductCommandHandler(
+    IProductRepository productRepository,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<UpdateProductCommand, Result>(lazyServiceProvider)
 {
-    private readonly IProductRepository _productRepository;
-
-    public UpdateProductCommandHandler(
-        IProductRepository productRepository,
-        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
-    {
-        _productRepository = productRepository;
-    }
-
     public override async Task<Result> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
+        var product = await productRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
 
         if (product is null)
             return Result.NotFound(Localizer[ProductConsts.NotFound]);
 
         product.Update(command.Name, command.Price, command.Description);
 
-        _productRepository.Update(product);
+        productRepository.Update(product);
 
         return Result.Success();
     }

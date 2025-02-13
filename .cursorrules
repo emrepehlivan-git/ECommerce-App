@@ -28,6 +28,7 @@ conventions:
   - DTOs should be record sealed
   - Use BaseApiController for all controllers
   - Controllers should be sealed
+  - Use primary constructor for all classes
 
 validation:
   framework: FluentValidation

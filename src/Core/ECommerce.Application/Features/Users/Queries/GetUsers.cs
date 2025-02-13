@@ -13,20 +13,14 @@ namespace ECommerce.Application.Features.Users.Queries;
 
 public sealed record GetUsersQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<List<UserDto>>>;
 
-internal sealed class GetUsersQueryHandler : BaseHandler<GetUsersQuery, PagedResult<List<UserDto>>>
+internal sealed class GetUsersQueryHandler(
+    IIdentityService identityService,
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetUsersQuery, PagedResult<List<UserDto>>>(lazyServiceProvider)
 {
-    private readonly IIdentityService _identityService;
-
-    public GetUsersQueryHandler(IIdentityService identityService, ILazyServiceProvider lazyServiceProvider)
-        : base(lazyServiceProvider)
-    {
-        _identityService = identityService;
-    }
-
     public override async Task<PagedResult<List<UserDto>>> Handle(GetUsersQuery query,
     CancellationToken cancellationToken)
     {
-        return await _identityService.Users
+        return await identityService.Users
             .AsNoTracking()
             .ProjectToType<UserDto>()
             .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);
