@@ -1,7 +1,7 @@
 using ECommerce.Domain.Entities;
 using ECommerce.SharedKernel;
 
-namespace ECommerce.Domain.Interfaces;
+namespace ECommerce.Application.Repositories;
 
 public interface ICategoryRepository : IRepository<Category>
 {

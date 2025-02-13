@@ -1,0 +1,70 @@
+using Ardalis.Result;
+using ECommerce.Application.Common.CQRS;
+using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Repositories;
+using ECommerce.Domain.Entities;
+using ECommerce.SharedKernel;
+using FluentValidation;
+using MediatR;
+
+namespace ECommerce.Application.Features.Products.Commands;
+
+public sealed record CreateProductCommand(
+    string Name,
+    string? Description,
+    decimal Price,
+    Guid CategoryId) : IRequest<Result<Guid>>;
+
+internal sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
+{
+    public CreateProductCommandValidator(
+        IProductRepository productRepository,
+        ICategoryRepository categoryRepository,
+        L localizer)
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MinimumLength(ProductConsts.NameMinLength)
+            .WithMessage(localizer[ProductConsts.NameMustBeAtLeast3Characters])
+            .MaximumLength(ProductConsts.NameMaxLength)
+            .WithMessage(localizer[ProductConsts.NameMustBeLessThan100Characters])
+            .MustAsync(async (name, ct) =>
+                !await productRepository.AnyAsync(x => x.Name.ToLower() == name.ToLower(), cancellationToken: ct))
+            .WithMessage(localizer[ProductConsts.NameExists]);
+
+        RuleFor(x => x.Price)
+            .GreaterThan(0)
+            .WithMessage(localizer[ProductConsts.PriceMustBeGreaterThanZero]);
+
+        RuleFor(x => x.CategoryId)
+            .NotEmpty()
+            .MustAsync(async (id, ct) =>
+                await categoryRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
+            .WithMessage(localizer[ProductConsts.CategoryNotFound]);
+    }
+}
+
+internal sealed class CreateProductCommandHandler : BaseHandler<CreateProductCommand, Result<Guid>>
+{
+    private readonly IProductRepository _productRepository;
+
+    public CreateProductCommandHandler(
+        IProductRepository productRepository,
+        ILazyServiceProvider lazyServiceProvider) : base(lazyServiceProvider)
+    {
+        _productRepository = productRepository;
+    }
+
+    public override Task<Result<Guid>> Handle(CreateProductCommand command, CancellationToken cancellationToken)
+    {
+        var product = Product.Create(
+            command.Name,
+            command.Description ?? string.Empty,
+            command.Price,
+            command.CategoryId);
+
+        _productRepository.Add(product);
+
+        return Task.FromResult(Result.Success(product.Id));
+    }
+}

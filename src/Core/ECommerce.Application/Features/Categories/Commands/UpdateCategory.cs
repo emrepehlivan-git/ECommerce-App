@@ -1,8 +1,7 @@
 using Ardalis.Result;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
-using ECommerce.Domain.Entities;
-using ECommerce.Domain.Interfaces;
+using ECommerce.Application.Common.Repositories;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
@@ -11,7 +10,7 @@ namespace ECommerce.Application.Features.Categories.Commands;
 
 public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>;
 
-public sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
+internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {
     public UpdateCategoryCommandValidator(ICategoryRepository categoryRepository, L localizer)
     {

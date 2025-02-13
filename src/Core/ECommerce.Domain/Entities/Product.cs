@@ -6,23 +6,24 @@ public sealed class Product : AuditableEntity
     public string? Description { get; set; }
     public decimal Price { get; private set; }
 
-    public Guid CategoryId { get; private set; }
-    public Category Category { get; private set; } = new();
+    public Guid CategoryId { get; set; }
+    public Category Category { get; set; } = new();
 
     internal Product()
     {
     }
 
-    private Product(string name, string description, decimal price)
+    private Product(string name, string description, decimal price, Guid categoryId)
     {
         Name = ValidateName(name);
         Description = description;
         Price = ValidatePrice(price);
+        CategoryId = categoryId;
     }
 
-    public static Product Create(string name, string description, decimal price)
+    public static Product Create(string name, string description, decimal price, Guid categoryId)
     {
-        return new(name, description, price);
+        return new(name, description, price, categoryId);
     }
 
     private string ValidateName(string name)
@@ -44,6 +45,13 @@ public sealed class Product : AuditableEntity
             throw new ArgumentException("Price must be greater than 0");
 
         return price;
+    }
+
+    public void Update(string name, decimal price, string? description)
+    {
+        Name = ValidateName(name);
+        Description = description;
+        Price = ValidatePrice(price);
     }
 }
 

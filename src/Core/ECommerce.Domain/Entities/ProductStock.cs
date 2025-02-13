@@ -12,6 +12,7 @@ public sealed class ProductStock : AuditableEntity
 
     private ProductStock(Guid productId, int quantity)
     {
+        ValidateQuantity(quantity);
         ProductId = productId;
         Quantity = quantity;
     }
@@ -21,11 +22,23 @@ public sealed class ProductStock : AuditableEntity
         return new(productId, quantity);
     }
 
-    private int ValidateQuantity(int quantity)
+    private void ValidateQuantity(int quantity)
     {
         if (quantity < 0)
             throw new ArgumentException("Quantity must be greater than 0");
+    }
 
-        return quantity;
+    public void Reserve(int quantity)
+    {
+        if (Quantity < quantity)
+            throw new InvalidOperationException("Insufficient stock");
+
+        Quantity -= quantity;
+    }
+
+    public void Release(int quantity)
+    {
+        ValidateQuantity(quantity);
+        Quantity += quantity;
     }
 }
