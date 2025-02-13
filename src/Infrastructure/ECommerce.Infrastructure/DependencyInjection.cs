@@ -1,7 +1,6 @@
 using ECommerce.SharedKernel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ECommerce.Application.Common.Helpers;
 
 namespace ECommerce.Infrastructure;
 

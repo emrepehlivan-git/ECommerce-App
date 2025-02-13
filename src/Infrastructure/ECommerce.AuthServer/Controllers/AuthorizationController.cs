@@ -13,23 +13,16 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace ECommerce.AuthServer.Controllers;
 
-public sealed class AuthorizationController : Controller
+public sealed class AuthorizationController(
+    IIdentityService identityService,
+    IOpenIddictApplicationManager applicationManager,
+    IOpenIddictAuthorizationManager authorizationManager,
+    IOpenIddictScopeManager scopeManager) : Controller
 {
-    private readonly IIdentityService _identityService;
-    private readonly IOpenIddictApplicationManager _applicationManager;
-    private readonly IOpenIddictAuthorizationManager _authorizationManager;
-    private readonly IOpenIddictScopeManager _scopeManager;
-    public AuthorizationController(
-        IIdentityService identityService,
-        IOpenIddictApplicationManager applicationManager,
-        IOpenIddictAuthorizationManager authorizationManager,
-        IOpenIddictScopeManager scopeManager)
-    {
-        _identityService = identityService;
-        _applicationManager = applicationManager;
-        _authorizationManager = authorizationManager;
-        _scopeManager = scopeManager;
-    }
+    private readonly IIdentityService _identityService = identityService;
+    private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
+    private readonly IOpenIddictAuthorizationManager _authorizationManager = authorizationManager;
+    private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
 
     [HttpGet("~/connect/authorize")]
     public async Task<IActionResult> Authorize()
@@ -97,14 +90,8 @@ public sealed class AuthorizationController : Controller
 
                 identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
                 identity.AddClaim(new Claim(Claims.Email, user.Email!));
-                identity.AddClaim(new Claim(Claims.Name, user.UserName!));
                 identity.AddClaim(new Claim("fullName", user.FullName.ToString()));
-
-                var roles = await _identityService.GetRolesAsync(user);
-                foreach (var role in roles)
-                {
-                    identity.AddClaim(new Claim(Claims.Role, role));
-                }
+                identity.AddClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
 
                 identity.SetScopes(request.GetScopes());
                 identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
@@ -149,7 +136,6 @@ public sealed class AuthorizationController : Controller
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        // Retrieve the profile of the logged in user.
         var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         if (!result.Succeeded)
         {
@@ -198,13 +184,8 @@ public sealed class AuthorizationController : Controller
 
             identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
             identity.AddClaim(new Claim(Claims.Email, user.Email!));
-            identity.AddClaim(new Claim(Claims.Name, user.UserName!));
             identity.AddClaim(new Claim("fullName", user.FullName.ToString()));
-            var roles = await _identityService.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                identity.AddClaim(new Claim(Claims.Role, role));
-            }
+            identity.AddClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
 
             identity.SetScopes(request.GetScopes());
             identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
@@ -264,8 +245,6 @@ public sealed class AuthorizationController : Controller
 
             identity.SetClaim(Claims.Subject, user.Id.ToString())
                     .SetClaim(Claims.Email, user.Email!)
-                    .SetClaim(Claims.Name, user.UserName!)
-                    .SetClaim(Claims.PreferredUsername, user.UserName!)
                     .SetClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)])
                     .SetClaim("fullName", user.FullName.ToString());
 

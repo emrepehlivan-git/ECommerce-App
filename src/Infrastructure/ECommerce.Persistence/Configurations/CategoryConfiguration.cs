@@ -7,6 +7,7 @@ internal sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Category> builder)
     {
+        builder.ToTable("categories");
         builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Name)

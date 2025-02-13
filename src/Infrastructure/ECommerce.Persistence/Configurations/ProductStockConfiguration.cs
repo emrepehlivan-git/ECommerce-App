@@ -7,6 +7,8 @@ internal sealed class ProductStockConfiguration : IEntityTypeConfiguration<Produ
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<ProductStock> builder)
     {
+        builder.ToTable("product_stocks");
+
         builder.HasKey(ps => ps.Id);
 
         builder.Property(ps => ps.Quantity)

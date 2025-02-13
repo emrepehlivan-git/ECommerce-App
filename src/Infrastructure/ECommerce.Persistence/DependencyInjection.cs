@@ -1,5 +1,7 @@
+using ECommerce.Application.Common.Interfaces;
 using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;
+using ECommerce.Persistence.Interceptors;
 using ECommerce.SharedKernel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +16,12 @@ public static class DependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             {
+                var currentUserService = services.BuildServiceProvider().GetRequiredService<ICurrentUserService>();
+
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
                 options.UseSnakeCaseNamingConvention();
                 options.UseOpenIddict();
+                options.AddInterceptors(new AuditEntityInterceptor(currentUserService));
             });
 
         services.AddIdentity<User, Role>(options =>

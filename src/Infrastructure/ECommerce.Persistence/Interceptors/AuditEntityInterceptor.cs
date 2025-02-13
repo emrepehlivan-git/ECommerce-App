@@ -1,0 +1,37 @@
+using ECommerce.Application.Common.Interfaces;
+using ECommerce.SharedKernel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
+namespace ECommerce.Persistence.Interceptors;
+
+internal sealed class AuditEntityInterceptor(ICurrentUserService currentUserService) : SaveChangesInterceptor
+{
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+    {
+        var dbContext = eventData.Context;
+
+        if (dbContext is null)
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+
+        var entries = dbContext.ChangeTracker.Entries()
+            .Where(e => e.Entity is IAuditableEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    ((IAuditableEntity)entry.Entity).CreatedAt = DateTime.UtcNow;
+                    ((IAuditableEntity)entry.Entity).CreatedBy = Guid.Parse(currentUserService.UserId ?? string.Empty);
+                    break;
+                case EntityState.Modified:
+                    ((IAuditableEntity)entry.Entity).UpdatedAt = DateTime.UtcNow;
+                    ((IAuditableEntity)entry.Entity).UpdatedBy = Guid.Parse(currentUserService.UserId ?? string.Empty);
+                    break;
+            }
+        }
+
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+}

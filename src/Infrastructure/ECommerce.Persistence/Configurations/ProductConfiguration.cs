@@ -7,6 +7,8 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Product> builder)
     {
+        builder.ToTable("products");
+
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.Name)

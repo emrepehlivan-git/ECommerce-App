@@ -1,10 +1,8 @@
 using System.Globalization;
 using ECommerce.Application;
-using ECommerce.Application.Common.Interfaces;
 using ECommerce.Infrastructure;
 using ECommerce.Persistence;
 using ECommerce.SharedKernel;
-using ECommerce.WebAPI.Services;
 using Microsoft.AspNetCore.Localization;
 
 namespace ECommerce.WebAPI;

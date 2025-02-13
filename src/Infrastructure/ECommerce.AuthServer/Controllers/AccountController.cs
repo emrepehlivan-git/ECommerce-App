@@ -6,17 +6,14 @@ using ECommerce.AuthServer.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using static OpenIddict.Abstractions.OpenIddictConstants;
+using OpenIddict.Abstractions;
 
 namespace ECommerce.AuthServer.Controllers;
 
-public sealed class AccountController : Controller
+public sealed class AccountController(IIdentityService identityService) : Controller
 {
-    private readonly IIdentityService _identityService;
-
-    public AccountController(IIdentityService identityService)
-    {
-        _identityService = identityService;
-    }
+    private readonly IIdentityService _identityService = identityService;
 
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
@@ -40,14 +37,8 @@ public sealed class AccountController : Controller
                 {
                     var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-                    identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName!));
                     identity.AddClaim(new Claim(ClaimTypes.Email, user.Email!));
-
-                    var roles = await _identityService.GetRolesAsync(user);
-                    foreach (var role in roles)
-                    {
-                        identity.AddClaim(new Claim(ClaimTypes.Role, role));
-                    }
+                    identity.AddClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
 
                     var principal = new ClaimsPrincipal(identity);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,

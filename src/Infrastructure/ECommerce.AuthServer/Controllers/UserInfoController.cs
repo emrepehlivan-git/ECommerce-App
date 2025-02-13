@@ -8,13 +8,9 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace ECommerce.AuthServer.Controllers;
 
-public sealed class UserInfoController : Controller
+public sealed class UserInfoController(IIdentityService identityService) : Controller
 {
-    private readonly IIdentityService _identityService;
-    public UserInfoController(IIdentityService identityService)
-    {
-        _identityService = identityService;
-    }
+    private readonly IIdentityService _identityService = identityService;
 
     [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
     [HttpGet("~/connect/userinfo"), HttpPost("~/connect/userinfo"), Produces("application/json")]

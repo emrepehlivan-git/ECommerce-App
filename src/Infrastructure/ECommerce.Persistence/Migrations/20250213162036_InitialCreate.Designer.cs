@@ -12,18 +12,133 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerce.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250201135858_AddOpenIddictSchema")]
-    partial class AddOpenIddictSchema
+    [Migration("20250213162036_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_categories");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_categories_name");
+
+                    b.ToTable("categories", (string)null);
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("price");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_products");
+
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("ix_products_category_id");
+
+                    b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.ProductStock", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by");
+
+                    b.HasKey("Id")
+                        .HasName("pk_product_stocks");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_product_stocks_product_id");
+
+                    b.ToTable("product_stocks", (string)null);
+                });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.Role", b =>
                 {
@@ -50,13 +165,27 @@ namespace ECommerce.Persistence.Migrations
                         .HasColumnName("normalized_name");
 
                     b.HasKey("Id")
-                        .HasName("pk_asp_net_roles");
+                        .HasName("pk_roles");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("8d04dce2-969a-435d-bba4-df3f325983dc"),
+                            Name = "USER",
+                            NormalizedName = "USER"
+                        },
+                        new
+                        {
+                            Id = new Guid("2c5e174e-3b0e-446f-86af-483d56fd7210"),
+                            Name = "ADMIN",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("ECommerce.Domain.Entities.User", b =>
@@ -118,14 +247,6 @@ namespace ECommerce.Persistence.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("phone_number_confirmed");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id");
-
-                    b.Property<Guid?>("RoleId1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("role_id1");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text")
                         .HasColumnName("security_stamp");
@@ -140,7 +261,7 @@ namespace ECommerce.Persistence.Migrations
                         .HasColumnName("user_name");
 
                     b.HasKey("Id")
-                        .HasName("pk_asp_net_users");
+                        .HasName("pk_users");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -149,13 +270,7 @@ namespace ECommerce.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("RoleId")
-                        .HasDatabaseName("ix_asp_net_users_role_id");
-
-                    b.HasIndex("RoleId1")
-                        .HasDatabaseName("ix_asp_net_users_role_id1");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -553,20 +668,32 @@ namespace ECommerce.Persistence.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ECommerce.Domain.Entities.User", b =>
+            modelBuilder.Entity("ECommerce.Domain.Entities.Product", b =>
                 {
-                    b.HasOne("ECommerce.Domain.Entities.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
+                    b.HasOne("ECommerce.Domain.Entities.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_asp_net_users_roles_role_id");
+                        .HasConstraintName("fk_products_categories_category_id");
 
-                    b.HasOne("ECommerce.Domain.Entities.Role", null)
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId1")
-                        .HasConstraintName("fk_asp_net_users_asp_net_roles_role_id1");
+                    b.Navigation("Category");
+                });
 
+            modelBuilder.Entity("ECommerce.Domain.Entities.ProductStock", b =>
+                {
+                    b.HasOne("ECommerce.Domain.Entities.Product", "Product")
+                        .WithOne()
+                        .HasForeignKey("ECommerce.Domain.Entities.ProductStock", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_product_stocks_products_product_id");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ECommerce.Domain.Entities.User", b =>
+                {
                     b.OwnsOne("ECommerce.Domain.ValueObjects.FullName", "FullName", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -587,17 +714,15 @@ namespace ECommerce.Persistence.Migrations
 
                             b1.HasKey("UserId");
 
-                            b1.ToTable("AspNetUsers");
+                            b1.ToTable("users");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserId")
-                                .HasConstraintName("fk_asp_net_users_asp_net_users_id");
+                                .HasConstraintName("fk_users_users_id");
                         });
 
                     b.Navigation("FullName")
                         .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -684,9 +809,9 @@ namespace ECommerce.Persistence.Migrations
                     b.Navigation("Authorization");
                 });
 
-            modelBuilder.Entity("ECommerce.Domain.Entities.Role", b =>
+            modelBuilder.Entity("ECommerce.Domain.Entities.Category", b =>
                 {
-                    b.Navigation("Users");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
