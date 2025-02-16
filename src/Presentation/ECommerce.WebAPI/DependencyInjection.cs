@@ -37,7 +37,6 @@ public static class DependencyInjection
         services.AddPersistence(configuration);
         services.AddHttpContextAccessor();
 
-
         return services;
     }
 

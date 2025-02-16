@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using ECommerce.Application.Behaviors;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
 using ECommerce.Application.Repositories;
@@ -8,7 +9,7 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Categories.Commands;
 
-public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>;
+public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>, ITransactionalRequest;
 
 internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {

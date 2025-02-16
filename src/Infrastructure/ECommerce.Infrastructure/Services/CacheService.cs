@@ -4,7 +4,7 @@ using ECommerce.SharedKernel;
 using Microsoft.Extensions.Caching.Distributed;
 namespace ECommerce.Infrastructure.Services;
 
-public sealed class CacheService : ICacheService, IScopedDependency
+public sealed class CacheService : ICacheService, ISingletonDependency
 {
     private readonly IDistributedCache _cache;
 

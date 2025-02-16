@@ -1,8 +1,8 @@
 using Ardalis.Result;
+using ECommerce.Application.Behaviors;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
 using ECommerce.Application.Repositories;
-using ECommerce.Domain.Entities;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
@@ -14,7 +14,7 @@ public sealed record UpdateProductCommand(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId) : IRequest<Result>;
+    Guid CategoryId) : IRequest<Result>, ITransactionalRequest;
 
 internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {

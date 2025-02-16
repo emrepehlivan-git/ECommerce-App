@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using ECommerce.Application.Behaviors;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
 using ECommerce.Application.Repositories;
@@ -13,7 +14,7 @@ public sealed record CreateProductCommand(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId) : IRequest<Result<Guid>>;
+    Guid CategoryId) : IRequest<Result<Guid>>, ITransactionalRequest;
 
 internal sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {

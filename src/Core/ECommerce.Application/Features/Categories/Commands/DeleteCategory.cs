@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using ECommerce.Application.Behaviors;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Repositories;
 using ECommerce.SharedKernel;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Categories.Commands;
 
-public sealed record DeleteCategoryCommand(Guid Id) : IRequest<Result>;
+public sealed record DeleteCategoryCommand(Guid Id) : IRequest<Result>, ITransactionalRequest;
 
 internal sealed class DeleteCategoryCommandHandler(
     ICategoryRepository categoryRepository,
