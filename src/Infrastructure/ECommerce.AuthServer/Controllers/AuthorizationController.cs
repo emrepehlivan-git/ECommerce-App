@@ -4,73 +4,77 @@ using ECommerce.AuthServer.Helpers;
 using ECommerce.AuthServer.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace ECommerce.AuthServer.Controllers;
+namespace OpenIddictExample.AuthServer.Controllers;
 
-public sealed class AuthorizationController(
-    IIdentityService identityService,
+public class AuthorizationController(
     IOpenIddictApplicationManager applicationManager,
     IOpenIddictAuthorizationManager authorizationManager,
-    IOpenIddictScopeManager scopeManager) : Controller
+    IOpenIddictScopeManager scopeManager,
+    IIdentityService identityService)
+    : Controller
 {
-    private readonly IIdentityService _identityService = identityService;
-    private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
-    private readonly IOpenIddictAuthorizationManager _authorizationManager = authorizationManager;
-    private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
-
     [HttpGet("~/connect/authorize")]
+    [HttpPost("~/connect/authorize")]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Authorize()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        if (!result.Succeeded)
+        var result = await HttpContext.AuthenticateAsync();
+        if (result == null || !result.Succeeded || request.HasPromptValue(PromptValues.Login) ||
+           (request.MaxAge != null && result.Properties?.IssuedUtc != null &&
+            DateTimeOffset.UtcNow - result.Properties.IssuedUtc > TimeSpan.FromSeconds(request.MaxAge.Value)))
         {
-            return Challenge(
-                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                        Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
-                });
+            if (request.HasPromptValue(PromptValues.None))
+            {
+                return Forbid(
+                    authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                    properties: new AuthenticationProperties(new Dictionary<string, string>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.LoginRequired,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is not logged in."
+                    }!));
+            }
+
+            var prompt = string.Join(" ", request.GetPromptValues().Remove(PromptValues.Login));
+
+            var parameters = Request.HasFormContentType ?
+                Request.Form.Where(parameter => parameter.Key != Parameters.Prompt).ToList() :
+                Request.Query.Where(parameter => parameter.Key != Parameters.Prompt).ToList();
+
+            parameters.Add(KeyValuePair.Create(Parameters.Prompt, new StringValues(prompt)));
+
+            return Challenge(new AuthenticationProperties
+            {
+                RedirectUri = Request.PathBase + Request.Path + QueryString.Create(parameters)
+            });
         }
 
-        var user = await _identityService.FindByIdAsync(result.Principal.FindFirstValue(Claims.Subject) ??
-            result.Principal.FindFirstValue(ClaimTypes.NameIdentifier) ??
-            throw new InvalidOperationException("No user identifier can be found."));
+        var user = await identityService.GetUserByPrincipalAsync(result.Principal) ??
+            throw new InvalidOperationException("The user details cannot be retrieved.");
 
-        if (user == null)
-        {
-            return Challenge(
-                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                        Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
-                });
-        }
-        var clientId = request.ClientId ?? throw new InvalidOperationException("Client ID is required.");
-        var application = await _applicationManager.FindByClientIdAsync(clientId) ??
+        var application = await applicationManager.FindByClientIdAsync(request.ClientId) ??
             throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
 
-        var authorizations = await _authorizationManager.FindAsync(
+        var authorizations = await authorizationManager.FindAsync(
             subject: user.Id.ToString(),
-            client: await _applicationManager.GetIdAsync(application),
+            client: await applicationManager.GetIdAsync(application),
             status: Statuses.Valid,
             type: AuthorizationTypes.Permanent,
-            scopes: request.GetScopes())
-            .ToListAsync();
+            scopes: request.GetScopes()).ToListAsync();
 
-        switch (await _applicationManager.GetConsentTypeAsync(application))
+        switch (await applicationManager.GetConsentTypeAsync(application))
         {
-            case ConsentTypes.External when !authorizations.Any():
+            case ConsentTypes.External when authorizations.Count is 0:
                 return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                     properties: new AuthenticationProperties(new Dictionary<string, string>
@@ -81,36 +85,36 @@ public sealed class AuthorizationController(
                     }!));
 
             case ConsentTypes.Implicit:
-            case ConsentTypes.External when authorizations.Any():
-            case ConsentTypes.Explicit when authorizations.Any() && !request.HasPromptValue(PromptValues.Consent):
+            case ConsentTypes.External when authorizations.Count is not 0:
+            case ConsentTypes.Explicit when authorizations.Count is not 0 && !request.HasPromptValue(PromptValues.Consent):
                 var identity = new ClaimsIdentity(
                     authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                     nameType: Claims.Name,
                     roleType: Claims.Role);
 
-                identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
-                identity.AddClaim(new Claim(Claims.Email, user.Email!));
-                identity.AddClaim(new Claim("fullName", user.FullName.ToString()));
-                identity.AddClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
+                identity.SetClaim(Claims.Subject, user.Id.ToString())
+                        .SetClaim(Claims.Email, user.Email)
+                        .SetClaim("fullName", user.FullName.ToString())
+                        .SetClaims(Claims.Role, [.. await identityService.GetRolesAsync(user)]);
 
                 identity.SetScopes(request.GetScopes());
-                identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+                identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
 
                 var authorization = authorizations.LastOrDefault();
-                authorization ??= await _authorizationManager.CreateAsync(
+                authorization ??= await authorizationManager.CreateAsync(
                     identity: identity,
                     subject: user.Id.ToString(),
-                    client: (await _applicationManager.GetIdAsync(application))!,
+                    client: await applicationManager.GetIdAsync(application),
                     type: AuthorizationTypes.Permanent,
                     scopes: identity.GetScopes());
 
-                identity.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization));
+                identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
                 identity.SetDestinations(GetDestinations);
 
                 return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
-            case ConsentTypes.Explicit when request.HasPromptValue(PromptValues.Consent):
-            case ConsentTypes.Systematic when request.HasPromptValue(PromptValues.Consent):
+            case ConsentTypes.Explicit when request.HasPromptValue(PromptValues.None):
+            case ConsentTypes.Systematic when request.HasPromptValue(PromptValues.None):
                 return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                     properties: new AuthenticationProperties(new Dictionary<string, string>
@@ -123,98 +127,92 @@ public sealed class AuthorizationController(
             default:
                 return View(new ConsentViewModel
                 {
-                    ApplicationName = (await _applicationManager.GetDisplayNameAsync(application))!,
-                    Scope = request.Scope ?? string.Empty
+                    ApplicationName = await applicationManager.GetLocalizedDisplayNameAsync(application),
+                    Scope = request.Scope
                 });
         }
     }
 
-    [HttpPost("~/connect/authorize")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Consent()
+    [Authorize, FormValueRequired("submit.Accept")]
+    [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> Accept()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        if (!result.Succeeded)
-        {
-            return Challenge(
-                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                        Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
-                });
-        }
+        var user = await identityService.GetUserByPrincipalAsync(User) ??
+            throw new InvalidOperationException("The user details cannot be retrieved.");
 
-        var user = await _identityService.FindByIdAsync(result.Principal.FindFirstValue(Claims.Subject) ??
-            result.Principal.FindFirstValue(ClaimTypes.NameIdentifier) ??
-            throw new InvalidOperationException("No user identifier can be found."));
-
-        if (user == null)
-        {
-            return Challenge(
-                authenticationSchemes: CookieAuthenticationDefaults.AuthenticationScheme,
-                properties: new AuthenticationProperties
-                {
-                    RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                        Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
-                });
-        }
-
-        var clientId = request.ClientId ?? throw new InvalidOperationException("Client ID is required.");
-        var application = await _applicationManager.FindByClientIdAsync(clientId) ??
+        var application = await applicationManager.FindByClientIdAsync(request.ClientId) ??
             throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
 
-        var authorizations = await _authorizationManager.FindAsync(
+        var authorizations = await authorizationManager.FindAsync(
             subject: user.Id.ToString(),
-            client: await _applicationManager.GetIdAsync(application),
+            client: await applicationManager.GetIdAsync(application),
             status: Statuses.Valid,
             type: AuthorizationTypes.Permanent,
-            scopes: request.GetScopes())
-            .ToListAsync();
+            scopes: request.GetScopes()).ToListAsync();
 
-        if (!string.IsNullOrEmpty(Request.Form["submit.Accept"]))
+        if (authorizations.Count is 0 && await applicationManager.HasConsentTypeAsync(application, ConsentTypes.External))
         {
-            var identity = new ClaimsIdentity(
-                    authenticationType: TokenValidationParameters.DefaultAuthenticationType,
-                    nameType: Claims.Name,
-                    roleType: Claims.Role);
-
-            identity.AddClaim(new Claim(Claims.Subject, user.Id.ToString()));
-            identity.AddClaim(new Claim(Claims.Email, user.Email!));
-            identity.AddClaim(new Claim("fullName", user.FullName.ToString()));
-            identity.AddClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
-
-            identity.SetScopes(request.GetScopes());
-            identity.SetResources(await _scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
-
-            var authorization = authorizations.LastOrDefault();
-            authorization ??= await _authorizationManager.CreateAsync(
-                identity: identity,
-                subject: user.Id.ToString(),
-                client: (await _applicationManager.GetIdAsync(application))!,
-                type: AuthorizationTypes.Permanent,
-                scopes: identity.GetScopes());
-
-            identity.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization));
-            identity.SetDestinations(GetDestinations);
-
-            return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            return Forbid(
+                authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                properties: new AuthenticationProperties(new Dictionary<string, string>
+                {
+                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.ConsentRequired,
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                        "The logged in user is not allowed to access this client application."
+                }!));
         }
 
-        return Forbid(
-            authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-            properties: new AuthenticationProperties(new Dictionary<string, string>
-            {
-                [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.AccessDenied,
-                [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                    "The authorization was denied by the resource owner."
-            }!));
+        var identity = new ClaimsIdentity(
+            authenticationType: TokenValidationParameters.DefaultAuthenticationType,
+            nameType: Claims.Name,
+            roleType: Claims.Role);
+
+        identity.SetClaim(Claims.Subject, user.Id.ToString())
+                .SetClaim(Claims.Email, user.Email)
+                .SetClaim("fullName", user.FullName.ToString())
+                .SetClaims(Claims.Role, [.. await identityService.GetRolesAsync(user)]);
+
+        identity.SetScopes(request.GetScopes());
+        identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+
+        var authorization = authorizations.LastOrDefault();
+        authorization ??= await authorizationManager.CreateAsync(
+            identity: identity,
+            subject: user.Id.ToString(),
+            client: await applicationManager.GetIdAsync(application),
+            type: AuthorizationTypes.Permanent,
+            scopes: identity.GetScopes());
+
+        identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
+        identity.SetDestinations(GetDestinations);
+
+        return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
-    [HttpPost("~/connect/token")]
+    [Authorize, FormValueRequired("submit.Deny")]
+    [HttpPost("~/connect/authorize"), ValidateAntiForgeryToken]
+    public IActionResult Deny() => Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+    [HttpGet("~/connect/logout")]
+    public IActionResult Logout() => View();
+
+    [ActionName(nameof(Logout)), HttpPost("~/connect/logout"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> LogoutPost()
+    {
+        await identityService.SignOutAsync();
+
+        return SignOut(
+            authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+            properties: new AuthenticationProperties
+            {
+                RedirectUri = "/"
+            });
+    }
+
+    [HttpPost("~/connect/token"), IgnoreAntiforgeryToken, Produces("application/json")]
     public async Task<IActionResult> Exchange()
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -223,11 +221,9 @@ public sealed class AuthorizationController(
         if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
             var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-            var userId = result.Principal?.FindFirstValue(Claims.Subject) ??
-                throw new InvalidOperationException("No user identifier can be found.");
 
-            var user = await _identityService.FindByIdAsync(userId);
-            if (user == null)
+            var user = await identityService.FindByIdAsync(result.Principal.GetClaim(Claims.Subject));
+            if (user is null)
             {
                 return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
@@ -238,15 +234,26 @@ public sealed class AuthorizationController(
                     }!));
             }
 
+            if (!await identityService.CanSignInAsync(user))
+            {
+                return Forbid(
+                    authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                    properties: new AuthenticationProperties(new Dictionary<string, string>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is no longer allowed to sign in."
+                    }!));
+            }
+
             var identity = new ClaimsIdentity(result.Principal.Claims,
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
                 roleType: Claims.Role);
 
             identity.SetClaim(Claims.Subject, user.Id.ToString())
-                    .SetClaim(Claims.Email, user.Email!)
-                    .SetClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)])
-                    .SetClaim("fullName", user.FullName.ToString());
+                    .SetClaim(Claims.Email, user.Email)
+                    .SetClaim("fullName", user.FullName.ToString())
+                    .SetClaims(Claims.Role, [.. await identityService.GetRolesAsync(user)]);
 
             identity.SetDestinations(GetDestinations);
 
@@ -256,45 +263,36 @@ public sealed class AuthorizationController(
         throw new InvalidOperationException("The specified grant type is not supported.");
     }
 
-    [HttpGet("~/connect/logout")]
-    public IActionResult Logout() => View();
-
-    [ActionName(nameof(Logout)), HttpPost("~/connect/logout"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> LogoutPost()
-    {
-        await _identityService.SignOutAsync();
-
-        return SignOut(
-            authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-            properties: new AuthenticationProperties
-            {
-                RedirectUri = "/"
-            });
-    }
-
-
     private static IEnumerable<string> GetDestinations(Claim claim)
     {
         switch (claim.Type)
         {
-            case Claims.Name:
+            case Claims.Name or Claims.PreferredUsername:
                 yield return Destinations.AccessToken;
-                yield return Destinations.IdentityToken;
-                break;
+
+                if (claim.Subject.HasScope(Scopes.Profile))
+                    yield return Destinations.IdentityToken;
+
+                yield break;
 
             case Claims.Email:
                 yield return Destinations.AccessToken;
-                yield return Destinations.IdentityToken;
-                break;
+
+                if (claim.Subject.HasScope(Scopes.Email))
+                    yield return Destinations.IdentityToken;
+
+                yield break;
 
             case Claims.Role:
                 yield return Destinations.AccessToken;
-                yield return Destinations.IdentityToken;
-                break;
 
+                if (claim.Subject.HasScope(Scopes.Roles))
+                    yield return Destinations.IdentityToken;
+
+                yield break;
             default:
                 yield return Destinations.AccessToken;
-                break;
+                yield break;
         }
     }
 }

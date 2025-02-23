@@ -1,20 +1,16 @@
-using ECommerce.Application.Common.Interfaces;
-using UserEntity = ECommerce.Domain.Entities.User;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using ECommerce.AuthServer.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
-using static OpenIddict.Abstractions.OpenIddictConstants;
-using OpenIddict.Abstractions;
+using ECommerce.Application.Common.Interfaces;
+using ECommerce.AuthServer.Models;
+using UserEntity = ECommerce.Domain.Entities.User;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ECommerce.AuthServer.Controllers;
+namespace OpenIddictExample.AuthServer.Controllers;
 
-public sealed class AccountController(IIdentityService identityService) : Controller
+public class AccountController(
+    IIdentityService identityService) : Controller
 {
-    private readonly IIdentityService _identityService = identityService;
-
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
     {
@@ -23,51 +19,46 @@ public sealed class AccountController(IIdentityService identityService) : Contro
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var result = await identityService.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
+        if (!result.Succeeded)
         {
-            var result = await _identityService.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
-            if (result.Succeeded)
-            {
-                var user = await _identityService.FindByEmailAsync(model.Email);
-                if (user != null)
-                {
-                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-                    identity.AddClaim(new Claim(ClaimTypes.Email, user.Email!));
-                    identity.AddClaims(Claims.Role, [.. await _identityService.GetRolesAsync(user)]);
-
-                    var principal = new ClaimsPrincipal(identity);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                        new AuthenticationProperties
-                        {
-                            IsPersistent = model.RememberMe,
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(50)
-                        });
-
-                    return RedirectToLocal(returnUrl ?? "/");
-                }
-            }
-            if (result.RequiresTwoFactor)
-            {
-                ModelState.AddModelError(string.Empty, "Two-factor authentication is not implemented yet.");
-                return View(model);
-            }
-            if (result.IsLockedOut)
-            {
-                return RedirectToAction(nameof(Lockout));
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Invalid credentials.");
-                return View(model);
-            }
+            ModelState.AddModelError(string.Empty, "Invalid credentials.");
+            return View(model);
         }
 
-        return View(model);
+        var user = await identityService.FindByEmailAsync(model.Email);
+
+        if (user is null)
+        {
+            ModelState.AddModelError(string.Empty, "Invalid credentials.");
+            return View(model);
+        }
+
+        List<Claim> claims =
+        [
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.FullName.ToString())
+        ];
+
+        var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+        identity.AddClaims(claims);
+
+        var principal = new ClaimsPrincipal(identity);
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+            new AuthenticationProperties
+            {
+                IsPersistent = model.RememberMe,
+            });
+
+        return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : Redirect("/");
     }
 
     [HttpGet]
@@ -82,39 +73,21 @@ public sealed class AccountController(IIdentityService identityService) : Contro
     public async Task<IActionResult> Register(RegisterViewModel model, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return View(model);
+
+        var user = UserEntity.Create(model.Email, model.FirstName, model.LastName);
+
+        var result = await identityService.CreateAsync(user, model.Password);
+
+        if (!result.Succeeded)
         {
-            var user = UserEntity.Create(model.Email, model.FirstName, model.LastName);
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
 
-            var result = await _identityService.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
-            {
-                await _identityService.PasswordSignInAsync(model.Email, model.Password, false, false);
-                return RedirectToLocal(returnUrl ?? "/");
-            }
-            AddErrors(result);
+            return View(model);
         }
 
-        return View(model);
-    }
-
-    [HttpGet]
-    public IActionResult Lockout()
-    {
-        return View();
-    }
-
-    private void AddErrors(IdentityResult result)
-    {
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
-    }
-
-    private IActionResult RedirectToLocal(string returnUrl = "/")
-    {
-        return Redirect(returnUrl);
+        await identityService.PasswordSignInAsync(model.Email, model.Password, false, false);
+        return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : Redirect("/");
     }
 }

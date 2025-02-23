@@ -36,7 +36,6 @@ public sealed class UserInfoController(IIdentityService identityService) : Contr
             [Claims.Subject] = user.Id,
             [Claims.Email] = user.Email!,
             [Claims.Role] = await _identityService.GetRolesAsync(user),
-            [Claims.Scope] = "api openid profile email",
             [Claims.Audience] = "api",
             ["fullName"] = user.FullName.ToString(),
         };

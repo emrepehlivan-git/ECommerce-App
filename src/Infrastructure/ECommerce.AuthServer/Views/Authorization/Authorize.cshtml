@@ -1,41 +1,24 @@
+@using Microsoft.Extensions.Primitives
 @model ConsentViewModel
+
 @{
     ViewData["Title"] = "Authorization";
     Layout = "_AuthLayout";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title text-center">Authorization Request</h2>
-                <p class="text-center">
-                    <strong>@Model.ApplicationName</strong> is requesting access to your account.
-                </p>
+<div class="jumbotron">
+    <h3>Authorization</h3>
 
-                <p class="text-center">Scope: @Model.Scope</p>
+    <p class="lead text-left">Do you want to grant <strong>@Model.ApplicationName</strong> access to your data? (scopes requested: @Model.Scope)</p>
 
-                <form asp-controller="Authorization" asp-action="Authorize" method="post">
-                    @Html.AntiForgeryToken()
+    <form asp-controller="Authorization" asp-action="Authorize" method="post">
+        @foreach (var parameter in Context.Request.HasFormContentType ?
+                          (IEnumerable<KeyValuePair<string, StringValues>>) Context.Request.Form : Context.Request.Query)
+        {
+            <input type="hidden" name="@parameter.Key" value="@parameter.Value" />
+        }
 
-                    <input type="hidden" asp-for="@Model.ApplicationName" />
-                    <input type="hidden" asp-for="@Model.Scope" />
-
-                    @foreach (var parameter in Context.Request.HasFormContentType ?
-                        Context.Request.Form.Where(p => p.Key != "submit.Accept" && p.Key != "submit.Deny") :
-                        Context.Request.Query.Where(p => p.Key != "submit.Accept" && p.Key != "submit.Deny"))
-                    {
-                        <input type="hidden" name="@parameter.Key" value="@parameter.Value" />
-                    }
-
-                    <div class="form-group mt-4">
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-success" name="submit.Accept" value="true" type="submit">Accept</button>
-                            <button class="btn btn-danger" name="submit.Deny" value="true" type="submit">Deny</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> 
+        <input class="btn btn-lg btn-success" name="submit.Accept" type="submit" value="Yes" />
+        <input class="btn btn-lg btn-danger" name="submit.Deny" type="submit" value="No" />
+    </form>
+</div>

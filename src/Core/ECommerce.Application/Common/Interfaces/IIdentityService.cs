@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,6 +11,7 @@ public interface IIdentityService
     Task SignOutAsync();
     Task<User?> FindByEmailAsync(string email);
     Task<User?> FindByIdAsync(string userId);
+    Task<User?> GetUserByPrincipalAsync(ClaimsPrincipal principal);
     Task<IdentityResult> CreateAsync(User user, string password);
     Task<IdentityResult> UpdateAsync(User user);
     Task<bool> CheckPasswordAsync(User user, string password);
@@ -20,4 +22,5 @@ public interface IIdentityService
     Task<IList<string>> GetRolesAsync(User user);
     Task<IdentityResult> AddToRoleAsync(User user, string role);
     Task<IdentityResult> RemoveFromRoleAsync(User user, string role);
+    Task<bool> CanSignInAsync(User user);
 }

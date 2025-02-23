@@ -1,21 +1,24 @@
 @using Microsoft.Extensions.Primitives
+@model ConsentViewModel
 
 @{
     ViewData["Title"] = "Logout";
-    Layout = null;
+    Layout = "_AuthLayout";
 }
 
 <div class="jumbotron">
-    <h3>Log out</h3>
-    <p class="lead text-left">Are you sure you want to sign out?</p>
+    <h3>Authorization</h3>
 
-    <form asp-controller="Authorization" asp-action="Logout" method="post">
+    <p class="lead text-left">Do you want to grant <strong>@Model.ApplicationName</strong> access to your data? (scopes requested: @Model.Scope)</p>
+
+    <form asp-controller="Authorization" asp-action="Authorize" method="post">
         @foreach (var parameter in Context.Request.HasFormContentType ?
-           (IEnumerable<KeyValuePair<string, StringValues>>) Context.Request.Form : Context.Request.Query)
+                          (IEnumerable<KeyValuePair<string, StringValues>>) Context.Request.Form : Context.Request.Query)
         {
             <input type="hidden" name="@parameter.Key" value="@parameter.Value" />
         }
 
-        <input class="btn btn-lg btn-success" name="Confirm" type="submit" value="Yes" />
+        <input class="btn btn-lg btn-success" name="submit.Accept" type="submit" value="Yes" />
+        <input class="btn btn-lg btn-danger" name="submit.Deny" type="submit" value="No" />
     </form>
 </div>

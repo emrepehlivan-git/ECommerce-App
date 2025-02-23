@@ -2,6 +2,7 @@ using ECommerce.Application.Common.Interfaces;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using ECommerce.SharedKernel;
+using System.Security.Claims;
 
 namespace ECommerce.Infrastructure.Services;
 
@@ -93,4 +94,14 @@ public sealed class IdentityService : IIdentityService, IScopedDependency
     }
 
     public Task<IdentityResult> RemoveFromRoleAsync(User user, string role) => _userManager.RemoveFromRoleAsync(user, role);
+
+    public Task<User?> GetUserByPrincipalAsync(ClaimsPrincipal principal)
+    {
+        return _userManager.GetUserAsync(principal);
+    }
+
+    public async Task<bool> CanSignInAsync(User user)
+    {
+        return await _signInManager.CanSignInAsync(user);
+    }
 }
