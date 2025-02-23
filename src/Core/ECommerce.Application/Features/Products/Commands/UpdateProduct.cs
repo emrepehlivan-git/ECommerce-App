@@ -21,7 +21,7 @@ internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdatePr
     public UpdateProductCommandValidator(
         IProductRepository productRepository,
         ICategoryRepository categoryRepository,
-        L localizer)
+        LocalizationHelper localizer)
     {
         RuleFor(x => x.Id)
             .NotEmpty();

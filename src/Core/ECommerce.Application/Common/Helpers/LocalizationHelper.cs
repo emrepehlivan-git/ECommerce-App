@@ -3,11 +3,11 @@ using ECommerce.SharedKernel;
 
 namespace ECommerce.Application.Common.Helpers;
 
-public sealed class L : ISingletonDependency
+public sealed class LocalizationHelper : ISingletonDependency
 {
     private readonly ILocalizationService _localizationService;
 
-    public L(ILocalizationService localizationService)
+    public LocalizationHelper(ILocalizationService localizationService)
     {
         _localizationService = localizationService;
     }

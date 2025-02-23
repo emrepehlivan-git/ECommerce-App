@@ -11,6 +11,6 @@ public abstract class BaseApiController : ControllerBase
 {
     private ILazyServiceProvider LazyServiceProvider => HttpContext.RequestServices.GetRequiredService<ILazyServiceProvider>();
     protected ISender Mediator => LazyServiceProvider.LazyGetRequiredService<ISender>();
-    protected L L => LazyServiceProvider.LazyGetRequiredService<L>();
+    protected LocalizationHelper Localizer => LazyServiceProvider.LazyGetRequiredService<LocalizationHelper>();
 }
 

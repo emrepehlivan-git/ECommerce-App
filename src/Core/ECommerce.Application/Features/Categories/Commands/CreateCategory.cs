@@ -14,7 +14,7 @@ public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>
 
 internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {
-    public CreateCategoryCommandValidator(ICategoryRepository categoryRepository, L localizer)
+    public CreateCategoryCommandValidator(ICategoryRepository categoryRepository, LocalizationHelper localizer)
     {
         RuleFor(x => x.Name)
             .NotEmpty()

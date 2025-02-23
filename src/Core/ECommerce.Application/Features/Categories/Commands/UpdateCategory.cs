@@ -13,7 +13,7 @@ public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Resu
 
 internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {
-    public UpdateCategoryCommandValidator(ICategoryRepository categoryRepository, L localizer)
+    public UpdateCategoryCommandValidator(ICategoryRepository categoryRepository, LocalizationHelper localizer)
     {
         RuleFor(x => x.Id)
             .NotEmpty();

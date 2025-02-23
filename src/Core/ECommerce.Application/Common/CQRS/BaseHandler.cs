@@ -9,7 +9,7 @@ public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler<TReques
 {
     protected ILazyServiceProvider LazyServiceProvider { get; }
 
-    protected L Localizer => LazyServiceProvider.LazyGetRequiredService<L>();
+    protected LocalizationHelper Localizer => LazyServiceProvider.LazyGetRequiredService<LocalizationHelper>();
 
     protected BaseHandler(ILazyServiceProvider lazyServiceProvider)
     {
