@@ -11,30 +11,16 @@ public class Category : BaseEntity
 
     private Category(string name)
     {
-        Name = ValidateName(name);
+        Name = name;
     }
 
     public static Category Create(string name)
     {
         return new(name);
     }
-
-    private string ValidateName(string name)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
-
-        if (name.Length < 3)
-            throw new ArgumentException("Name must be at least 3 characters long");
-
-        if (name.Length > 100)
-            throw new ArgumentException("Name must be less than 100 characters long");
-
-        return name;
-    }
-
     public void UpdateName(string name)
     {
-        Name = ValidateName(name);
+        Name = name;
     }
 }
 

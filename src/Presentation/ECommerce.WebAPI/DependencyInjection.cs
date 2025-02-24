@@ -3,6 +3,7 @@ using ECommerce.Application;
 using ECommerce.Infrastructure;
 using ECommerce.Persistence;
 using ECommerce.SharedKernel;
+using ECommerce.WebAPI.Middlewares;
 using Microsoft.AspNetCore.Localization;
 
 namespace ECommerce.WebAPI;
@@ -27,21 +28,24 @@ public static class DependencyInjection
                 new AcceptLanguageHeaderRequestCultureProvider()
             ];
         });
+        services.AddApplication();
+        services.AddInfrastructure(configuration);
+        services.AddPersistence(configuration);
+
         services.AddServicesRegistration([typeof(DependencyInjection).Assembly]);
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddInfrastructure(configuration);
-        services.AddApplication();
-        services.AddPersistence(configuration);
         services.AddHttpContextAccessor();
+        services.AddProblemDetails();
 
         return services;
     }
 
     public static WebApplication UsePresentation(this WebApplication app, IWebHostEnvironment environment)
     {
+
         app.UseRequestLocalization();
 
         if (environment.IsDevelopment())
@@ -50,6 +54,7 @@ public static class DependencyInjection
             app.UseSwaggerUI();
         }
 
+        app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
         app.UseHttpsRedirection();
 
         app.UseAuthorization();

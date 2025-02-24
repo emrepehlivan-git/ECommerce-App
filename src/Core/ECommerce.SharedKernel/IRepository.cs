@@ -42,4 +42,6 @@ public interface IRepository<TEntity>
     void Delete(Guid id);
 
     void Delete(TEntity entity);
+
+    void DeleteRange(IEnumerable<TEntity> entities);
 }

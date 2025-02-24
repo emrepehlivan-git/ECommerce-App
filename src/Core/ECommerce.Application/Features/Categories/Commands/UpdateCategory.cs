@@ -9,22 +9,29 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Categories.Commands;
 
-public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>, ITransactionalRequest;
+public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
 internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {
-    public UpdateCategoryCommandValidator(ICategoryRepository categoryRepository, LocalizationHelper localizer)
+    private readonly CategoryBusinessRules _categoryBusinessRules;
+    private readonly ICategoryRepository _categoryRepository;
+    public UpdateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, ICategoryRepository categoryRepository, LocalizationHelper localizer)
     {
+        _categoryBusinessRules = categoryBusinessRules;
+        _categoryRepository = categoryRepository;
         RuleFor(x => x.Id)
-            .NotEmpty();
+            .MustAsync(async (id, ct) => !await _categoryRepository.AnyAsync(x => x.Id == id, ct))
+            .WithMessage(localizer[CategoryConsts.NotFound]);
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MinimumLength(3)
-            .MaximumLength(100)
+            .WithMessage(localizer[CategoryConsts.NameIsRequired])
+            .MinimumLength(CategoryConsts.NameMinLength)
+            .WithMessage(localizer[CategoryConsts.NameMustBeAtLeastCharacters])
+            .MaximumLength(CategoryConsts.NameMaxLength)
+            .WithMessage(localizer[CategoryConsts.NameMustBeLessThanCharacters])
             .MustAsync(async (command, name, ct) =>
-                !await categoryRepository.AnyAsync(x => x.Name == name, cancellationToken: ct) ||
-                (await categoryRepository.GetByIdAsync(command.Id, cancellationToken: ct))?.Name == name)
+                !await _categoryBusinessRules.CheckIfCategoryExistsAsync(name, command.Id, ct))
             .WithMessage(localizer[CategoryConsts.NameExists]);
     }
 }

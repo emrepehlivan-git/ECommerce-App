@@ -10,27 +10,34 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Categories.Commands;
 
-public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>, ITransactionalRequest;
+public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
 
 internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {
-    public CreateCategoryCommandValidator(ICategoryRepository categoryRepository, LocalizationHelper localizer)
+    private readonly CategoryBusinessRules _categoryBusinessRules;
+    private readonly LocalizationHelper _localizer;
+    public CreateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, LocalizationHelper localizer)
     {
+        _categoryBusinessRules = categoryBusinessRules;
+        _localizer = localizer;
+
         RuleFor(x => x.Name)
             .NotEmpty()
+            .WithMessage(_localizer[CategoryConsts.NameIsRequired])
             .MinimumLength(CategoryConsts.NameMinLength)
-            .WithMessage(localizer[CategoryConsts.NameMustBeAtLeast3Characters])
+            .WithMessage(_localizer[CategoryConsts.NameMustBeAtLeastCharacters])
             .MaximumLength(CategoryConsts.NameMaxLength)
-            .WithMessage(localizer[CategoryConsts.NameMustBeLessThan100Characters])
+            .WithMessage(_localizer[CategoryConsts.NameMustBeLessThanCharacters])
             .MustAsync(async (name, ct) =>
-                !await categoryRepository.AnyAsync(x => x.Name == name, cancellationToken: ct))
-            .WithMessage(localizer[CategoryConsts.NameExists]);
+                !await _categoryBusinessRules.CheckIfCategoryExistsAsync(name, cancellationToken: ct))
+            .WithMessage(_localizer[CategoryConsts.NameExists]);
     }
 }
 
-internal sealed class CreateCategoryCommandHandler(
+public sealed class CreateCategoryCommandHandler(
     ICategoryRepository categoryRepository,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<CreateCategoryCommand, Result<Guid>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) :
+    BaseHandler<CreateCategoryCommand, Result<Guid>>(lazyServiceProvider)
 {
     public override Task<Result<Guid>> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {

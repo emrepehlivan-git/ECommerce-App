@@ -1,5 +1,5 @@
 using ECommerce.Application.Behaviors;
-using ECommerce.Application.Common.CQRS;
+using ECommerce.Application.Features.Categories.Commands;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
@@ -13,15 +13,14 @@ public static class DependencyInjection
     {
         var assembly = typeof(DependencyInjection).Assembly;
 
-        services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(assembly);
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionalRequest<,>));
-        });
+        services.AddValidatorsFromAssemblyContaining<CreateCategoryCommandValidator>(includeInternalTypes: true);
 
-        services.AddValidatorsFromAssembly(assembly);
+        services.AddMediatR(config =>
+            config.RegisterServicesFromAssembly(assembly)
+            .AddOpenBehavior(typeof(ValidationBehavior<,>))
+            .AddOpenBehavior(typeof(CacheBehavior<,>))
+            .AddOpenBehavior(typeof(TransactionalRequest<,>)));
+
         services.AddServicesRegistration([assembly]);
 
         return services;

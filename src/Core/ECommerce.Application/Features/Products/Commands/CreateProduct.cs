@@ -14,7 +14,7 @@ public sealed record CreateProductCommand(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId) : IRequest<Result<Guid>>, ITransactionalRequest;
+    Guid CategoryId) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
 
 internal sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
@@ -24,11 +24,10 @@ internal sealed class CreateProductCommandValidator : AbstractValidator<CreatePr
         LocalizationHelper localizer)
     {
         RuleFor(x => x.Name)
-            .NotEmpty()
             .MinimumLength(ProductConsts.NameMinLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeAtLeast3Characters])
+            .WithMessage(localizer[ProductConsts.NameMustBeAtLeastCharacters])
             .MaximumLength(ProductConsts.NameMaxLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeLessThan100Characters])
+            .WithMessage(localizer[ProductConsts.NameMustBeLessThanCharacters])
             .MustAsync(async (name, ct) =>
                 !await productRepository.AnyAsync(x => x.Name.ToLower() == name.ToLower(), cancellationToken: ct))
             .WithMessage(localizer[ProductConsts.NameExists]);
@@ -38,9 +37,8 @@ internal sealed class CreateProductCommandValidator : AbstractValidator<CreatePr
             .WithMessage(localizer[ProductConsts.PriceMustBeGreaterThanZero]);
 
         RuleFor(x => x.CategoryId)
-            .NotEmpty()
             .MustAsync(async (id, ct) =>
-                await categoryRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
+                !await categoryRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
             .WithMessage(localizer[ProductConsts.CategoryNotFound]);
     }
 }
@@ -53,7 +51,7 @@ internal sealed class CreateProductCommandHandler(
     {
         var product = Product.Create(
             command.Name,
-            command.Description ?? string.Empty,
+            command.Description,
             command.Price,
             command.CategoryId);
 

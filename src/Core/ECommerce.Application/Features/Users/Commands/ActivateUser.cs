@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using ECommerce.Application.Behaviors;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.SharedKernel;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Users.Commands;
 
-public record ActivateUserCommand(Guid UserId) : IRequest<Result>;
+public record ActivateUserCommand(Guid UserId) : IRequest<Result>, ITransactionalRequest;
 
 internal sealed class ActivateUserCommandHandler(
     IIdentityService identityService,

@@ -14,7 +14,7 @@ public sealed record UpdateProductCommand(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId) : IRequest<Result>, ITransactionalRequest;
+    Guid CategoryId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
 internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
@@ -29,9 +29,9 @@ internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdatePr
         RuleFor(x => x.Name)
             .NotEmpty()
             .MinimumLength(ProductConsts.NameMinLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeAtLeast3Characters])
+            .WithMessage(localizer[ProductConsts.NameMustBeAtLeastCharacters])
             .MaximumLength(ProductConsts.NameMaxLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeLessThan100Characters])
+            .WithMessage(localizer[ProductConsts.NameMustBeLessThanCharacters])
             .MustAsync(async (command, name, ct) =>
                 !await productRepository.AnyAsync(x => x.Name.ToLower() == name.ToLower() && x.Id != command.Id, cancellationToken: ct))
             .WithMessage(localizer[ProductConsts.NameExists]);

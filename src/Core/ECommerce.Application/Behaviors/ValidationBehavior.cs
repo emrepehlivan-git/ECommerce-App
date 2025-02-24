@@ -1,37 +1,37 @@
-using Ardalis.Result;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using ECommerce.Application.Common.Interfaces;
 
 namespace ECommerce.Application.Behaviors;
 
-public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IValidetableRequest
-    where TResponse : Result
+public sealed class ValidationBehavior<TRequest, TResponse>(
+    IEnumerable<IValidator<TRequest>> validators,
+    ILogger<ValidationBehavior<TRequest, TResponse>> logger,
+    ILocalizationService localizationService) : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IValidateRequest
 {
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
-    {
-        _validators = validators;
-    }
-
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (!_validators.Any()) return await next();
+        if (!validators.Any()) return await next();
 
         var context = new ValidationContext<TRequest>(request);
 
         var validationResults = await Task.WhenAll(
-            _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+            validators.Select(v => v.ValidateAsync(context, cancellationToken))).ConfigureAwait(false);
 
         var failures = validationResults
-            .Where(r => r.Errors.Any())
+            .Where(r => r.Errors.Count > 0)
             .SelectMany(e => e.Errors)
-            .Select(e => new ValidationError(e.PropertyName, e.ErrorMessage, e.ErrorCode, ValidationSeverity.Error))
+            .Select(e => new ValidationFailure(e.PropertyName, localizationService.GetLocalizedString(e.ErrorMessage)))
             .ToList();
 
-        if (failures.Any())
-            return (TResponse)Result.Invalid(failures);
+        if (failures.Count > 0)
+        {
+            logger.LogWarning("Validation failed for request {RequestType}. Errors: {Errors}", typeof(TRequest).Name, failures);
+            throw new ValidationException(failures);
+        }
 
         return await next();
     }

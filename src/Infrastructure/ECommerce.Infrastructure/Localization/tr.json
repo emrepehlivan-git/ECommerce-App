@@ -5,6 +5,16 @@
   "AuthMessages.LogoutSuccess": "Çıkış başarılı.",
   "AuthMessages.EmailConfirmationSent": "Email doğrulama linki gnderildi.",
   "AuthMessages.EmailConfirmed": "Email başarıyla doğrulandı.",
-  "AuthMessages.PasswordResetLinkSent": "Şifre sıfırlama linki gönderildi.",
-  "AuthMessages.PasswordChanged": "Şifre başarıyla değiştirildi."
+  "AuthMessages.PasswordResetLinkSent": "Şifre sıfırlama linki gnderildi.",
+  "AuthMessages.PasswordChanged": "Şifre başarıyla değiştirildi.",
+  "Product.Name.Exists": "Ürün adı zaten mevcut.",
+  "Product.Name.IsRequired": "Ürün adı gereklidir.",
+  "Product.Name.MustBeAtLeast3Characters": "Ürün adı en az 3 karakter olmalıdır.",
+  "Product.Name.MustBeLessThan100Characters": "Ürün adı en fazla 100 karakter olmalıdır.",
+  "Product.Price.MustBeGreaterThanZero": "Ürün fiyatı sıfırdan büyük olmalıdır.",
+  "Product.Category.NotFound": "Ürün kategorisi bulunamadı.",
+  "Category.Name.Exists": "Kategori adı zaten mevcut.",
+  "Category.Name.IsRequired": "Kategori adı gereklidir.",
+  "Category.Name.MustBeAtLeast3Characters": "Kategori adı en az 3 karakter olmalıdır.",
+  "Category.Name.MustBeLessThan100Characters": "Kategori adı en fazla 100 karakter olmalıdır."
 }

@@ -56,6 +56,11 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         Table.Remove(entity);
     }
 
+    public void DeleteRange(IEnumerable<TEntity> entities)
+    {
+        Table.RemoveRange(entities);
+    }
+
     public async Task<TEntity?> GetByIdAsync(Guid id, bool isTracking = false, CancellationToken cancellationToken = default)
     {
         var query = Query(x => x.Id == id, isTracking: isTracking);

@@ -1,9 +1,13 @@
 using ECommerce.Application.Common.Interfaces;
 using MediatR;
-
+using Microsoft.Extensions.Logging;
 namespace ECommerce.Application.Behaviors;
 
-public sealed class TransactionalRequest<TRequest, TResponse>(IUnitOfWork unitOfWork) : IPipelineBehavior<TRequest, TResponse> where TRequest : ITransactionalRequest
+public sealed class TransactionalRequest<TRequest, TResponse>(
+    IUnitOfWork unitOfWork,
+    ILogger<TransactionalRequest<TRequest, TResponse>> logger)
+ : IPipelineBehavior<TRequest, TResponse>
+ where TRequest : ITransactionalRequest
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
@@ -15,9 +19,10 @@ public sealed class TransactionalRequest<TRequest, TResponse>(IUnitOfWork unitOf
             await transaction.CommitAsync(cancellationToken);
             return response;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
             await transaction.RollbackAsync(cancellationToken);
+            logger.LogError(exception, "Transaction failed for request {RequestType}", typeof(TRequest).Name);
             throw;
         }
     }

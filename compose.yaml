@@ -9,9 +9,11 @@ services:
       - ConnectionStrings__DefaultConnection=Host=ecommerce.db;Database=ecommerce;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=ecommerce.redis:6379
       - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog__WriteTo__1__Args__serverUrl=http://ecommerce.seq:5341
     depends_on:
       - ecommerce.db
       - ecommerce.redis
+      - ecommerce.seq
     ports:
       - 4000:8080
       - 4001:8081
@@ -52,6 +54,16 @@ services:
     volumes:
       - redisdata:/data
 
+  ecommerce.seq:
+    image: datalust/seq
+    ports:
+      - 5341:80
+    environment:
+      - ACCEPT_EULA=Y
+    volumes:
+      - seqdata:/data
+
 volumes:
   pgdata:
   redisdata:
+  seqdata:

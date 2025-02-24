@@ -6,5 +6,15 @@
   "AuthMessages.EmailConfirmationSent": "Email confirmation link has been sent.",
   "AuthMessages.EmailConfirmed": "Email has been successfully confirmed.",
   "AuthMessages.PasswordResetLinkSent": "Password reset link has been sent.",
-  "AuthMessages.PasswordChanged": "Password changed successfully."
+  "AuthMessages.PasswordChanged": "Password changed successfully.",
+  "Product.Name.Exists": "Product name already exists.",
+  "Product.Name.IsRequired": "Product name is required.",
+  "Product.Name.MustBeAtLeast3Characters": "Product name must be at least 3 characters long.",
+  "Product.Name.MustBeLessThan100Characters": "Product name must be less than 100 characters long.",
+  "Product.Price.MustBeGreaterThanZero": "Product price must be greater than 0.",
+  "Product.Category.NotFound": "Product category not found.",
+  "Category.Name.Exists": "Category name already exists.",
+  "Category.Name.IsRequired": "Category name is required.",
+  "Category.Name.MustBeAtLeastCharacters": "Category name must be at least 3 characters long.",
+  "Category.Name.MustBeLessThanCharacters": "Category name must be less than 100 characters long."
 }
