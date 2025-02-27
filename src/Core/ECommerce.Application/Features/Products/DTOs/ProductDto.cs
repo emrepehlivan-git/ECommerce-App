@@ -5,5 +5,4 @@ public sealed record ProductDto(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId,
     string CategoryName);

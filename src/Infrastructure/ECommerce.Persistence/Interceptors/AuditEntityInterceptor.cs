@@ -23,11 +23,11 @@ internal sealed class AuditEntityInterceptor(ICurrentUserService currentUserServ
             {
                 case EntityState.Added:
                     ((IAuditableEntity)entry.Entity).CreatedAt = DateTime.UtcNow;
-                    ((IAuditableEntity)entry.Entity).CreatedBy = Guid.Parse(currentUserService.UserId ?? string.Empty);
+                    ((IAuditableEntity)entry.Entity).CreatedBy = Guid.TryParse(currentUserService.UserId, out var createdBy) ? createdBy : Guid.Empty;
                     break;
                 case EntityState.Modified:
                     ((IAuditableEntity)entry.Entity).UpdatedAt = DateTime.UtcNow;
-                    ((IAuditableEntity)entry.Entity).UpdatedBy = Guid.Parse(currentUserService.UserId ?? string.Empty);
+                    ((IAuditableEntity)entry.Entity).UpdatedBy = Guid.TryParse(currentUserService.UserId, out var updatedBy) ? updatedBy : Guid.Empty;
                     break;
             }
         }

@@ -20,7 +20,7 @@ internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateC
         _categoryBusinessRules = categoryBusinessRules;
         _categoryRepository = categoryRepository;
         RuleFor(x => x.Id)
-            .MustAsync(async (id, ct) => !await _categoryRepository.AnyAsync(x => x.Id == id, ct))
+            .MustAsync(async (id, ct) => await _categoryRepository.AnyAsync(x => x.Id == id, ct))
             .WithMessage(localizer[CategoryConsts.NotFound]);
 
         RuleFor(x => x.Name)

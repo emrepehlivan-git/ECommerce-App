@@ -19,8 +19,9 @@ internal sealed class GetAllProductsQueryHandler(
 {
     public override async Task<PagedResult<List<ProductDto>>> Handle(GetAllProductsQuery query, CancellationToken cancellationToken)
     {
-        return await productRepository.Query()
-            .Include(x => x.Category)
+        return await productRepository.Query(
+             include: x => x.Include(y => y.Category),
+             isTracking: true)
             .ProjectToType<ProductDto>()
             .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);
     }

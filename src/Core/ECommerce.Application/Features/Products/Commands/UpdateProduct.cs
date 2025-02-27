@@ -24,7 +24,9 @@ internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdatePr
         LocalizationHelper localizer)
     {
         RuleFor(x => x.Id)
-            .NotEmpty();
+            .MustAsync(async (id, ct) =>
+                await productRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
+            .WithMessage(localizer[ProductConsts.NotFound]);
 
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -56,10 +58,7 @@ internal sealed class UpdateProductCommandHandler(
     {
         var product = await productRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
 
-        if (product is null)
-            return Result.NotFound(Localizer[ProductConsts.NotFound]);
-
-        product.Update(command.Name, command.Price, command.Description);
+        product!.Update(command.Name, command.Price, command.CategoryId, command.Description);
 
         productRepository.Update(product);
 

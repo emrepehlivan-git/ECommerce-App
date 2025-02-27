@@ -38,7 +38,7 @@ internal sealed class CreateProductCommandValidator : AbstractValidator<CreatePr
 
         RuleFor(x => x.CategoryId)
             .MustAsync(async (id, ct) =>
-                !await categoryRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
+                await categoryRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
             .WithMessage(localizer[ProductConsts.CategoryNotFound]);
     }
 }

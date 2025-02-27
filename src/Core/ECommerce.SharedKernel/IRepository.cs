@@ -7,14 +7,14 @@ public interface IRepository<TEntity>
 {
     IQueryable<TEntity> Query(
         Expression<Func<TEntity, bool>>? predicate = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
+        Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
         bool isTracking = false);
 
     Task<PagedResult<List<TEntity>>> GetPagedAsync(
         Expression<Func<TEntity, bool>>? predicate = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
+        Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
         int page = 1,
         int pageSize = 10,
         bool isTracking = false,
@@ -22,13 +22,16 @@ public interface IRepository<TEntity>
 
     PagedResult<List<TEntity>> GetPaged(
         Expression<Func<TEntity, bool>>? predicate = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
+        Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
         int page = 1,
         int pageSize = 10,
         bool isTracking = false);
 
-    Task<TEntity?> GetByIdAsync(Guid id, bool isTracking = false, CancellationToken cancellationToken = default);
+    Task<TEntity?> GetByIdAsync(Guid id,
+        Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
+        bool isTracking = false,
+        CancellationToken cancellationToken = default);
 
     Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);

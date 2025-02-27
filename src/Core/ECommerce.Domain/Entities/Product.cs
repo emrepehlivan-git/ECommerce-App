@@ -7,13 +7,13 @@ public sealed class Product : AuditableEntity
     public decimal Price { get; private set; }
 
     public Guid CategoryId { get; set; }
-    public Category Category { get; set; } = new();
+    public Category Category { get; set; }
 
     internal Product()
     {
     }
 
-    private Product(string name, string? description = null, decimal price = 0, Guid categoryId = default)
+    private Product(string name, string? description, decimal price, Guid categoryId)
     {
         Name = name;
         Description = description;
@@ -21,16 +21,17 @@ public sealed class Product : AuditableEntity
         CategoryId = categoryId;
     }
 
-    public static Product Create(string name, string? description = null, decimal price = 0, Guid categoryId = default)
+    public static Product Create(string name, string? description, decimal price, Guid categoryId)
     {
         return new(name, description, price, categoryId);
     }
 
-    public void Update(string name, decimal price, string? description)
+    public void Update(string name, decimal price, Guid categoryId, string? description)
     {
         Name = name;
         Description = description;
         Price = price;
+        CategoryId = categoryId;
     }
 }
 

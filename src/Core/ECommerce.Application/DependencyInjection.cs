@@ -1,4 +1,5 @@
 using ECommerce.Application.Behaviors;
+using ECommerce.Application.Common.Mappings;
 using ECommerce.Application.Features.Categories.Commands;
 using ECommerce.SharedKernel;
 using FluentValidation;
@@ -22,6 +23,8 @@ public static class DependencyInjection
             .AddOpenBehavior(typeof(TransactionalRequest<,>)));
 
         services.AddServicesRegistration([assembly]);
+
+        services.AddMapsterConfiguration();
 
         return services;
     }

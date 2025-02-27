@@ -1,0 +1,21 @@
+using ECommerce.Application.Features.Categories;
+using ECommerce.Application.Features.Products;
+using Mapster;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ECommerce.Application.Common.Mappings;
+
+public static class MapsterConfig
+{
+    public static IServiceCollection AddMapsterConfiguration(this IServiceCollection services)
+    {
+        var config = TypeAdapterConfig.GlobalSettings;
+
+        config.Scan(typeof(MapsterConfig).Assembly);
+
+        ProductMapperConfig.Configure(config);
+        CategoryMapperConfig.Configure(config);
+
+        return services;
+    }
+}
