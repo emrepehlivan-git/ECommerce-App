@@ -14,23 +14,19 @@ public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>
 
 internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {
-    private readonly CategoryBusinessRules _categoryBusinessRules;
-    private readonly LocalizationHelper _localizer;
     public CreateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, LocalizationHelper localizer)
     {
-        _categoryBusinessRules = categoryBusinessRules;
-        _localizer = localizer;
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage(_localizer[CategoryConsts.NameIsRequired])
+            .WithMessage(localizer[CategoryConsts.NameIsRequired])
             .MinimumLength(CategoryConsts.NameMinLength)
-            .WithMessage(_localizer[CategoryConsts.NameMustBeAtLeastCharacters])
+            .WithMessage(localizer[CategoryConsts.NameMustBeAtLeastCharacters])
             .MaximumLength(CategoryConsts.NameMaxLength)
-            .WithMessage(_localizer[CategoryConsts.NameMustBeLessThanCharacters])
+            .WithMessage(localizer[CategoryConsts.NameMustBeLessThanCharacters])
             .MustAsync(async (name, ct) =>
-                !await _categoryBusinessRules.CheckIfCategoryExistsAsync(name, cancellationToken: ct))
-            .WithMessage(_localizer[CategoryConsts.NameExists]);
+                !await categoryBusinessRules.CheckIfCategoryExistsAsync(name, cancellationToken: ct))
+            .WithMessage(localizer[CategoryConsts.NameExists]);
     }
 }
 

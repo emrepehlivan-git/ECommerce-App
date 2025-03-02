@@ -5,4 +5,4 @@ namespace ECommerce.Application.Features.Categories.DTOs;
 public sealed record CategoryWithProductsDto(
     Guid Id,
     string Name,
-    List<ProductDto>? Products = null);
+    List<ProductDto> Products);

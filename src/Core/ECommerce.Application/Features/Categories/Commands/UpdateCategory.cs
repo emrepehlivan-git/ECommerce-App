@@ -13,14 +13,10 @@ public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Resu
 
 internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {
-    private readonly CategoryBusinessRules _categoryBusinessRules;
-    private readonly ICategoryRepository _categoryRepository;
     public UpdateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, ICategoryRepository categoryRepository, LocalizationHelper localizer)
     {
-        _categoryBusinessRules = categoryBusinessRules;
-        _categoryRepository = categoryRepository;
         RuleFor(x => x.Id)
-            .MustAsync(async (id, ct) => await _categoryRepository.AnyAsync(x => x.Id == id, ct))
+            .MustAsync(async (id, ct) => await categoryRepository.AnyAsync(x => x.Id == id, ct))
             .WithMessage(localizer[CategoryConsts.NotFound]);
 
         RuleFor(x => x.Name)
@@ -31,7 +27,7 @@ internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateC
             .MaximumLength(CategoryConsts.NameMaxLength)
             .WithMessage(localizer[CategoryConsts.NameMustBeLessThanCharacters])
             .MustAsync(async (command, name, ct) =>
-                !await _categoryBusinessRules.CheckIfCategoryExistsAsync(name, command.Id, ct))
+                !await categoryBusinessRules.CheckIfCategoryExistsAsync(name, command.Id, ct))
             .WithMessage(localizer[CategoryConsts.NameExists]);
     }
 }
