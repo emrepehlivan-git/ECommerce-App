@@ -17,5 +17,15 @@
   "Category.Name.Exists": "Kategori adı zaten mevcut.",
   "Category.Name.IsRequired": "Kategori adı gereklidir.",
   "Category.Name.MustBeAtLeastCharacters": "Kategori adı en az 3 karakter olmalıdır.",
-  "Category.Name.MustBeLessThanCharacters": "Kategori adı en fazla 100 karakter olmalıdır."
+  "Category.Name.MustBeLessThanCharacters": "Kategori adı en fazla 100 karakter olmalıdır.",
+  "Order.NotFound": "Sipariş bulunamadı.",
+  "Order.UserNotFound": "Bu sipariş için kullanıcı bulunamadı.",
+  "Order.ProductNotFound": "Bu sipariş için ürün bulunamadı.",
+  "Order.QuantityMustBeGreaterThanZero": "Sipariş ürün miktarı sıfırdan büyük olmalıdır.",
+  "Order.CannotBeModified": "Sipariş mevcut durumunda değiştirilemez.",
+  "Order.CannotBeCancelled": "Sipariş mevcut durumunda iptal edilemez.",
+  "Order.ItemNotFound": "Sipariş ürünü bulunamadı.",
+  "Order.ShippingAddressRequired": "Teslimat adresi gereklidir.",
+  "Order.BillingAddressRequired": "Fatura adresi gereklidir.",
+  "Order.EmptyOrder": "Sipariş boş olamaz. Lütfen en az bir ürün ekleyin."
 }
