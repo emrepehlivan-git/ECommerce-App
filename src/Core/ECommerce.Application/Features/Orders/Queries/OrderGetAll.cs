@@ -4,7 +4,7 @@ using ECommerce.Application.Common.Extensions;
 using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Orders.DTOs;
 using ECommerce.Application.Repositories;
-using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
 using ECommerce.SharedKernel;
 using Mapster;
 using MediatR;

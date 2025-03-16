@@ -1,4 +1,4 @@
-using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
 
 namespace ECommerce.Application.Features.Orders.DTOs;
 

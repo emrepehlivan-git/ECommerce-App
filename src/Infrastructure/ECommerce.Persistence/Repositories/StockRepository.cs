@@ -1,3 +1,4 @@
+using ECommerce.Application.Common.Exceptions;
 using ECommerce.Application.Repositories;
 using ECommerce.Persistence.Contexts;
 using ECommerce.SharedKernel;
@@ -12,46 +13,34 @@ public sealed class StockRepository(ApplicationDbContext context, ILogger<StockR
 
     public async Task ReserveStockAsync(Guid productId, int quantity, CancellationToken cancellationToken = default)
     {
-        var stock = await _context.ProductStocks.FindAsync(productId, cancellationToken);
+        var stock = await _context.ProductStocks.FindAsync([productId], cancellationToken);
         if (stock is null)
-            throw new InvalidOperationException("Stock not found");
-
-        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-
-        try
         {
-            stock.Reserve(quantity);
-            await transaction.CommitAsync(cancellationToken);
+            _logger.LogError("Stock not found for product {ProductId}", productId);
+            throw new NotFoundException($"Stock not found for product {productId}");
         }
-        catch (Exception ex)
+
+        if (stock.Quantity < quantity)
         {
-            await transaction.RollbackAsync(cancellationToken);
-            _logger.LogError(ex, "Error reserving stock for product {ProductId}", productId);
-            throw new InvalidOperationException("Stock not found", ex);
+            _logger.LogError("Insufficient stock for product {ProductId}. Available: {Available}, Requested: {Requested}",
+                productId, stock.Quantity, quantity);
+            throw new BusinessException($"Insufficient stock for product {productId}");
         }
+
+        stock.Reserve(quantity);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task ReleaseStockAsync(Guid productId, int quantity, CancellationToken cancellationToken = default)
     {
-        var stock = await _context.ProductStocks.FindAsync(productId, cancellationToken);
+        var stock = await _context.ProductStocks.FindAsync([productId], cancellationToken);
         if (stock is null)
         {
             _logger.LogError("Stock not found for product {ProductId}", productId);
-            throw new InvalidOperationException("Stock not found");
+            throw new NotFoundException($"Stock not found for product {productId}");
         }
 
-        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-
-        try
-        {
-            stock.Release(quantity);
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            _logger.LogError(ex, "Error releasing stock for product {ProductId}", productId);
-            throw new InvalidOperationException("Stock not found", ex);
-        }
+        stock.Release(quantity);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

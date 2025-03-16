@@ -10,7 +10,7 @@ public sealed class OrderItem : BaseEntity
 
     public decimal UnitPrice { get; private set; }
     public int Quantity { get; private set; }
-    public decimal TotalPrice => UnitPrice * Quantity;
+    public decimal TotalPrice { get; private set; }
 
     internal OrderItem()
     {
@@ -22,6 +22,7 @@ public sealed class OrderItem : BaseEntity
         ProductId = productId;
         UnitPrice = unitPrice;
         Quantity = quantity;
+        TotalPrice = unitPrice * quantity;
     }
 
     public static OrderItem Create(Guid orderId, Guid productId, decimal unitPrice, int quantity)
@@ -47,6 +48,7 @@ public sealed class OrderItem : BaseEntity
         }
 
         Quantity = quantity;
+        TotalPrice = UnitPrice * quantity;
     }
 
     public void UpdateUnitPrice(decimal unitPrice)
@@ -57,5 +59,6 @@ public sealed class OrderItem : BaseEntity
         }
 
         UnitPrice = unitPrice;
+        TotalPrice = unitPrice * Quantity;
     }
 }

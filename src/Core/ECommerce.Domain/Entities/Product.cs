@@ -6,24 +6,27 @@ public sealed class Product : AuditableEntity
     public string? Description { get; set; }
     public decimal Price { get; private set; }
 
-    public Guid CategoryId { get; set; }
-    public Category Category { get; set; }
+    public Guid CategoryId { get; private set; }
+    public Category Category { get; private set; }
+
+    public int StockQuantity { get; private set; }
 
     internal Product()
     {
     }
 
-    private Product(string name, string? description, decimal price, Guid categoryId)
+    private Product(string name, string? description, decimal price, Guid categoryId, int initialStock)
     {
         Name = name;
         Description = description;
         Price = price;
         CategoryId = categoryId;
+        StockQuantity = initialStock;
     }
 
-    public static Product Create(string name, string? description, decimal price, Guid categoryId)
+    public static Product Create(string name, string? description, decimal price, Guid categoryId, int initialStock = 0)
     {
-        return new(name, description, price, categoryId);
+        return new(name, description, price, categoryId, initialStock);
     }
 
     public void Update(string name, decimal price, Guid categoryId, string? description)
@@ -32,6 +35,16 @@ public sealed class Product : AuditableEntity
         Description = description;
         Price = price;
         CategoryId = categoryId;
+    }
+
+    public void UpdateStock(int quantity)
+    {
+        StockQuantity = quantity;
+    }
+
+    public bool HasSufficientStock(int requestedQuantity)
+    {
+        return StockQuantity >= requestedQuantity;
     }
 }
 

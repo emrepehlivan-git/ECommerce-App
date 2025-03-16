@@ -17,6 +17,8 @@ services:
     ports:
       - 4000:8080
       - 4001:8081
+    volumes:
+      - keys:/root/.aspnet/DataProtection-Keys
 
   ecommerce.authserver:
     build:
@@ -67,3 +69,4 @@ volumes:
   pgdata:
   redisdata:
   seqdata:
+  keys:

@@ -1,3 +1,5 @@
+using ECommerce.Domain.Enums;
+
 namespace ECommerce.Domain.Entities;
 
 public sealed class Order : AuditableEntity
@@ -99,11 +101,3 @@ public sealed class Order : AuditableEntity
     }
 }
 
-public enum OrderStatus : byte
-{
-    Pending,
-    Processing,
-    Shipped,
-    Delivered,
-    Cancelled
-}

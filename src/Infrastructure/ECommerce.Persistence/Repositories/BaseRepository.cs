@@ -107,22 +107,27 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         bool isTracking = false)
     {
         var query = Table.AsQueryable();
+
         if (predicate != null)
         {
             query = query.Where(predicate);
         }
-        if (orderBy != null)
-        {
-            query = orderBy.Compile()(query);
-        }
+
         if (include != null)
         {
             query = include.Compile()(query);
         }
+
+        if (orderBy != null)
+        {
+            query = orderBy.Compile()(query);
+        }
+
         if (!isTracking)
         {
             query = query.AsNoTracking();
         }
+
         return query;
     }
 

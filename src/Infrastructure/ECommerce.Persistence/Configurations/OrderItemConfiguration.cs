@@ -20,7 +20,7 @@ internal sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderIte
             .IsRequired();
 
         builder.Property(oi => oi.TotalPrice)
-            .HasComputedColumnSql("UnitPrice * Quantity", stored: true)
+            .IsRequired()
             .HasColumnType("decimal(18,2)");
 
         builder.HasOne(oi => oi.Order)

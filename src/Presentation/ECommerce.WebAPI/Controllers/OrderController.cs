@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.WebAPI.Controllers;
 
-public sealed class OrdersController() : BaseApiController
+public sealed class OrderController() : BaseApiController
 {
     [HttpGet]
     public async Task<IActionResult> GetOrders(

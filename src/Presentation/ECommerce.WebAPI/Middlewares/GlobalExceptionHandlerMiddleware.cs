@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Ardalis.Result;
+using ECommerce.Application.Common.Exceptions;
 using FluentValidation;
 
 namespace ECommerce.WebAPI.Middlewares;
@@ -43,8 +44,11 @@ internal sealed class GlobalExceptionHandlerMiddleware
             UnauthorizedAccessException =>
                 Result.Unauthorized(),
 
-            KeyNotFoundException =>
-                Result.NotFound(),
+            NotFoundException =>
+                Result.NotFound(exception.Message),
+
+            BusinessException =>
+                Result.Error(exception.Message),
 
             _ => Result.Error(exception.Message)
         };
@@ -54,6 +58,7 @@ internal sealed class GlobalExceptionHandlerMiddleware
             ResultStatus.Invalid => (int)HttpStatusCode.BadRequest,
             ResultStatus.Unauthorized => (int)HttpStatusCode.Unauthorized,
             ResultStatus.NotFound => (int)HttpStatusCode.NotFound,
+            ResultStatus.Error => (int)HttpStatusCode.BadRequest,
             _ => (int)HttpStatusCode.InternalServerError
         };
 

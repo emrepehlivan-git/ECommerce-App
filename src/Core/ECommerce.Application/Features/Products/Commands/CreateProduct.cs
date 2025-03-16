@@ -14,7 +14,8 @@ public sealed record CreateProductCommand(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
+    Guid CategoryId,
+    int StockQuantity) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
 
 internal sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
@@ -53,7 +54,8 @@ internal sealed class CreateProductCommandHandler(
             command.Name,
             command.Description,
             command.Price,
-            command.CategoryId);
+            command.CategoryId,
+            command.StockQuantity);
 
         productRepository.Add(product);
 

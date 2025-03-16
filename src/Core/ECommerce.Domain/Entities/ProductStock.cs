@@ -12,6 +12,11 @@ public sealed class ProductStock : AuditableEntity
 
     private ProductStock(Guid productId, int quantity)
     {
+        if (quantity < 0)
+        {
+            throw new ArgumentException("Stock quantity cannot be negative.", nameof(quantity));
+        }
+
         ProductId = productId;
         Quantity = quantity;
     }
@@ -21,13 +26,38 @@ public sealed class ProductStock : AuditableEntity
         return new(productId, quantity);
     }
 
+    public void UpdateQuantity(int quantity)
+    {
+        if (quantity < 0)
+        {
+            throw new ArgumentException("Stock quantity cannot be negative.", nameof(quantity));
+        }
+
+        Quantity = quantity;
+    }
+
     public void Reserve(int quantity)
     {
+        if (quantity <= 0)
+        {
+            throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
+        }
+
+        if (Quantity < quantity)
+        {
+            throw new InvalidOperationException("Insufficient stock.");
+        }
+
         Quantity -= quantity;
     }
 
     public void Release(int quantity)
     {
+        if (quantity <= 0)
+        {
+            throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
+        }
+
         Quantity += quantity;
     }
 }
