@@ -5,4 +5,5 @@ public sealed record ProductDto(
     string Name,
     string? Description,
     decimal Price,
-    string CategoryName);
+    string CategoryName,
+    int StockQuantity);

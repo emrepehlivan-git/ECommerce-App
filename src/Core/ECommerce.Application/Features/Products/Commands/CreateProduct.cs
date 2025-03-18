@@ -28,10 +28,7 @@ internal sealed class CreateProductCommandValidator : AbstractValidator<CreatePr
             .MinimumLength(ProductConsts.NameMinLength)
             .WithMessage(localizer[ProductConsts.NameMustBeAtLeastCharacters])
             .MaximumLength(ProductConsts.NameMaxLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeLessThanCharacters])
-            .MustAsync(async (name, ct) =>
-                !await productRepository.AnyAsync(x => x.Name.ToLower() == name.ToLower(), cancellationToken: ct))
-            .WithMessage(localizer[ProductConsts.NameExists]);
+            .WithMessage(localizer[ProductConsts.NameMustBeLessThanCharacters]);
 
         RuleFor(x => x.Price)
             .GreaterThan(0)

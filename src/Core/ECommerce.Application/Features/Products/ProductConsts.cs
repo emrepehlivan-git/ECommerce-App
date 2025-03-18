@@ -9,7 +9,7 @@ public static class ProductConsts
     public const string NameMustBeLessThanCharacters = "Product.Name.MustBeLessThanCharacters";
     public const string PriceMustBeGreaterThanZero = "Product.Price.MustBeGreaterThanZero";
     public const string CategoryNotFound = "Product.Category.NotFound";
-
+    public const string StockQuantityMustBeGreaterThanZero = "Product.StockQuantity.MustBeGreaterThanZero";
     public const int NameMinLength = 3;
     public const int NameMaxLength = 100;
 }

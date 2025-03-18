@@ -41,4 +41,18 @@ public sealed class ProductController : BaseApiController
         var product = await Mediator.Send(new DeleteProductCommand(id), cancellationToken);
         return Ok(product);
     }
+
+    [HttpGet("{id}/stock")]
+    public async Task<IActionResult> GetProductStockInfo(Guid id, CancellationToken cancellationToken)
+    {
+        var stockInfo = await Mediator.Send(new GetProductStockInfo(id), cancellationToken);
+        return Ok(stockInfo);
+    }
+
+    [HttpPut("{id}/stock")]
+    public async Task<IActionResult> UpdateProductStock(Guid id, UpdateProductStock command, CancellationToken cancellationToken)
+    {
+        var product = await Mediator.Send(command with { ProductId = id }, cancellationToken);
+        return Ok(product);
+    }
 }

@@ -4,6 +4,7 @@ using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;

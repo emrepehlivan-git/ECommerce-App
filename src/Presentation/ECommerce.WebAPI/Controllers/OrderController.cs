@@ -2,6 +2,7 @@ using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Orders.Commands;
 using ECommerce.Application.Features.Orders.Queries;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.WebAPI.Controllers;
