@@ -12,7 +12,7 @@ namespace ECommerce.Application.Features.Products.Commands;
 public record class UpdateProductStock(Guid ProductId, int StockQuantity) : IRequest<Result>, IValidateRequest, ITransactionalRequest
 ;
 
-internal sealed class UpdateProductStockValidator : AbstractValidator<UpdateProductStock>
+public sealed class UpdateProductStockValidator : AbstractValidator<UpdateProductStock>
 {
     public UpdateProductStockValidator(IProductRepository productRepository, LocalizationHelper localizer)
     {
@@ -26,7 +26,7 @@ internal sealed class UpdateProductStockValidator : AbstractValidator<UpdateProd
     }
 }
 
-internal sealed class UpdateProductStockHandler(
+public sealed class UpdateProductStockHandler(
     IStockRepository stockRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<UpdateProductStock, Result>(lazyServiceProvider)
 {

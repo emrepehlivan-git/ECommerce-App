@@ -17,7 +17,7 @@ public sealed record CreateProductCommand(
     Guid CategoryId,
     int StockQuantity) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
+public sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
     public CreateProductCommandValidator(
         IProductRepository productRepository,
@@ -41,7 +41,7 @@ internal sealed class CreateProductCommandValidator : AbstractValidator<CreatePr
     }
 }
 
-internal sealed class CreateProductCommandHandler(
+public sealed class CreateProductCommandHandler(
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<CreateProductCommand, Result<Guid>>(lazyServiceProvider)
 {

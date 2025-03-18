@@ -16,7 +16,7 @@ public sealed record OrderItemRemoveCommand(
     Guid OrderId,
     Guid ProductId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class OrderItemRemoveCommandValidator : AbstractValidator<OrderItemRemoveCommand>
+public sealed class OrderItemRemoveCommandValidator : AbstractValidator<OrderItemRemoveCommand>
 {
     public OrderItemRemoveCommandValidator(
         IOrderRepository orderRepository,
@@ -51,7 +51,7 @@ internal sealed class OrderItemRemoveCommandValidator : AbstractValidator<OrderI
     }
 }
 
-internal sealed class OrderItemRemoveCommandHandler(
+public sealed class OrderItemRemoveCommandHandler(
     IOrderRepository orderRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderItemRemoveCommand, Result>(lazyServiceProvider)
 {

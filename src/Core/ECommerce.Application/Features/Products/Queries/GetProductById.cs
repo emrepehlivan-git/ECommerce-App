@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Products.Queries;
 
 public sealed record GetProductByIdQuery(Guid Id) : IRequest<Result<ProductDto>>;
 
-internal sealed class GetProductByIdQueryHandler(
+public sealed class GetProductByIdQueryHandler(
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetProductByIdQuery, Result<ProductDto>>(lazyServiceProvider)
 {

@@ -13,7 +13,7 @@ namespace ECommerce.Application.Features.Users.Queries;
 
 public sealed record GetUsersQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<List<UserDto>>>;
 
-internal sealed class GetUsersQueryHandler(
+public sealed class GetUsersQueryHandler(
     IIdentityService identityService,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetUsersQuery, PagedResult<List<UserDto>>>(lazyServiceProvider)
 {

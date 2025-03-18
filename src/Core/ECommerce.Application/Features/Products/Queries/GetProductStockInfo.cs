@@ -8,7 +8,7 @@ namespace ECommerce.Application.Features.Products.Queries;
 
 
 public sealed record GetProductStockInfo(Guid ProductId) : IRequest<Result<int>>;
-internal sealed class GetProductStockInfoHandler(
+public sealed class GetProductStockInfoHandler(
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetProductStockInfo, Result<int>>(lazyServiceProvider)
 {

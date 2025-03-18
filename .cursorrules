@@ -6,6 +6,7 @@ layers:
   - Core:
       - ECommerce.Domain
       - ECommerce.Application
+      - ECommerce.SharedKernel
   - Infrastructure:
       - ECommerce.Infrastructure
       - ECommerce.Persistence
@@ -20,12 +21,11 @@ conventions:
   - Use async/await for all I/O operations
   - Use meaningful and descriptive names for variables, methods, and classes
   - Use fluent api for entity configurations
-  - Request handler classes should be internal sealed
   - Use MediatR for request/response handling
   - Use FluentValidation for request validation
   - Use record types for value objects
   - Use DTOs for data transfer between layers
-  - DTOs should be record sealed
+  - DTOs should be record types and sealed
   - Use BaseApiController for all controllers
   - Controllers should be sealed
   - Use primary constructor for all classes

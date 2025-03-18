@@ -20,7 +20,7 @@ public sealed record OrderItemRequest(
     Guid ProductId,
     int Quantity);
 
-internal sealed class OrderPlaceCommandValidator : AbstractValidator<OrderPlaceCommand>
+public sealed class OrderPlaceCommandValidator : AbstractValidator<OrderPlaceCommand>
 {
     public OrderPlaceCommandValidator(
         IProductRepository productRepository,
@@ -52,7 +52,7 @@ internal sealed class OrderPlaceCommandValidator : AbstractValidator<OrderPlaceC
     }
 }
 
-internal sealed class OrderPlaceCommandHandler(
+public sealed class OrderPlaceCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IStockRepository stockRepository,

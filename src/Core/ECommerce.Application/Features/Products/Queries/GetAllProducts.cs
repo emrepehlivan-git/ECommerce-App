@@ -13,7 +13,7 @@ namespace ECommerce.Application.Features.Products.Queries;
 
 public sealed record GetAllProductsQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<List<ProductDto>>>;
 
-internal sealed class GetAllProductsQueryHandler(
+public sealed class GetAllProductsQueryHandler(
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllProductsQuery, PagedResult<List<ProductDto>>>(lazyServiceProvider)
 {

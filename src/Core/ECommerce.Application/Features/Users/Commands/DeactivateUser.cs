@@ -9,7 +9,7 @@ namespace ECommerce.Application.Features.Users.Commands;
 
 public sealed record DeactivateUserCommand(Guid UserId) : IRequest<Result>, ITransactionalRequest;
 
-internal sealed class DeactivateUserCommandHandler(
+public sealed class DeactivateUserCommandHandler(
     IIdentityService identityService,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<DeactivateUserCommand, Result>(lazyServiceProvider)
 {

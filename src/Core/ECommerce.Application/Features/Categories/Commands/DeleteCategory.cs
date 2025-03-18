@@ -9,7 +9,7 @@ namespace ECommerce.Application.Features.Categories.Commands;
 
 public sealed record DeleteCategoryCommand(Guid Id) : IRequest<Result>, ITransactionalRequest;
 
-internal sealed class DeleteCategoryCommandHandler(
+public sealed class DeleteCategoryCommandHandler(
     ICategoryRepository categoryRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<DeleteCategoryCommand, Result>(lazyServiceProvider)
 {

@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Users.Queries;
 
 public sealed record GetUserByIdQuery(Guid UserId) : IRequest<Result<UserDto>>;
 
-internal sealed class GetUserByIdQueryHandler(
+public sealed class GetUserByIdQueryHandler(
     IIdentityService identityService,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetUserByIdQuery, Result<UserDto>>(lazyServiceProvider)
 {

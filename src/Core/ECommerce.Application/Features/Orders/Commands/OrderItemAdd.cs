@@ -17,7 +17,7 @@ public sealed record OrderItemAddCommand(
     Guid ProductId,
     int Quantity) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class OrderItemAddCommandValidator : AbstractValidator<OrderItemAddCommand>
+public sealed class OrderItemAddCommandValidator : AbstractValidator<OrderItemAddCommand>
 {
     public OrderItemAddCommandValidator(
         IOrderRepository orderRepository,
@@ -44,7 +44,7 @@ internal sealed class OrderItemAddCommandValidator : AbstractValidator<OrderItem
     }
 }
 
-internal sealed class OrderItemAddCommandHandler(
+public sealed class OrderItemAddCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderItemAddCommand, Result>(lazyServiceProvider)

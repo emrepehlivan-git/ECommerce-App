@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ECommerce.Persistence.Configurations;
 
-internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
+public sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
 {
     private static readonly Guid UserRoleId = new("8D04DCE2-969A-435D-BBA4-DF3F325983DC");
     private static readonly Guid AdminRoleId = new("2C5E174E-3B0E-446F-86AF-483D56FD7210");

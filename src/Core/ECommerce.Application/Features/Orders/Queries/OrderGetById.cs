@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Orders.Queries;
 
 public sealed record OrderGetByIdQuery(Guid Id) : IRequest<Result<OrderDto>>;
 
-internal sealed class OrderGetByIdQueryHandler(
+public sealed class OrderGetByIdQueryHandler(
     IOrderRepository orderRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetByIdQuery, Result<OrderDto>>(lazyServiceProvider)
 {

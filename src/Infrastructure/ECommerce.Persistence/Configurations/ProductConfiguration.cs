@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Persistence.Configurations;
 
-internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
+public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Product> builder)
     {

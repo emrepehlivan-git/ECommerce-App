@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Orders.Queries;
 
 public sealed record OrderGetByUserQuery(Guid UserId) : IRequest<Result<List<OrderDto>>>;
 
-internal sealed class OrderGetByUserQueryHandler(
+public sealed class OrderGetByUserQueryHandler(
     IOrderRepository orderRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetByUserQuery, Result<List<OrderDto>>>(lazyServiceProvider)
 {

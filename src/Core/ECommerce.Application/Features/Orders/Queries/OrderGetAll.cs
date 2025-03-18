@@ -16,7 +16,7 @@ public sealed record OrderGetAllQuery(
     PageableRequestParams PageableRequestParams,
     OrderStatus? Status = null) : IRequest<PagedResult<List<OrderDto>>>;
 
-internal sealed class OrderGetAllQueryHandler(
+public sealed class OrderGetAllQueryHandler(
     IOrderRepository orderRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetAllQuery, PagedResult<List<OrderDto>>>(lazyServiceProvider)
 {

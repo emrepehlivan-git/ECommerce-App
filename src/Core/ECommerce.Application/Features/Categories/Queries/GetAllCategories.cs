@@ -13,7 +13,7 @@ namespace ECommerce.Application.Features.Categories.Queries;
 
 public sealed record GetAllCategoriesQuery(PageableRequestParams PageableRequestParams, string? OrderBy = null, bool IncludeProducts = false) : IRequest<PagedResult<List<CategoryDto>>>;
 
-internal sealed class GetAllCategoriesQueryHandler(
+public sealed class GetAllCategoriesQueryHandler(
     ICategoryRepository categoryRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllCategoriesQuery, PagedResult<List<CategoryDto>>>(lazyServiceProvider)
 {

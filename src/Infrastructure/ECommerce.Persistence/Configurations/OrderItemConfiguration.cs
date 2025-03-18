@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ECommerce.Persistence.Configurations;
 
-internal sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
+public sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {

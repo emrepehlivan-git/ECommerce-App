@@ -6,7 +6,7 @@ using FluentValidation;
 
 namespace ECommerce.WebAPI.Middlewares;
 
-internal sealed class GlobalExceptionHandlerMiddleware
+public sealed class GlobalExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;

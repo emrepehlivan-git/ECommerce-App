@@ -15,7 +15,7 @@ public sealed record OrderStatusUpdateCommand(
     Guid OrderId,
     OrderStatus NewStatus) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class OrderStatusUpdateCommandValidator : AbstractValidator<OrderStatusUpdateCommand>
+public sealed class OrderStatusUpdateCommandValidator : AbstractValidator<OrderStatusUpdateCommand>
 {
     public OrderStatusUpdateCommandValidator(
         IOrderRepository orderRepository,
@@ -32,7 +32,7 @@ internal sealed class OrderStatusUpdateCommandValidator : AbstractValidator<Orde
     }
 }
 
-internal sealed class OrderStatusUpdateCommandHandler(
+public sealed class OrderStatusUpdateCommandHandler(
     IOrderRepository orderRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderStatusUpdateCommand, Result>(lazyServiceProvider)
 {

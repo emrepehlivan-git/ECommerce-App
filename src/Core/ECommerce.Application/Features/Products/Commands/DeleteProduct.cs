@@ -9,7 +9,7 @@ namespace ECommerce.Application.Features.Products.Commands;
 
 public sealed record DeleteProductCommand(Guid Id) : IRequest<Result>, ITransactionalRequest;
 
-internal sealed class DeleteProductCommandHandler(
+public sealed class DeleteProductCommandHandler(
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<DeleteProductCommand, Result>(lazyServiceProvider)
 {

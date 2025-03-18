@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Categories.Commands;
 
 public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
+public sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {
     public UpdateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, ICategoryRepository categoryRepository, LocalizationHelper localizer)
     {
@@ -32,7 +32,7 @@ internal sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateC
     }
 }
 
-internal sealed class UpdateCategoryCommandHandler(
+public sealed class UpdateCategoryCommandHandler(
     ICategoryRepository categoryRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<UpdateCategoryCommand, Result>(lazyServiceProvider)
 {

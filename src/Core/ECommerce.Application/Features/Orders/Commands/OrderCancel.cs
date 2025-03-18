@@ -14,7 +14,7 @@ namespace ECommerce.Application.Features.Orders.Commands;
 
 public sealed record OrderCancelCommand(Guid OrderId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class OrderCancelCommandValidator : AbstractValidator<OrderCancelCommand>
+public sealed class OrderCancelCommandValidator : AbstractValidator<OrderCancelCommand>
 {
     public OrderCancelCommandValidator(
         IOrderRepository orderRepository,
@@ -37,7 +37,7 @@ internal sealed class OrderCancelCommandValidator : AbstractValidator<OrderCance
     }
 }
 
-internal sealed class OrderCancelCommandHandler(
+public sealed class OrderCancelCommandHandler(
     IOrderRepository orderRepository,
     IStockRepository stockRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderCancelCommand, Result>(lazyServiceProvider)

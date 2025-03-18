@@ -16,7 +16,7 @@ public sealed record UpdateProductCommand(
     decimal Price,
     Guid CategoryId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
+public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
     public UpdateProductCommandValidator(
         IProductRepository productRepository,
@@ -50,7 +50,7 @@ internal sealed class UpdateProductCommandValidator : AbstractValidator<UpdatePr
     }
 }
 
-internal sealed class UpdateProductCommandHandler(
+public sealed class UpdateProductCommandHandler(
     IProductRepository productRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<UpdateProductCommand, Result>(lazyServiceProvider)
 {

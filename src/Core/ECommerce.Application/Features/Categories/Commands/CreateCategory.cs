@@ -12,7 +12,7 @@ namespace ECommerce.Application.Features.Categories.Commands;
 
 public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
 
-internal sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
+public sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {
     public CreateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, LocalizationHelper localizer)
     {

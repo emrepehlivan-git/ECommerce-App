@@ -11,7 +11,7 @@ namespace ECommerce.Application.Features.Categories.Queries;
 
 public sealed record GetCategoryByIdQuery(Guid Id, bool IncludeProducts = false) : IRequest<Result<CategoryWithProductsDto>>;
 
-internal sealed class GetCategoryByIdQueryHandler(
+public sealed class GetCategoryByIdQueryHandler(
     ICategoryRepository categoryRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetCategoryByIdQuery, Result<CategoryWithProductsDto>>(lazyServiceProvider)
 {

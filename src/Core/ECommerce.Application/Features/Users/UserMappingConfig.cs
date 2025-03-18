@@ -4,7 +4,7 @@ using Mapster;
 
 namespace ECommerce.Application.Features.Users;
 
-internal sealed class UserMappingConfig : IRegister
+public sealed class UserMappingConfig : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
