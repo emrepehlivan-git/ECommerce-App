@@ -20,7 +20,6 @@ public sealed record CreateProductCommand(
 public sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
     public CreateProductCommandValidator(
-        IProductRepository productRepository,
         ICategoryRepository categoryRepository,
         LocalizationHelper localizer)
     {

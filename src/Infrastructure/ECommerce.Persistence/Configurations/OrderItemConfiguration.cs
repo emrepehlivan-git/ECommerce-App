@@ -1,4 +1,5 @@
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,15 +14,21 @@ public sealed class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.HasKey(oi => oi.Id);
 
         builder.Property(oi => oi.UnitPrice)
-            .IsRequired()
-            .HasColumnType("decimal(18,2)");
+            .HasConversion(
+                price => price.Value,
+                value => Price.Create(value))
+            .HasColumnType("decimal(18,2)")
+            .IsRequired();
 
         builder.Property(oi => oi.Quantity)
             .IsRequired();
 
         builder.Property(oi => oi.TotalPrice)
-            .IsRequired()
-            .HasColumnType("decimal(18,2)");
+            .HasConversion(
+                price => price.Value,
+                value => Price.Create(value))
+            .HasColumnType("decimal(18,2)")
+            .IsRequired();
 
         builder.HasOne(oi => oi.Order)
             .WithMany(o => o.Items)

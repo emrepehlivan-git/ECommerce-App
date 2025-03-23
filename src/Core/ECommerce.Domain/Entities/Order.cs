@@ -1,4 +1,5 @@
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.ValueObjects;
 
 namespace ECommerce.Domain.Entities;
 
@@ -37,7 +38,7 @@ public sealed class Order : AuditableEntity
         return new(userId, shippingAddress, billingAddress);
     }
 
-    public void AddItem(Guid productId, decimal unitPrice, int quantity)
+    public void AddItem(Guid productId, Price unitPrice, int quantity)
     {
         var existingItem = _items.FirstOrDefault(i => i.ProductId == productId);
 
@@ -47,7 +48,7 @@ public sealed class Order : AuditableEntity
         }
         else
         {
-            var orderItem = OrderItem.Create(Id, productId, unitPrice, quantity);
+            var orderItem = OrderItem.Create(Id, productId, unitPrice.Value, quantity);
             _items.Add(orderItem);
         }
 
@@ -86,7 +87,7 @@ public sealed class Order : AuditableEntity
 
     private void RecalculateTotalAmount()
     {
-        TotalAmount = _items.Sum(i => i.TotalPrice);
+        TotalAmount = _items.Sum(i => i.TotalPrice.Value);
     }
 
     public void UpdateStatus(OrderStatus status)

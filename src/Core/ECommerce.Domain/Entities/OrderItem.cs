@@ -1,3 +1,5 @@
+using ECommerce.Domain.ValueObjects;
+
 namespace ECommerce.Domain.Entities;
 
 public sealed class OrderItem : BaseEntity
@@ -8,9 +10,9 @@ public sealed class OrderItem : BaseEntity
     public Guid ProductId { get; private set; }
     public Product Product { get; private set; } = null!;
 
-    public decimal UnitPrice { get; private set; }
+    public Price UnitPrice { get; private set; }
     public int Quantity { get; private set; }
-    public decimal TotalPrice { get; private set; }
+    public Price TotalPrice { get; private set; }
 
     internal OrderItem()
     {
@@ -20,9 +22,9 @@ public sealed class OrderItem : BaseEntity
     {
         OrderId = orderId;
         ProductId = productId;
-        UnitPrice = unitPrice;
+        UnitPrice = Price.Create(unitPrice);
         Quantity = quantity;
-        TotalPrice = unitPrice * quantity;
+        TotalPrice = UnitPrice * quantity;
     }
 
     public static OrderItem Create(Guid orderId, Guid productId, decimal unitPrice, int quantity)
@@ -58,7 +60,7 @@ public sealed class OrderItem : BaseEntity
             throw new ArgumentException("Unit price cannot be negative", nameof(unitPrice));
         }
 
-        UnitPrice = unitPrice;
-        TotalPrice = unitPrice * Quantity;
+        UnitPrice = Price.Create(unitPrice);
+        TotalPrice = UnitPrice * Quantity;
     }
 }

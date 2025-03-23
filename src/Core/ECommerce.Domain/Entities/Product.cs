@@ -1,10 +1,12 @@
+using ECommerce.Domain.ValueObjects;
+
 namespace ECommerce.Domain.Entities;
 
 public sealed class Product : AuditableEntity
 {
     public string Name { get; private set; } = string.Empty;
     public string? Description { get; set; }
-    public decimal Price { get; private set; }
+    public Price Price { get; private set; }
 
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; }
@@ -19,7 +21,7 @@ public sealed class Product : AuditableEntity
     {
         Name = name;
         Description = description;
-        Price = price;
+        Price = Price.Create(price);
         CategoryId = categoryId;
         StockQuantity = initialStock;
     }
@@ -33,7 +35,7 @@ public sealed class Product : AuditableEntity
     {
         Name = name;
         Description = description;
-        Price = price;
+        Price = Price.Create(price);
         CategoryId = categoryId;
     }
 

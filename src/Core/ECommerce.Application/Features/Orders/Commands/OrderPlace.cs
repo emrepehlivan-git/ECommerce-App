@@ -68,12 +68,11 @@ public sealed class OrderPlaceCommandHandler(
         foreach (var item in command.Items)
         {
             var product = await productRepository.GetByIdAsync(item.ProductId, cancellationToken: cancellationToken);
-            if (product is null)
-                return Result.NotFound(Localizer[OrderConsts.ProductNotFound]);
-
-            await stockRepository.ReserveStockAsync(item.ProductId, item.Quantity, cancellationToken);
-
-            order.AddItem(item.ProductId, product.Price, item.Quantity);
+            if (product is not null)
+            {
+                await stockRepository.ReserveStockAsync(item.ProductId, item.Quantity, cancellationToken);
+                order.AddItem(item.ProductId, product.Price, item.Quantity);
+            }
         }
 
         orderRepository.Add(order);
