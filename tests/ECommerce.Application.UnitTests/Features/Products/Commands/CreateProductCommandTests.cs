@@ -1,81 +1,40 @@
-using ECommerce.Application.Features.Products;
-using ECommerce.Application.Common.Interfaces;
-
 namespace ECommerce.Application.UnitTests.Features.Products.Commands;
 
-public sealed class CreateProductCommandTests
+public sealed class CreateProductCommandTests : ProductCommandsTestBase
 {
-    private readonly Mock<IProductRepository> _productRepositoryMock;
-    private readonly Mock<ICategoryRepository> _categoryRepositoryMock;
-    private readonly Mock<ILazyServiceProvider> _lazyServiceProviderMock;
-    private readonly Mock<ILocalizationService> _localizationServiceMock;
-    private readonly CreateProductCommandHandler _handler;
-    private readonly CreateProductCommandValidator _validator;
-    private readonly LocalizationHelper _localizer;
-
+    private readonly CreateProductCommandHandler Handler;
+    private readonly CreateProductCommand Command;
+    private readonly CreateProductCommandValidator Validator;
     public CreateProductCommandTests()
     {
-        _productRepositoryMock = new Mock<IProductRepository>();
-        _categoryRepositoryMock = new Mock<ICategoryRepository>();
-        _lazyServiceProviderMock = new Mock<ILazyServiceProvider>();
-        _localizationServiceMock = new Mock<ILocalizationService>();
+        SetupDefaultLocalizationMessages();
 
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.NameMustBeAtLeastCharacters))
-            .Returns("Product name must be at least 3 characters long");
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.NameMustBeLessThanCharacters))
-            .Returns("Product name must be less than 100 characters long");
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.PriceMustBeGreaterThanZero))
-            .Returns("Product price must be greater than zero");
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.CategoryNotFound))
-            .Returns("Product category not found");
-
-        _localizer = new LocalizationHelper(_localizationServiceMock.Object);
-
-        _handler = new CreateProductCommandHandler(
-            _productRepositoryMock.Object,
-            _lazyServiceProviderMock.Object);
-
-        _validator = new CreateProductCommandValidator(
-            _categoryRepositoryMock.Object,
-            _localizer);
-    }
-
-    [Fact]
-    public async Task Handle_WithValidCommand_ShouldCreateProduct()
-    {
-        // Arrange
-        var command = new CreateProductCommand(
+        Command = new CreateProductCommand(
             Name: "Test Product",
             Description: "Test Description",
             Price: 100m,
             CategoryId: Guid.NewGuid(),
             StockQuantity: 10);
 
-        Product? capturedProduct = null;
-        _productRepositoryMock
-            .Setup(x => x.Add(It.IsAny<Product>()))
-            .Callback<Product>(product => capturedProduct = product);
+        Handler = new CreateProductCommandHandler(
+            ProductRepositoryMock.Object,
+            LazyServiceProviderMock.Object);
 
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
+        Validator = new CreateProductCommandValidator(
+            CategoryRepositoryMock.Object,
+            Localizer);
+    }
 
-        // Assert
+    [Fact]
+    public async Task Handle_WithValidCommand_ShouldCreateProduct()
+    {
+        SetupProductRepositoryAdd(DefaultProduct);
+
+        var result = await Handler.Handle(Command, CancellationToken.None);
+
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(capturedProduct!.Id);
-
-        _productRepositoryMock.Verify(x => x.Add(It.IsAny<Product>()), Times.Once);
-
-        capturedProduct.Should().NotBeNull();
-        capturedProduct!.Name.Should().Be(command.Name);
-        capturedProduct.Description.Should().Be(command.Description);
-        capturedProduct.Price.Should().Be(command.Price);
-        capturedProduct.CategoryId.Should().Be(command.CategoryId);
-        capturedProduct.StockQuantity.Should().Be(command.StockQuantity);
+        result.Value.Should().Be(DefaultProduct.Id);
     }
 
     [Theory]
@@ -83,84 +42,40 @@ public sealed class CreateProductCommandTests
     [InlineData("AB", "Product name must be at least 3 characters long")]
     public async Task Validate_WithInvalidName_ShouldReturnValidationError(string name, string expectedError)
     {
-        // Arrange
-        var command = new CreateProductCommand(
-            Name: name,
-            Description: "Test Description",
-            Price: 100m,
-            CategoryId: Guid.NewGuid(),
-            StockQuantity: 10);
+        var command = Command with { Name = name };
 
-        // Setup category to exist to isolate the name validation
-        _categoryRepositoryMock
-            .Setup(x => x.AnyAsync(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true);
+        SetupCategoryExists(true);
 
-        // Verify localization service is called with correct constant
-        _localizationServiceMock.Verify(x => x.GetLocalizedString(ProductConsts.NameMustBeAtLeastCharacters), Times.Once);
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.NameMustBeAtLeastCharacters))
-            .Returns(expectedError)
-            .Verifiable();
+        var validationResult = await Validator.ValidateAsync(command);
 
-        // Act
-        var validationResult = await _validator.ValidateAsync(command);
-
-        // Assert
         validationResult.IsValid.Should().BeFalse();
         validationResult.Errors.Should().ContainSingle()
             .Which.ErrorMessage.Should().Be(expectedError);
 
     }
 
-    [Fact]
-    public async Task Validate_WithInvalidPrice_ShouldReturnValidationError()
+    [Theory]
+    [InlineData(0, "Product price must be greater than zero")]
+    public async Task Validate_WithInvalidPrice_ShouldReturnValidationError(decimal price, string expectedError)
     {
-        // Arrange
-        var command = new CreateProductCommand(
-            Name: "Test Product",
-            Description: "Test Description",
-            Price: 0m,
-            CategoryId: Guid.NewGuid(),
-            StockQuantity: 10);
+        var command = Command with { Price = price };
 
-        var expectedError = "Product price must be greater than zero";
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.PriceMustBeGreaterThanZero))
-            .Returns(expectedError);
+        var validationResult = await Validator.ValidateAsync(command);
 
-        // Act
-        var validationResult = await _validator.ValidateAsync(command);
-
-        // Assert
         validationResult.IsValid.Should().BeFalse();
         validationResult.Errors.Should().Contain(x => x.ErrorMessage == expectedError);
     }
 
-    [Fact]
-    public async Task Validate_WithNonExistentCategory_ShouldReturnValidationError()
+    [Theory]
+    [InlineData("00000000-0000-0000-0000-000000000000", "Product category not found")]
+    public async Task Validate_WithNonExistentCategory_ShouldReturnValidationError(string categoryId, string expectedError)
     {
-        // Arrange
-        var command = new CreateProductCommand(
-            Name: "Test Product",
-            Description: "Test Description",
-            Price: 100m,
-            CategoryId: Guid.NewGuid(),
-            StockQuantity: 10);
+        var command = Command with { CategoryId = Guid.Parse(categoryId) };
 
-        var expectedError = "Product category not found";
-        _localizationServiceMock
-            .Setup(x => x.GetLocalizedString(ProductConsts.CategoryNotFound))
-            .Returns(expectedError);
+        SetupCategoryExists(false);
 
-        _ = _categoryRepositoryMock
-            .Setup(x => x.AnyAsync(It.IsAny<Expression<Func<Category, bool>>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(false);
+        var validationResult = await Validator.ValidateAsync(command);
 
-        // Act
-        var validationResult = await _validator.ValidateAsync(command);
-
-        // Assert
         validationResult.IsValid.Should().BeFalse();
         validationResult.Errors.Should().Contain(x => x.ErrorMessage == expectedError);
     }

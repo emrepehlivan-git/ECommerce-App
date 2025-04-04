@@ -3,7 +3,6 @@ using ECommerce.Application.Common.Mappings;
 using ECommerce.Application.Features.Categories.Commands;
 using ECommerce.SharedKernel;
 using FluentValidation;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Application;
