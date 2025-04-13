@@ -1,4 +1,4 @@
-namespace ECommerce.Application.UnitTests.Features.Users;
+namespace ECommerce.Application.UnitTests.Features.Users.Queries;
 
 public abstract class UserQueriesTestBase
 {
@@ -6,12 +6,18 @@ public abstract class UserQueriesTestBase
     protected readonly Mock<ILazyServiceProvider> LazyServiceProviderMock;
     protected readonly Mock<ILocalizationService> LocalizationServiceMock;
     protected readonly User DefaultUser;
-
+    protected readonly LocalizationHelper Localizer;
     protected UserQueriesTestBase()
     {
         IdentityServiceMock = new Mock<IIdentityService>();
         LazyServiceProviderMock = new Mock<ILazyServiceProvider>();
         LocalizationServiceMock = new Mock<ILocalizationService>();
+
+        Localizer = new LocalizationHelper(LocalizationServiceMock.Object);
+
+        LazyServiceProviderMock
+            .Setup(x => x.LazyGetRequiredService<LocalizationHelper>())
+            .Returns(Localizer);
 
         DefaultUser = User.Create("test@example.com", "Test User", "Password123!");
     }

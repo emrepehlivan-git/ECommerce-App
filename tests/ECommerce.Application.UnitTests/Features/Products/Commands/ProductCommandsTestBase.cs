@@ -5,7 +5,7 @@ namespace ECommerce.Application.UnitTests.Features.Products.Commands;
 public class ProductCommandsTestBase
 {
     protected Guid CategoryId = Guid.Parse("e64db34c-7455-41da-b255-a9a7a46ace54");
-    protected Product DefaultProduct => Product.Create("Original Name", "Original Description", 100m, CategoryId);
+    protected Product DefaultProduct => Product.Create("Original Name", "Original Description", 100m, CategoryId, 10);
 
     protected Mock<IProductRepository> ProductRepositoryMock;
     protected Mock<ICategoryRepository> CategoryRepositoryMock;
@@ -22,6 +22,10 @@ public class ProductCommandsTestBase
         LocalizationServiceMock = new Mock<ILocalizationService>();
 
         Localizer = new LocalizationHelper(LocalizationServiceMock.Object);
+
+        LazyServiceProviderMock
+            .Setup(x => x.LazyGetRequiredService<LocalizationHelper>())
+            .Returns(Localizer);
 
         SetupDefaultLocalizationMessages();
     }
@@ -42,7 +46,10 @@ public class ProductCommandsTestBase
             .Returns("Product category not found");
         LocalizationServiceMock
             .Setup(x => x.GetLocalizedString(ProductConsts.NotFound))
-            .Returns("Product not found");
+            .Returns("Product not found.");
+        LocalizationServiceMock
+            .Setup(x => x.GetLocalizedString(ProductConsts.NameExists))
+            .Returns("Product with this name already exists");
     }
 
     protected void SetupProductRepositoryAdd(Product capturedProduct)
@@ -64,6 +71,17 @@ public class ProductCommandsTestBase
         ProductRepositoryMock
             .Setup(x => x.AnyAsync(It.IsAny<Expression<Func<Product, bool>>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(exists);
+    }
+
+    protected void SetupProductRepositoryGetByIdAsync(Product product)
+    {
+        ProductRepositoryMock
+            .Setup(x => x.GetByIdAsync(
+                It.IsAny<Guid>(),
+                It.IsAny<Expression<Func<IQueryable<Product>, IQueryable<Product>>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(product);
     }
 
     protected void SetupLocalizedMessage(string message)

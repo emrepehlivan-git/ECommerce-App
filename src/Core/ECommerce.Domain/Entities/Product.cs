@@ -9,7 +9,7 @@ public sealed class Product : AuditableEntity
     public Price Price { get; private set; }
 
     public Guid CategoryId { get; private set; }
-    public Category Category { get; private set; }
+    public Category Category { get; set; }
 
     public int StockQuantity { get; private set; }
 
@@ -26,7 +26,7 @@ public sealed class Product : AuditableEntity
         StockQuantity = initialStock;
     }
 
-    public static Product Create(string name, string? description, decimal price, Guid categoryId, int initialStock = 0)
+    public static Product Create(string name, string? description, decimal price, Guid categoryId, int initialStock)
     {
         return new(name, description, price, categoryId, initialStock);
     }

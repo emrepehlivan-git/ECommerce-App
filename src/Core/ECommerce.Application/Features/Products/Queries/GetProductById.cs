@@ -17,9 +17,9 @@ public sealed class GetProductByIdQueryHandler(
 {
     public override async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
     {
-        var product = await productRepository.Query()
-            .Include(x => x.Category)
-            .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
+        var product = await productRepository.GetByIdAsync(query.Id,
+            include: x => x.Include(p => p.Category),
+            cancellationToken: cancellationToken);
 
         if (product is null)
             return Result.NotFound(Localizer[ProductConsts.NotFound]);

@@ -9,6 +9,7 @@ public class ProductMapperConfig
     public static void Configure(TypeAdapterConfig config)
     {
         config.NewConfig<Product, ProductDto>()
-            .Map(dest => dest.CategoryName, src => src.Category.Name);
+            .Map(dest => dest.Price, src => src.Price != null ? src.Price.Value : 0m)
+            .Map(dest => dest.CategoryName, src => src.Category != null ? src.Category.Name : string.Empty);
     }
 }

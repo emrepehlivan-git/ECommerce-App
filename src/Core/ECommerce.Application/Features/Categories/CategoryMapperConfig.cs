@@ -8,7 +8,6 @@ public class CategoryMapperConfig
 {
     public static void Configure(TypeAdapterConfig config)
     {
-        config.NewConfig<Category, CategoryWithProductsDto>()
-            .Map(dest => dest.Products, src => src.Products == null ? null : src.Products);
+        config.NewConfig<Category, CategoryDto>();
     }
 }

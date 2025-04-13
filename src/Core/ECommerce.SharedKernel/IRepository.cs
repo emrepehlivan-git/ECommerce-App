@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Ardalis.Result;
-
 namespace ECommerce.SharedKernel;
 
 public interface IRepository<TEntity>

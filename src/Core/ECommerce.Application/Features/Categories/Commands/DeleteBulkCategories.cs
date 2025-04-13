@@ -16,12 +16,12 @@ public class DeleteBulkCategoriesCommandHandler(
 {
     public override async Task<Result> Handle(DeleteBulkCategoriesCommand command, CancellationToken cancellationToken)
     {
-        var categories = await categoryRepository.Query().Where(x => command.Ids.Contains(x.Id)).ToListAsync(cancellationToken);
+        var categories = categoryRepository.Query(predicate: x => command.Ids.Contains(x.Id)).ToList();
 
         if (categories.Count == 0)
             return Result.NotFound();
 
         categoryRepository.DeleteRange(categories);
-        return Result.Success();
+        return await Task.FromResult(Result.Success());
     }
 }

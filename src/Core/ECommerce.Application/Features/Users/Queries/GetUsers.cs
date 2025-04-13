@@ -4,6 +4,7 @@ using ECommerce.Application.Common.Extensions;
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Users.DTOs;
+using ECommerce.Domain.Entities;
 using ECommerce.SharedKernel;
 using Mapster;
 using MediatR;
@@ -22,7 +23,6 @@ public sealed class GetUsersQueryHandler(
     {
         return await identityService.Users
             .AsNoTracking()
-            .ProjectToType<UserDto>()
-            .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);
+            .ApplyPagingAsync<User, UserDto>(query.PageableRequestParams, cancellationToken);
     }
 }

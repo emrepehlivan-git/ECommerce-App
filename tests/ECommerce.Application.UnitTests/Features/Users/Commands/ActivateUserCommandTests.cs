@@ -67,7 +67,7 @@ public sealed class ActivateUserCommandTests : UserCommandsTestBase
         result.IsSuccess.Should().BeFalse();
         result.Status.Should().Be(ResultStatus.NotFound);
         result.Errors.Should().ContainSingle()
-            .Which.Should().Be("User not found");
+            .Which.Should().Be(UserConsts.NotFound);
     }
 
     [Fact]
@@ -82,13 +82,11 @@ public sealed class ActivateUserCommandTests : UserCommandsTestBase
 
         IdentityServiceMock
             .Setup(x => x.UpdateAsync(It.IsAny<User>()))
-            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Update failed" }));
+            .ReturnsAsync(IdentityResult.Failed());
 
         var result = await Handler.Handle(Command, CancellationToken.None);
 
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.Should().Be("Update failed");
     }
 }

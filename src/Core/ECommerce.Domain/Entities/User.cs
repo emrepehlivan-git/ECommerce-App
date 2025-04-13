@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using ECommerce.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,8 +15,7 @@ public sealed class User : IdentityUser<Guid>
 
     private User(string email, FullName fullName)
     {
-        Email = email;
-        UserName = email;
+        SetEmail(email);
         FullName = fullName;
         IsActive = true;
     }
@@ -30,4 +30,18 @@ public sealed class User : IdentityUser<Guid>
     public void Activate() => IsActive = true;
 
     public void UpdateName(string firstName, string lastName) => FullName = FullName.Create(firstName, lastName);
+
+    private void SetEmail(string email)
+    {
+        const string EmailRegex = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new NullReferenceException("Email cannot be null or empty.");
+
+        if (!Regex.IsMatch(email, EmailRegex))
+            throw new ArgumentException("Invalid email address.");
+
+        Email = email;
+        UserName = email;
+    }
 }

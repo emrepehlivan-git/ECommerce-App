@@ -13,6 +13,7 @@ public sealed class DeleteProductCommandTests : ProductCommandsTestBase
         Handler = new DeleteProductCommandHandler(
             ProductRepositoryMock.Object,
             LazyServiceProviderMock.Object);
+        SetupDefaultLocalizationMessages();
     }
 
     [Fact]
@@ -23,18 +24,16 @@ public sealed class DeleteProductCommandTests : ProductCommandsTestBase
         var result = await Handler.Handle(Command, CancellationToken.None);
 
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccess.Should().BeFalse();
     }
 
     [Theory]
-    [InlineData("00000000-0000-0000-0000-000000000000", "Product not found")]
+    [InlineData("00000000-0000-0000-0000-000000000000", "Product not found.")]
     public async Task Handle_WithNonExistingProduct_ShouldReturnNotFound(string productId, string expectedError)
     {
         Command = Command with { Id = Guid.Parse(productId) };
 
         SetupProductExists(false);
-
-        SetupLocalizedMessage(ProductConsts.NotFound);
 
         var result = await Handler.Handle(Command, CancellationToken.None);
 

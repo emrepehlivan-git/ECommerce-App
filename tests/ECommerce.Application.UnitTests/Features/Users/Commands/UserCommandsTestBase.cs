@@ -1,6 +1,6 @@
 using ECommerce.Application.Features.Users;
 
-namespace ECommerce.Application.UnitTests.Features.Users;
+namespace ECommerce.Application.UnitTests.Features.Users.Commands;
 
 public class UserCommandsTestBase
 {
@@ -20,6 +20,10 @@ public class UserCommandsTestBase
         LocalizationServiceMock = new Mock<ILocalizationService>();
 
         Localizer = new LocalizationHelper(LocalizationServiceMock.Object);
+
+        LazyServiceProviderMock
+            .Setup(x => x.LazyGetRequiredService<LocalizationHelper>())
+            .Returns(Localizer);
 
         SetupDefaultLocalizationMessages();
     }

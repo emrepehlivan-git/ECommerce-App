@@ -28,6 +28,6 @@ public sealed class ActivateUserCommandHandler(
 
         return result.Succeeded
             ? Result.Success()
-            : Result.Error(string.Join(", ", result.Errors.Select(e => e.Description)));
+            : Result.Invalid(result.Errors.Select(e => new ValidationError(e.Description)).ToArray());
     }
 }

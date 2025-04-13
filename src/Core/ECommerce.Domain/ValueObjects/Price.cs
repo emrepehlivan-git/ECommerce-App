@@ -17,7 +17,7 @@ public record Price
 
     private static void IsValidValue(decimal value)
     {
-        if (value < 0)
+        if (value <= 0)
         {
             throw new ArgumentException("Value must be greater than 0.", nameof(value));
         }
@@ -52,9 +52,9 @@ public record Price
         }
 
         var result = a.Value / quantity;
-        if (result < 0)
+        if (result < 1)
         {
-            throw new InvalidOperationException("Division would result in a negative price.");
+            throw new InvalidOperationException("Division would result in a price less than 1.");
         }
         return Create(result);
     }
@@ -64,5 +64,11 @@ public record Price
     public static bool operator <=(Price a, Price b) => a.Value <= b.Value;
     public static bool operator >=(Price a, Price b) => a.Value >= b.Value;
 
-    public override string ToString() => Value.ToString("N2");
+    public static implicit operator decimal(Price price) => price.Value;
+    public static implicit operator double(Price price) => (double)price.Value;
+    public static implicit operator float(Price price) => (float)price.Value;
+    public static implicit operator Price(decimal value) => Create(value);
+    public static implicit operator Price(double value) => Create((decimal)value);
+    public static implicit operator Price(float value) => Create((decimal)value);
+    public override string ToString() => Value.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
 }

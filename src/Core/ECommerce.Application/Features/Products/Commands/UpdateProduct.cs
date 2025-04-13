@@ -29,7 +29,6 @@ public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProd
             .WithMessage(localizer[ProductConsts.NotFound]);
 
         RuleFor(x => x.Name)
-            .NotEmpty()
             .MinimumLength(ProductConsts.NameMinLength)
             .WithMessage(localizer[ProductConsts.NameMustBeAtLeastCharacters])
             .MaximumLength(ProductConsts.NameMaxLength)
@@ -57,6 +56,9 @@ public sealed class UpdateProductCommandHandler(
     public override async Task<Result> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
     {
         var product = await productRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
+
+        if (product is null)
+            return Result.NotFound(Localizer[ProductConsts.NotFound]);
 
         product!.Update(command.Name, command.Price, command.CategoryId, command.Description);
 

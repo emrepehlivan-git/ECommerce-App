@@ -1,3 +1,4 @@
+using ECommerce.Application.Features.Products;
 using ECommerce.Application.Features.Products.Queries;
 
 namespace ECommerce.Application.UnitTests.Features.Products.Queries;
@@ -22,8 +23,10 @@ public sealed class GetProductByIdQueryTest : ProductQueriesTestsBase
         var result = await Handler.Handle(Query, CancellationToken.None);
 
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBeNull();
+        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ResultStatus.NotFound);
+        result.Errors.Should().ContainSingle()
+            .Which.Should().Be(Localizer[ProductConsts.NotFound]);
     }
 
     [Fact]

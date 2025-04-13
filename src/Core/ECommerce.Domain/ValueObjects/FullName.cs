@@ -21,10 +21,10 @@ public sealed record FullName
     private void Validate(string firstName, string lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
-            throw new ArgumentException("First name cannot be null or empty.", nameof(firstName));
+            throw new NullReferenceException("First name cannot be null or empty.");
 
         if (string.IsNullOrWhiteSpace(lastName))
-            throw new ArgumentException("Last name cannot be null or empty.", nameof(lastName));
+            throw new NullReferenceException("Last name cannot be null or empty.");
 
         if (firstName.Length < 3)
             throw new ArgumentException("First name cannot be less than 3 characters.", nameof(firstName));

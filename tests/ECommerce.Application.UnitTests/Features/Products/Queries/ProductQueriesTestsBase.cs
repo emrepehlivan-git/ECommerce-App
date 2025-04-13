@@ -10,7 +10,7 @@ public abstract class ProductQueriesTestsBase
     protected readonly Mock<ILocalizationService> LocalizationServiceMock;
     protected readonly Product DefaultProduct;
     protected readonly Category DefaultCategory;
-
+    protected readonly LocalizationHelper Localizer;
 
     protected ProductQueriesTestsBase()
     {
@@ -19,8 +19,15 @@ public abstract class ProductQueriesTestsBase
         LazyServiceProviderMock = new Mock<ILazyServiceProvider>();
         LocalizationServiceMock = new Mock<ILocalizationService>();
 
-        DefaultProduct = Product.Create("Test Product", "Test Description", 100m, Guid.NewGuid());
+        Localizer = new LocalizationHelper(LocalizationServiceMock.Object);
+
         DefaultCategory = Category.Create("Test Category");
+        DefaultProduct = Product.Create("Test Product", "Test Description", 100m, DefaultCategory.Id, 10);
+        DefaultProduct.Category = DefaultCategory;
+
+        LazyServiceProviderMock
+            .Setup(x => x.LazyGetRequiredService<LocalizationHelper>())
+            .Returns(Localizer);
     }
 
     protected void SetupProductExists(bool exists = true)

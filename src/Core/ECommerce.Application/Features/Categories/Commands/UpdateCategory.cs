@@ -16,7 +16,7 @@ public sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCat
     public UpdateCategoryCommandValidator(CategoryBusinessRules categoryBusinessRules, ICategoryRepository categoryRepository, LocalizationHelper localizer)
     {
         RuleFor(x => x.Id)
-            .MustAsync(async (id, ct) => await categoryRepository.AnyAsync(x => x.Id == id, ct))
+            .MustAsync(async (command, id, ct) => await categoryRepository.GetByIdAsync(id, cancellationToken: ct) is not null)
             .WithMessage(localizer[CategoryConsts.NotFound]);
 
         RuleFor(x => x.Name)
@@ -39,6 +39,7 @@ public sealed class UpdateCategoryCommandHandler(
     public override async Task<Result> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
         var category = await categoryRepository.GetByIdAsync(command.Id, cancellationToken: cancellationToken);
+
         category!.UpdateName(command.Name);
 
         categoryRepository.Update(category);

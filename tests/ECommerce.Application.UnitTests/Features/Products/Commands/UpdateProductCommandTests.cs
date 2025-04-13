@@ -19,7 +19,6 @@ public sealed class UpdateProductCommandTests : ProductCommandsTestBase
 
         LazyServiceProviderMock = new Mock<ILazyServiceProvider>();
 
-        SetupDefaultLocalizationMessages();
 
         Handler = new UpdateProductCommandHandler(
             ProductRepositoryMock.Object,
@@ -29,36 +28,49 @@ public sealed class UpdateProductCommandTests : ProductCommandsTestBase
             ProductRepositoryMock.Object,
             CategoryRepositoryMock.Object,
             Localizer);
+        SetupDefaultLocalizationMessages();
     }
 
     [Fact]
     public async Task Handle_WithValidCommand_ShouldUpdateProduct()
     {
+        // Arrange
         SetupProductExists(true);
         SetupCategoryExists(true);
+        SetupProductRepositoryGetByIdAsync(DefaultProduct);
 
-        DefaultProduct.Update(Command.Name, Command.Price, Command.CategoryId, Command.Description);
-
+        // Act
         var result = await Handler.Handle(Command, CancellationToken.None);
 
+        // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
 
-        DefaultProduct.Should().BeEquivalentTo(Command);
+        // Verify that the repository's Update method was called with the updated product
+        ProductRepositoryMock.Verify(
+            x => x.Update(It.Is<Product>(p =>
+                p.Name == Command.Name &&
+                p.Description == Command.Description &&
+                p.Price.Value == Command.Price &&
+                p.CategoryId == Command.CategoryId)),
+            Times.Once);
     }
 
     [Theory]
-    [InlineData("00000000-0000-0000-0000-000000000000", "Product not found")]
-    public async Task Validate_WithNonExistentProduct_ShouldReturnValidationError(string productId, string expectedError)
+    [InlineData("00000000-0000-0000-0000-000000000000", "Product not found.", "Product category not found")]
+    public async Task Validate_WithNonExistentProduct_ShouldReturnValidationError(string productId, string expectedError1, string expectedError2)
     {
         Command = Command with { Id = Guid.Parse(productId) };
 
         SetupProductExists(false);
+        SetupCategoryExists(false);
 
         var validationResult = await Validator.ValidateAsync(Command);
 
         validationResult.IsValid.Should().BeFalse();
-        validationResult.Errors.Should().Contain(x => x.ErrorMessage == expectedError);
+        validationResult.Errors.Should().HaveCount(2);
+        validationResult.Errors.Should().Contain(x => x.ErrorMessage == expectedError1);
+        validationResult.Errors.Should().Contain(x => x.ErrorMessage == expectedError2);
     }
 
     [Theory]

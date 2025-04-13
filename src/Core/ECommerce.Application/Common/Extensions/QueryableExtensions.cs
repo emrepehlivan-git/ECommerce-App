@@ -2,7 +2,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Ardalis.Result;
 using ECommerce.Application.Common.Parameters;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ECommerce.Application.Common.Extensions;
 
@@ -13,19 +15,147 @@ public static class QueryableExtensions
         var totalCount = query.Count();
         var totalPages = (int)Math.Ceiling((double)totalCount / pageableRequestParams.PageSize);
         var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, totalCount);
-        var items = query.Skip((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize).Take(pageableRequestParams.PageSize).ToList();
+        var items = query.Take(((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize)..pageableRequestParams.PageSize).ToList();
         return new PagedResult<List<T>>(pageInfo, items);
+    }
+    /*
+        public static async Task<PagedResult<List<T>>> ApplyPagingAsync<T>(
+         this IQueryable<T> query, PageableRequestParams pageableRequestParams,
+          CancellationToken cancellationToken = default)
+        {
+            if (query is null)
+                throw new ArgumentNullException(nameof(query));
+
+            int count;
+            List<T> items;
+
+            if (query.Provider is IAsyncQueryProvider)
+            {
+                count = (int)await query.LongCountAsync(cancellationToken);
+                items = await query
+                    .Skip((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize)
+                    .Take(pageableRequestParams.PageSize)
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                count = (int)query.LongCount();
+                items = query
+                    .Skip((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize)
+                    .Take(pageableRequestParams.PageSize)
+                    .ToList();
+
+                await Task.CompletedTask;
+            }
+
+            var totalPages = (int)Math.Ceiling((double)count / pageableRequestParams.PageSize);
+            var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, count);
+            return new PagedResult<List<T>>(pageInfo, items);
+        }
+
+        public static async Task<PagedResult<List<TDestination>>> ApplyPagingWithProjectionAsync<TSource, TDestination>(
+            this IQueryable<TSource> query,
+            PageableRequestParams pageableRequestParams,
+            CancellationToken cancellationToken = default)
+        {
+            if (query is null)
+                throw new ArgumentNullException(nameof(query));
+
+            int count;
+            List<TDestination> items;
+
+            if (query.Provider is IAsyncQueryProvider)
+            {
+                count = await query.CountAsync(cancellationToken);
+
+                items = await query
+                    .Skip((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize)
+                    .Take(pageableRequestParams.PageSize)
+                    .ProjectToType<TDestination>()
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                count = query.Count();
+                var sourceItems = query
+                    .Skip((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize)
+                    .Take(pageableRequestParams.PageSize)
+                    .ToList();
+
+                items = sourceItems.Adapt<List<TDestination>>();
+
+                await Task.CompletedTask;
+            }
+
+            var totalPages = (int)Math.Ceiling((double)count / pageableRequestParams.PageSize);
+            var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, count);
+            return new PagedResult<List<TDestination>>(pageInfo, items);
+        }
+        */
+
+    public static async Task<PagedResult<List<TDestination>>> ApplyPagingAsync<TSource, TDestination>(
+    this IQueryable<TSource> query,
+    PageableRequestParams pageableRequestParams,
+    CancellationToken cancellationToken = default)
+    {
+        if (query is null)
+            throw new ArgumentNullException(nameof(query));
+
+        int count;
+        List<TDestination> items;
+
+        var skip = (pageableRequestParams.Page - 1) * pageableRequestParams.PageSize;
+        var take = pageableRequestParams.PageSize;
+
+        if (query.Provider is IAsyncQueryProvider)
+        {
+            count = await query.CountAsync(cancellationToken);
+
+            if (typeof(TSource) == typeof(TDestination))
+            {
+                var list = await query
+                    .Skip(skip)
+                    .Take(take)
+                    .Cast<TDestination>() // güvenli cast
+                    .ToListAsync(cancellationToken);
+
+                items = list;
+            }
+            else
+            {
+                items = await query
+                    .Skip(skip)
+                    .Take(take)
+                    .ProjectToType<TDestination>() // Mapster veya AutoMapper
+                    .ToListAsync(cancellationToken);
+            }
+        }
+        else
+        {
+            count = query.Count();
+
+            var sourceItems = query
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+
+            if (typeof(TSource) == typeof(TDestination))
+            {
+                items = sourceItems.Cast<TDestination>().ToList();
+            }
+            else
+            {
+                items = sourceItems.Adapt<List<TDestination>>();
+            }
+
+            await Task.CompletedTask;
+        }
+
+        var totalPages = (int)Math.Ceiling((double)count / pageableRequestParams.PageSize);
+        var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, count);
+        return new PagedResult<List<TDestination>>(pageInfo, items);
     }
 
-    public static async Task<PagedResult<List<T>>> ApplyPagingAsync<T>(this IQueryable<T> query, PageableRequestParams pageableRequestParams, CancellationToken cancellationToken = default)
-    {
-        var totalCount = await query.LongCountAsync(cancellationToken);
-        var totalPages = (int)Math.Ceiling((double)totalCount / pageableRequestParams.PageSize);
-        var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, totalCount);
-        var items = await query.Skip((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize).Take(pageableRequestParams.PageSize)
-        .ToListAsync(cancellationToken);
-        return new PagedResult<List<T>>(pageInfo, items);
-    }
 
     public static IQueryable<T> IncludeIf<T>(this IQueryable<T> query,
     bool condition,

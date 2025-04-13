@@ -8,16 +8,16 @@ namespace ECommerce.WebAPI.Controllers;
 public sealed class CategoryController : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetCategories([FromQuery] PageableRequestParams requestParams, [FromQuery] string? orderBy = null, [FromQuery] bool withProducts = false, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetCategories([FromQuery] PageableRequestParams requestParams, [FromQuery] string? orderBy = null, CancellationToken cancellationToken = default)
     {
-        var categories = await Mediator.Send(new GetAllCategoriesQuery(requestParams, orderBy, withProducts), cancellationToken);
+        var categories = await Mediator.Send(new GetAllCategoriesQuery(requestParams, orderBy), cancellationToken);
         return Ok(categories);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetCategoryById(Guid id, [FromQuery] bool withProducts = false, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken cancellationToken = default)
     {
-        var category = await Mediator.Send(new GetCategoryByIdQuery(id, withProducts), cancellationToken);
+        var category = await Mediator.Send(new GetCategoryByIdQuery(id), cancellationToken);
         return Ok(category);
     }
 

@@ -4,9 +4,9 @@ using ECommerce.Application.Common.Extensions;
 using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Orders.DTOs;
 using ECommerce.Application.Repositories;
+using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.SharedKernel;
-using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +27,6 @@ public sealed class OrderGetAllQueryHandler(
             orderBy: q => q.OrderByDescending(x => x.OrderDate),
             include: q => q.Include(x => x.Items).ThenInclude(x => x.Product)
         )
-        .ProjectToType<OrderDto>()
-        .ApplyPagingAsync(query.PageableRequestParams, cancellationToken);
+        .ApplyPagingAsync<Order, OrderDto>(query.PageableRequestParams, cancellationToken);
     }
 }

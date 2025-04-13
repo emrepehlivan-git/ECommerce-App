@@ -92,7 +92,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         CancellationToken cancellationToken = default)
     {
         var query = Query(predicate, orderBy, include, isTracking);
-        return query.ApplyPagingAsync<TEntity>(new PageableRequestParams(page, pageSize), cancellationToken);
+        return query.ApplyPagingAsync<TEntity, TEntity>(new PageableRequestParams(page, pageSize), cancellationToken);
     }
 
     public Task<long> LongCountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
