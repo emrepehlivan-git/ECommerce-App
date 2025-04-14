@@ -6,12 +6,12 @@ namespace ECommerce.Application.Features.Orders;
 
 public static class OrderMapperConfig
 {
-    public static void Configure()
+    public static void Configure(TypeAdapterConfig config)
     {
-        TypeAdapterConfig<Order, OrderDto>.NewConfig()
+        config.ForType<Order, OrderDto>()
             .Map(dest => dest.Items, src => src.Items);
 
-        TypeAdapterConfig<OrderItem, OrderItemDto>.NewConfig()
+        config.ForType<OrderItem, OrderItemDto>()
             .Map(dest => dest.ProductName, src => src.Product.Name);
     }
 }

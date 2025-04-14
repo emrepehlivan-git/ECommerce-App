@@ -12,10 +12,12 @@ public sealed class RoleTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void Create_WithInvalidName_ShouldThrowArgumentException(string name)
+    public void Create_WithInvalidName_ShouldThrowArgumentException(string? name)
     {
         // Act
+#pragma warning disable CS8604 // Possible null reference argument.
         var act = () => Role.Create(name);
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         act.Should().Throw<NullReferenceException>()

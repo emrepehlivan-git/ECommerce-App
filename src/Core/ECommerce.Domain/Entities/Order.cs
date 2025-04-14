@@ -8,14 +8,14 @@ public sealed class Order : AuditableEntity
     private readonly List<OrderItem> _items = [];
 
     public Guid UserId { get; private set; }
-    public User User { get; private set; }
+    public User User { get; private set; } = new();
 
     public DateTime OrderDate { get; private set; }
     public OrderStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }
 
-    public string ShippingAddress { get; private set; }
-    public string BillingAddress { get; private set; }
+    public string ShippingAddress { get; private set; } = string.Empty;
+    public string BillingAddress { get; private set; } = string.Empty;
 
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 

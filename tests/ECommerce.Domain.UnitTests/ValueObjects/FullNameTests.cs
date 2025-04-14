@@ -6,10 +6,12 @@ public sealed class FullNameTests
     [InlineData(null, "Doe")]
     [InlineData("", "Doe")]
     [InlineData(" ", "Doe")]
-    public void Create_WithInvalidFirstName_ShouldThrowArgumentException(string firstName, string lastName)
+    public void Create_WithInvalidFirstName_ShouldThrowArgumentException(string? firstName, string lastName)
     {
         // Act
+#pragma warning disable CS8604 // Possible null reference argument.
         var act = () => FullName.Create(firstName, lastName);
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         act.Should().Throw<NullReferenceException>();
@@ -19,10 +21,12 @@ public sealed class FullNameTests
     [InlineData("John", null)]
     [InlineData("John", "")]
     [InlineData("John", " ")]
-    public void Create_WithInvalidLastName_ShouldThrowArgumentException(string firstName, string lastName)
+    public void Create_WithInvalidLastName_ShouldThrowArgumentException(string? firstName, string? lastName)
     {
         // Act
+#pragma warning disable CS8604 // Possible null reference argument.
         var act = () => FullName.Create(firstName, lastName);
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         act.Should().Throw<NullReferenceException>();

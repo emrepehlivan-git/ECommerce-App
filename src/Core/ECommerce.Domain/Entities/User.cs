@@ -9,7 +9,7 @@ public sealed class User : IdentityUser<Guid>
     public FullName FullName { get; private set; } = null!;
     public bool IsActive { get; private set; }
 
-    private User()
+    internal User()
     {
     }
 

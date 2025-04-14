@@ -70,7 +70,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public PagedResult<List<TEntity>> GetPaged(
+    public PagedResult<IEnumerable<TEntity>> GetPaged(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
@@ -82,7 +82,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return query.ApplyPaging(new PageableRequestParams(page, pageSize));
     }
 
-    public Task<PagedResult<List<TEntity>>> GetPagedAsync(
+    public Task<PagedResult<IEnumerable<TEntity>>> GetPagedAsync(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
@@ -92,7 +92,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         CancellationToken cancellationToken = default)
     {
         var query = Query(predicate, orderBy, include, isTracking);
-        return query.ApplyPagingAsync<TEntity, TEntity>(new PageableRequestParams(page, pageSize), cancellationToken);
+        return query.ApplyPagingAsync<TEntity, TEntity>(new PageableRequestParams(page, pageSize), predicate: predicate, cancellationToken: cancellationToken);
     }
 
     public Task<long> LongCountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)

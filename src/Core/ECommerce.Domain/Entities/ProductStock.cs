@@ -3,7 +3,7 @@ namespace ECommerce.Domain.Entities;
 public sealed class ProductStock : AuditableEntity
 {
     public Guid ProductId { get; private set; }
-    public Product Product { get; private set; }
+    public Product Product { get; private set; } = new();
     public int Quantity { get; private set; }
 
     internal ProductStock()

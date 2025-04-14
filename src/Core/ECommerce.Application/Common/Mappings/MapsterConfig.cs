@@ -1,4 +1,5 @@
 using ECommerce.Application.Features.Categories;
+using ECommerce.Application.Features.Orders;
 using ECommerce.Application.Features.Products;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ public static class MapsterConfig
 
         ProductMapperConfig.Configure(config);
         CategoryMapperConfig.Configure(config);
+        OrderMapperConfig.Configure(config);
 
         return services;
     }

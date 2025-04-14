@@ -13,16 +13,16 @@ using ECommerce.Domain.Entities;
 
 namespace ECommerce.Application.Features.Categories.Queries;
 
-public sealed record GetAllCategoriesQuery(PageableRequestParams PageableRequestParams, string? OrderBy = null) : IRequest<PagedResult<List<CategoryDto>>>;
+public sealed record GetAllCategoriesQuery(PageableRequestParams PageableRequestParams, string? OrderBy = null) : IRequest<PagedResult<IEnumerable<CategoryDto>>>;
 public sealed class GetAllCategoriesQueryHandler(
     ICategoryRepository categoryRepository,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllCategoriesQuery, PagedResult<List<CategoryDto>>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllCategoriesQuery, PagedResult<IEnumerable<CategoryDto>>>(lazyServiceProvider)
 {
-    public override async Task<PagedResult<List<CategoryDto>>> Handle(GetAllCategoriesQuery query, CancellationToken cancellationToken)
+    public override async Task<PagedResult<IEnumerable<CategoryDto>>> Handle(GetAllCategoriesQuery query, CancellationToken cancellationToken)
     {
         return await categoryRepository.Query(
             orderBy: x => query.OrderBy == "products" ? x.OrderBy(c => c.Products.Count) : x.OrderBy(c => c.Name)
         )
-        .ApplyPagingAsync<Category, CategoryDto>(query.PageableRequestParams, cancellationToken);
+        .ApplyPagingAsync<Category, CategoryDto>(query.PageableRequestParams, cancellationToken: cancellationToken);
     }
 }

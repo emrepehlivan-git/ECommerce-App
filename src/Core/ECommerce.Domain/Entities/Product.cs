@@ -6,10 +6,10 @@ public sealed class Product : AuditableEntity
 {
     public string Name { get; private set; } = string.Empty;
     public string? Description { get; set; }
-    public Price Price { get; private set; }
+    public Price Price { get; private set; } = Price.Create(0);
 
     public Guid CategoryId { get; private set; }
-    public Category Category { get; set; }
+    public Category Category { get; set; } = new();
 
     public int StockQuantity { get; private set; }
 

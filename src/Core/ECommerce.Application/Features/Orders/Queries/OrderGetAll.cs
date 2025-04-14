@@ -14,19 +14,19 @@ namespace ECommerce.Application.Features.Orders.Queries;
 
 public sealed record OrderGetAllQuery(
     PageableRequestParams PageableRequestParams,
-    OrderStatus? Status = null) : IRequest<PagedResult<List<OrderDto>>>;
+    OrderStatus? Status = null) : IRequest<PagedResult<IEnumerable<OrderDto>>>;
 
 public sealed class OrderGetAllQueryHandler(
     IOrderRepository orderRepository,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetAllQuery, PagedResult<List<OrderDto>>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetAllQuery, PagedResult<IEnumerable<OrderDto>>>(lazyServiceProvider)
 {
-    public override async Task<PagedResult<List<OrderDto>>> Handle(OrderGetAllQuery query, CancellationToken cancellationToken)
+    public override async Task<PagedResult<IEnumerable<OrderDto>>> Handle(OrderGetAllQuery query, CancellationToken cancellationToken)
     {
         return await orderRepository.Query(
             predicate: query.Status.HasValue ? x => x.Status == query.Status.Value : null,
             orderBy: q => q.OrderByDescending(x => x.OrderDate),
             include: q => q.Include(x => x.Items).ThenInclude(x => x.Product)
         )
-        .ApplyPagingAsync<Order, OrderDto>(query.PageableRequestParams, cancellationToken);
+        .ApplyPagingAsync<Order, OrderDto>(query.PageableRequestParams, cancellationToken: cancellationToken);
     }
 }

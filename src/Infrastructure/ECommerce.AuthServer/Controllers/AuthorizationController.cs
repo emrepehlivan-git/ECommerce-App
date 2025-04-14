@@ -61,8 +61,9 @@ public class AuthorizationController(
 
         var user = await identityService.GetUserByPrincipalAsync(result.Principal) ??
             throw new InvalidOperationException("The user details cannot be retrieved.");
+        var clientId = request.ClientId ?? throw new InvalidOperationException("The client ID cannot be retrieved.");
 
-        var application = await applicationManager.FindByClientIdAsync(request.ClientId) ??
+        var application = await applicationManager.FindByClientIdAsync(clientId) ??
             throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
 
         var authorizations = await authorizationManager.FindAsync(
@@ -104,7 +105,7 @@ public class AuthorizationController(
                 authorization ??= await authorizationManager.CreateAsync(
                     identity: identity,
                     subject: user.Id.ToString(),
-                    client: await applicationManager.GetIdAsync(application),
+                    client: await applicationManager.GetIdAsync(application) ?? throw new InvalidOperationException("The client ID cannot be retrieved."),
                     type: AuthorizationTypes.Permanent,
                     scopes: identity.GetScopes());
 
@@ -127,8 +128,8 @@ public class AuthorizationController(
             default:
                 return View(new ConsentViewModel
                 {
-                    ApplicationName = await applicationManager.GetLocalizedDisplayNameAsync(application),
-                    Scope = request.Scope
+                    ApplicationName = await applicationManager.GetLocalizedDisplayNameAsync(application) ?? string.Empty,
+                    Scope = request.Scope ?? string.Empty
                 });
         }
     }
@@ -143,7 +144,7 @@ public class AuthorizationController(
         var user = await identityService.GetUserByPrincipalAsync(User) ??
             throw new InvalidOperationException("The user details cannot be retrieved.");
 
-        var application = await applicationManager.FindByClientIdAsync(request.ClientId) ??
+        var application = await applicationManager.FindByClientIdAsync(request.ClientId!) ??
             throw new InvalidOperationException("Details concerning the calling client application cannot be found.");
 
         var authorizations = await authorizationManager.FindAsync(
@@ -182,7 +183,7 @@ public class AuthorizationController(
         authorization ??= await authorizationManager.CreateAsync(
             identity: identity,
             subject: user.Id.ToString(),
-            client: await applicationManager.GetIdAsync(application),
+            client: await applicationManager.GetIdAsync(application) ?? throw new InvalidOperationException("The client ID cannot be retrieved."),
             type: AuthorizationTypes.Permanent,
             scopes: identity.GetScopes());
 
@@ -217,12 +218,12 @@ public class AuthorizationController(
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
-
         if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
         {
-            var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme) ??
+                throw new InvalidOperationException("The user details cannot be retrieved.");
 
-            var user = await identityService.FindByIdAsync(result.Principal.GetClaim(Claims.Subject));
+            var user = await identityService.FindByIdAsync(result.Principal?.GetClaim(Claims.Subject) ?? string.Empty);
             if (user is null)
             {
                 return Forbid(
@@ -245,7 +246,7 @@ public class AuthorizationController(
                     }!));
             }
 
-            var identity = new ClaimsIdentity(result.Principal.Claims,
+            var identity = new ClaimsIdentity(result.Principal?.Claims,
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
                 roleType: Claims.Role);
@@ -270,7 +271,7 @@ public class AuthorizationController(
             case Claims.Name or Claims.PreferredUsername:
                 yield return Destinations.AccessToken;
 
-                if (claim.Subject.HasScope(Scopes.Profile))
+                if (claim.Subject?.HasScope(Scopes.Profile) == true)
                     yield return Destinations.IdentityToken;
 
                 yield break;
@@ -278,7 +279,7 @@ public class AuthorizationController(
             case Claims.Email:
                 yield return Destinations.AccessToken;
 
-                if (claim.Subject.HasScope(Scopes.Email))
+                if (claim.Subject?.HasScope(Scopes.Email) == true)
                     yield return Destinations.IdentityToken;
 
                 yield break;
@@ -286,7 +287,7 @@ public class AuthorizationController(
             case Claims.Role:
                 yield return Destinations.AccessToken;
 
-                if (claim.Subject.HasScope(Scopes.Roles))
+                if (claim.Subject?.HasScope(Scopes.Roles) == true)
                     yield return Destinations.IdentityToken;
 
                 yield break;

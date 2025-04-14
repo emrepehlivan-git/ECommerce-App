@@ -17,11 +17,13 @@ public sealed class OrderGetByUserQueryHandler(
 {
     public override async Task<Result<List<OrderDto>>> Handle(OrderGetByUserQuery query, CancellationToken cancellationToken)
     {
-        return await orderRepository.Query(x => x.UserId == query.UserId)
-            .Include(x => x.Items)
-            .ThenInclude(x => x.Product)
-            .ProjectToType<OrderDto>()
-            .OrderByDescending(x => x.OrderDate)
-            .ToListAsync(cancellationToken);
+        return await orderRepository.Query(
+            x => x.UserId == query.UserId,
+            x => x.Include(x => x.Items)
+                .ThenInclude(x => x.Product)
+                .OrderByDescending(x => x.OrderDate)
+        )
+        .ProjectToType<OrderDto>()
+        .ToListAsync(cancellationToken);
     }
 }

@@ -10,10 +10,12 @@ public sealed class UserTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData(" ")]
-    public void Create_WithInvalidEmail_ShouldThrowNullReferenceException(string email)
+    public void Create_WithInvalidEmail_ShouldThrowNullReferenceException(string? email)
     {
         // Act
+#pragma warning disable CS8604 // Possible null reference argument.
         var act = () => User.Create(email, ValidFirstName, ValidLastName);
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         act.Should().Throw<NullReferenceException>();
@@ -95,13 +97,15 @@ public sealed class UserTests
     [InlineData(null, "Smith")]
     [InlineData("", "Smith")]
     [InlineData(" ", "Smith")]
-    public void UpdateName_WithInvalidFirstName_ShouldThrowArgumentException(string firstName, string lastName)
+    public void UpdateName_WithInvalidFirstName_ShouldThrowArgumentException(string? firstName, string lastName)
     {
         // Arrange
         var user = User.Create(ValidEmail, ValidFirstName, ValidLastName);
 
         // Act
+#pragma warning disable CS8604 // Possible null reference argument.
         var act = () => user.UpdateName(firstName, lastName);
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         act.Should().Throw<NullReferenceException>();
@@ -111,13 +115,15 @@ public sealed class UserTests
     [InlineData("Jane", null)]
     [InlineData("Jane", "")]
     [InlineData("Jane", " ")]
-    public void UpdateName_WithInvalidLastName_ShouldThrowArgumentException(string firstName, string lastName)
+    public void UpdateName_WithInvalidLastName_ShouldThrowArgumentException(string? firstName, string? lastName)
     {
         // Arrange
         var user = User.Create(ValidEmail, ValidFirstName, ValidLastName);
 
         // Act
+#pragma warning disable CS8604 // Possible null reference argument.
         var act = () => user.UpdateName(firstName, lastName);
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // Assert
         act.Should().Throw<NullReferenceException>();
