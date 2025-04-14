@@ -1,12 +1,11 @@
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using ECommerce.SharedKernel;
 using System.Security.Claims;
 
 namespace ECommerce.Infrastructure.Services;
 
-public sealed class IdentityService : IIdentityService, IScopedDependency
+public sealed class IdentityService : IIdentityService
 {
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;

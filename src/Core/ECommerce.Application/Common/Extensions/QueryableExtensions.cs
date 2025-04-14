@@ -10,16 +10,16 @@ namespace ECommerce.Application.Common.Extensions;
 
 public static class QueryableExtensions
 {
-    public static PagedResult<IEnumerable<T>> ApplyPaging<T>(this IQueryable<T> query, PageableRequestParams pageableRequestParams)
+    public static PagedResult<List<T>> ApplyPaging<T>(this IQueryable<T> query, PageableRequestParams pageableRequestParams)
     {
         var totalCount = query.Count();
         var totalPages = (int)Math.Ceiling((double)totalCount / pageableRequestParams.PageSize);
         var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, totalCount);
         var items = query.Take(((pageableRequestParams.Page - 1) * pageableRequestParams.PageSize)..pageableRequestParams.PageSize).ToList();
-        return new PagedResult<IEnumerable<T>>(pageInfo, items);
+        return new PagedResult<List<T>>(pageInfo, items);
     }
 
-    public static async Task<PagedResult<IEnumerable<TDestination>>> ApplyPagingAsync<TSource, TDestination>(
+    public static async Task<PagedResult<List<TDestination>>> ApplyPagingAsync<TSource, TDestination>(
     this IQueryable<TSource> query,
     PageableRequestParams pageableRequestParams,
     Expression<Func<TSource, bool>>? predicate = null,
@@ -41,7 +41,8 @@ public static class QueryableExtensions
             if (typeof(TSource) == typeof(TDestination))
             {
                 var list = await query
-                    .Take(skip..take)
+                    .Skip(skip)
+                    .Take(take)
                     .Cast<TDestination>()
                     .ToListAsync(cancellationToken);
 
@@ -50,7 +51,8 @@ public static class QueryableExtensions
             else
             {
                 items = await query
-                    .Take(skip..take)
+                    .Skip(skip)
+                    .Take(take)
                     .ProjectToType<TDestination>()
                     .ToListAsync(cancellationToken);
             }
@@ -76,7 +78,7 @@ public static class QueryableExtensions
 
         var totalPages = (int)Math.Ceiling((double)count / pageableRequestParams.PageSize);
         var pageInfo = new PagedInfo(pageableRequestParams.Page, pageableRequestParams.PageSize, totalPages, count);
-        return new PagedResult<IEnumerable<TDestination>>(pageInfo, items);
+        return new PagedResult<List<TDestination>>(pageInfo, items);
     }
 
 

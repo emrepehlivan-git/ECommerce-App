@@ -14,13 +14,13 @@ namespace ECommerce.Application.Features.Orders.Queries;
 
 public sealed record OrderGetAllQuery(
     PageableRequestParams PageableRequestParams,
-    OrderStatus? Status = null) : IRequest<PagedResult<IEnumerable<OrderDto>>>;
+    OrderStatus? Status = null) : IRequest<PagedResult<List<OrderDto>>>;
 
 public sealed class OrderGetAllQueryHandler(
     IOrderRepository orderRepository,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetAllQuery, PagedResult<IEnumerable<OrderDto>>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderGetAllQuery, PagedResult<List<OrderDto>>>(lazyServiceProvider)
 {
-    public override async Task<PagedResult<IEnumerable<OrderDto>>> Handle(OrderGetAllQuery query, CancellationToken cancellationToken)
+    public override async Task<PagedResult<List<OrderDto>>> Handle(OrderGetAllQuery query, CancellationToken cancellationToken)
     {
         return await orderRepository.Query(
             predicate: query.Status.HasValue ? x => x.Status == query.Status.Value : null,

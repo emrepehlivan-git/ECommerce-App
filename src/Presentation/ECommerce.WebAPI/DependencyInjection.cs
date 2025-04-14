@@ -1,9 +1,11 @@
 using System.Globalization;
 using ECommerce.Application;
+using ECommerce.Application.Common.Interfaces;
 using ECommerce.Infrastructure;
 using ECommerce.Persistence;
 using ECommerce.SharedKernel;
 using ECommerce.WebAPI.Middlewares;
+using ECommerce.WebAPI.Services;
 using Microsoft.AspNetCore.Localization;
 
 namespace ECommerce.WebAPI;
@@ -32,7 +34,8 @@ public static class DependencyInjection
         services.AddInfrastructure(configuration);
         services.AddPersistence(configuration);
 
-        services.AddServicesRegistration([typeof(DependencyInjection).Assembly]);
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddTransient<ILazyServiceProvider, LazyServiceProvider>();
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();

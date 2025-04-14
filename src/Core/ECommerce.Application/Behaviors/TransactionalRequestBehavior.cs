@@ -3,9 +3,9 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 namespace ECommerce.Application.Behaviors;
 
-public sealed class TransactionalRequest<TRequest, TResponse>(
+public sealed class TransactionalRequestBehavior<TRequest, TResponse>(
     IUnitOfWork unitOfWork,
-    ILogger<TransactionalRequest<TRequest, TResponse>> logger)
+    ILogger<TransactionalRequestBehavior<TRequest, TResponse>> logger)
  : IPipelineBehavior<TRequest, TResponse>
  where TRequest : ITransactionalRequest
 {

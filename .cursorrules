@@ -2,12 +2,14 @@ language: C#
 framework: .NET 8
 
 architecture: Onion Architecture
+
 layers:
   - Core:
       - ECommerce.Domain
       - ECommerce.Application
       - ECommerce.SharedKernel
   - Infrastructure:
+      - ECommerce.AuthServer
       - ECommerce.Infrastructure
       - ECommerce.Persistence
   - Presentation:
@@ -54,7 +56,6 @@ logging:
   sinks:
     - Console
     - File
-    - Database
   conventions:
     - Use structured logging
     - Include correlation IDs
@@ -65,14 +66,6 @@ error_handling:
   - Standardized API responses
   - Custom domain exceptions
   - Validation error responses
-
-api:
-  style: RESTful
-  documentation: Swagger/OpenAPI
-  versioning: true
-  responses:
-    success: application/json
-    error: ProblemDetails format
 
 testing:
   frameworks:
@@ -108,8 +101,6 @@ dependency_injection:
 # File Organization
 file_structure:
   entities: src/Core/ECommerce.Domain/Entities
-  interfaces: src/Core/ECommerce.Domain/Interfaces
-  services: src/Core/ECommerce.Application/Services
   controllers: src/Presentation/ECommerce.WebAPI/Controllers
   configurations: src/Infrastructure/ECommerce.Persistence/Configurations
 

@@ -1,12 +1,11 @@
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;
-using ECommerce.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Persistence.Repositories;
 
-public sealed class OrderRepository : BaseRepository<Order>, IOrderRepository, IScopedDependency
+public sealed class OrderRepository : BaseRepository<Order>, IOrderRepository
 {
     public OrderRepository(ApplicationDbContext context) : base(context)
     {

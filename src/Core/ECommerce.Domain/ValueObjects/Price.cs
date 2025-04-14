@@ -17,9 +17,9 @@ public record Price
 
     private static void IsValidValue(decimal value)
     {
-        if (value <= 0)
+        if (value < 0)
         {
-            throw new ArgumentException("Value must be greater than 0.", nameof(value));
+            throw new ArgumentException("Value cannot be negative.", nameof(value));
         }
     }
 

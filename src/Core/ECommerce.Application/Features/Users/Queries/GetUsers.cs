@@ -12,13 +12,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Application.Features.Users.Queries;
 
-public sealed record GetUsersQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<IEnumerable<UserDto>>>;
+public sealed record GetUsersQuery(PageableRequestParams PageableRequestParams) : IRequest<PagedResult<List<UserDto>>>;
 
 public sealed class GetUsersQueryHandler(
     IIdentityService identityService,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetUsersQuery, PagedResult<IEnumerable<UserDto>>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetUsersQuery, PagedResult<List<UserDto>>>(lazyServiceProvider)
 {
-    public override async Task<PagedResult<IEnumerable<UserDto>>> Handle(GetUsersQuery query,
+    public override async Task<PagedResult<List<UserDto>>> Handle(GetUsersQuery query,
     CancellationToken cancellationToken)
     {
         return await identityService.Users

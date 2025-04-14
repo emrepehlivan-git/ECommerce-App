@@ -1,11 +1,10 @@
 using System.Text.Json;
 using System.Globalization;
 using ECommerce.Application.Common.Interfaces;
-using ECommerce.SharedKernel;
 
 namespace ECommerce.Infrastructure.Services;
 
-public sealed class LocalizationService : ILocalizationService, ISingletonDependency
+public sealed class LocalizationService : ILocalizationService
 {
     private readonly Dictionary<string, Dictionary<string, string>> _localizedData = [];
 

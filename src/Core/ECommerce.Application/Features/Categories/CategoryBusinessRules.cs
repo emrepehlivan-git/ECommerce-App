@@ -1,9 +1,8 @@
 using ECommerce.Application.Repositories;
-using ECommerce.SharedKernel;
 
 namespace ECommerce.Application.Features.Categories;
 
-public sealed class CategoryBusinessRules(ICategoryRepository categoryRepository) : ITransientDependency
+public sealed class CategoryBusinessRules(ICategoryRepository categoryRepository)
 {
     public async Task<bool> CheckIfCategoryExistsAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default)
     {

@@ -1,9 +1,8 @@
 using ECommerce.Application.Common.Interfaces;
-using ECommerce.SharedKernel;
 
 namespace ECommerce.Application.Common.Helpers;
 
-public class LocalizationHelper : ISingletonDependency
+public class LocalizationHelper
 {
     private readonly ILocalizationService _localizationService;
 

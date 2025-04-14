@@ -4,21 +4,20 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using ECommerce.SharedKernel;
 using ECommerce.AuthServer;
+using ECommerce.AuthServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddServicesRegistration([typeof(Program).Assembly]);
-
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 builder.Services.AddCors(options =>
 {

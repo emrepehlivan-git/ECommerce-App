@@ -1,3 +1,5 @@
+using ECommerce.Application.Common.Interfaces;
+using ECommerce.Infrastructure.Services;
 using ECommerce.SharedKernel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +15,10 @@ public static class DependencyInjection
             options.Configuration = configuration.GetConnectionString("Redis");
         });
 
-        services.AddServicesRegistration([typeof(DependencyInjection).Assembly]);
+        services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddSingleton<ICacheService, CacheService>();
+        services.AddScoped<IIdentityService, IdentityService>();
+
         return services;
     }
 }

@@ -1,10 +1,10 @@
 using System.Text.Json;
 using ECommerce.Application.Common.Interfaces;
-using ECommerce.SharedKernel;
 using Microsoft.Extensions.Caching.Distributed;
+
 namespace ECommerce.Infrastructure.Services;
 
-public sealed class CacheService : ICacheService, ISingletonDependency
+public sealed class CacheService : ICacheService
 {
     private readonly IDistributedCache _cache;
 

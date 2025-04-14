@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BFCF3A9A-3B1F-4A4B-BE3D-86F8E3F6C383}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5C3C1BF4-8E1D-4C9B-B2A3-76CECD8E5337}"
@@ -32,6 +32,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Infrastructure.IntegrationTests", "tests\ECommerce.Infrastructure.IntegrationTests\ECommerce.Infrastructure.IntegrationTests.csproj", "{FEB4B4AB-E5AC-428D-832D-5B96580B81EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.WebAPI.IntegrationTests", "tests\ECommerce.WebAPI.IntegrationTests\ECommerce.WebAPI.IntegrationTests.csproj", "{92C8CA62-5E14-49F4-8172-31B77463A0D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{77BEA46E-D2DB-4258-9864-EFBC90A5CF7A}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

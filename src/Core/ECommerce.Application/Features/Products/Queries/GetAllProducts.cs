@@ -11,13 +11,13 @@ using ECommerce.Domain.Entities;
 
 namespace ECommerce.Application.Features.Products.Queries;
 
-public sealed record GetAllProductsQuery(PageableRequestParams PageableRequestParams, bool IncludeCategory = false) : IRequest<PagedResult<IEnumerable<ProductDto>>>;
+public sealed record GetAllProductsQuery(PageableRequestParams PageableRequestParams, bool IncludeCategory = false) : IRequest<PagedResult<List<ProductDto>>>;
 
 public sealed class GetAllProductsQueryHandler(
     IProductRepository productRepository,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllProductsQuery, PagedResult<IEnumerable<ProductDto>>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<GetAllProductsQuery, PagedResult<List<ProductDto>>>(lazyServiceProvider)
 {
-    public override async Task<PagedResult<IEnumerable<ProductDto>>> Handle(GetAllProductsQuery query, CancellationToken cancellationToken)
+    public override async Task<PagedResult<List<ProductDto>>> Handle(GetAllProductsQuery query, CancellationToken cancellationToken)
     {
         return await productRepository.Query(
              include: x => x.IncludeIf(query.IncludeCategory, y => y.Category))

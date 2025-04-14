@@ -1,12 +1,11 @@
 using ECommerce.Application.Common.Exceptions;
 using ECommerce.Application.Repositories;
 using ECommerce.Persistence.Contexts;
-using ECommerce.SharedKernel;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Persistence.Repositories;
 
-public sealed class StockRepository(ApplicationDbContext context, ILogger<StockRepository> logger) : IStockRepository, IScopedDependency
+public sealed class StockRepository(ApplicationDbContext context, ILogger<StockRepository> logger) : IStockRepository
 {
     private readonly ApplicationDbContext _context = context;
     private readonly ILogger<StockRepository> _logger = logger;

@@ -70,7 +70,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public PagedResult<IEnumerable<TEntity>> GetPaged(
+    public PagedResult<List<TEntity>> GetPaged(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
@@ -82,7 +82,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return query.ApplyPaging(new PageableRequestParams(page, pageSize));
     }
 
-    public Task<PagedResult<IEnumerable<TEntity>>> GetPagedAsync(
+    public Task<PagedResult<List<TEntity>>> GetPagedAsync(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
