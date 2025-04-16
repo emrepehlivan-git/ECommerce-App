@@ -4,6 +4,8 @@ public record Price
 {
     public decimal Value { get; init; }
 
+    public static readonly Price Zero = new Price(0m);
+
     private Price(decimal value)
     {
         IsValidValue(value);
@@ -23,23 +25,21 @@ public record Price
         }
     }
 
-    public static Price operator +(Price a, Price b) => Create(a.Value + b.Value);
+    public static Price operator +(Price a, Price b)
+    {
+        return Create(a.Value + b.Value);
+    }
 
     public static Price operator -(Price a, Price b)
     {
-        var result = a.Value - b.Value;
-        if (result < 0)
-        {
-            throw new InvalidOperationException("Subtraction would result in a negative price.");
-        }
-        return Create(result);
+        return Create(a.Value - b.Value);
     }
 
     public static Price operator *(Price a, int quantity)
     {
-        if (quantity <= 0)
+        if (quantity < 0)
         {
-            throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
+            throw new ArgumentException("Quantity cannot be negative.", nameof(quantity));
         }
         return Create(a.Value * quantity);
     }
@@ -50,25 +50,30 @@ public record Price
         {
             throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
         }
-
-        var result = a.Value / quantity;
-        if (result < 1)
-        {
-            throw new InvalidOperationException("Division would result in a price less than 1.");
-        }
-        return Create(result);
+        return Create(a.Value / quantity);
     }
 
-    public static bool operator <(Price a, Price b) => a.Value < b.Value;
-    public static bool operator >(Price a, Price b) => a.Value > b.Value;
-    public static bool operator <=(Price a, Price b) => a.Value <= b.Value;
-    public static bool operator >=(Price a, Price b) => a.Value >= b.Value;
+    public static bool operator <(Price a, Price b)
+    {
+        return a.Value < b.Value;
+    }
+
+    public static bool operator >(Price a, Price b)
+    {
+        return a.Value > b.Value;
+    }
+
+    public static bool operator <=(Price a, Price b)
+    {
+        return a.Value <= b.Value;
+    }
+
+    public static bool operator >=(Price a, Price b)
+    {
+        return a.Value >= b.Value;
+    }
 
     public static implicit operator decimal(Price price) => price.Value;
-    public static implicit operator double(Price price) => (double)price.Value;
-    public static implicit operator float(Price price) => (float)price.Value;
-    public static implicit operator Price(decimal value) => Create(value);
-    public static implicit operator Price(double value) => Create((decimal)value);
-    public static implicit operator Price(float value) => Create((decimal)value);
-    public override string ToString() => Value.ToString("N2", System.Globalization.CultureInfo.InvariantCulture);
+
+    public override string ToString() => $"{Value.ToString("N2", System.Globalization.CultureInfo.InvariantCulture)}";
 }

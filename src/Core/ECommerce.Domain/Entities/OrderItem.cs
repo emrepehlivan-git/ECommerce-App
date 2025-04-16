@@ -10,9 +10,9 @@ public sealed class OrderItem : BaseEntity
     public Guid ProductId { get; private set; }
     public Product Product { get; private set; } = null!;
 
-    public Price UnitPrice { get; private set; } = Price.Create(0);
+    public Price UnitPrice { get; private set; } = Price.Zero;
     public int Quantity { get; private set; }
-    public Price TotalPrice { get; private set; } = Price.Create(0);
+    public Price TotalPrice { get; private set; } = Price.Zero;
 
     internal OrderItem()
     {

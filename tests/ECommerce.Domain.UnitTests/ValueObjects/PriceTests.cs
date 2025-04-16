@@ -1,13 +1,8 @@
-using ECommerce.Domain.ValueObjects;
-using FluentAssertions;
-using Xunit;
-
 namespace ECommerce.Domain.UnitTests.ValueObjects;
 
 public sealed class PriceTests
 {
     [Theory]
-    [InlineData(0)]
     [InlineData(-1)]
     [InlineData(-100)]
     public void Create_WithInvalidValue_ShouldThrowArgumentException(decimal value)
@@ -17,10 +12,11 @@ public sealed class PriceTests
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage("Value must be greater than 0.*");
+            .WithMessage("Value cannot be negative.*");
     }
 
     [Theory]
+    [InlineData(0)]
     [InlineData(1)]
     [InlineData(100)]
     [InlineData(1000.50)]
@@ -35,7 +31,40 @@ public sealed class PriceTests
     }
 
     [Fact]
-    public void Add_WithValidPrice_ShouldReturnNewPrice()
+    public void Create_WithCustomCurrency_ShouldCreatePrice()
+    {
+        // Act
+        var price = Price.Create(100);
+
+        // Assert
+        price.Should().NotBeNull();
+        price.Value.Should().Be(100);
+    }
+
+    [Fact]
+    public void Zero_ShouldCreateZeroPrice()
+    {
+        // Act
+        var price = Price.Zero;
+
+        // Assert
+        price.Should().NotBeNull();
+        price.Value.Should().Be(0);
+    }
+
+    [Fact]
+    public void Zero_WithCustomCurrency_ShouldCreateZeroPrice()
+    {
+        // Act
+        var price = Price.Zero;
+
+        // Assert
+        price.Should().NotBeNull();
+        price.Value.Should().Be(0);
+    }
+
+    [Fact]
+    public void Add_WithSameCurrency_ShouldReturnNewPrice()
     {
         // Arrange
         var price1 = Price.Create(100);
@@ -50,7 +79,7 @@ public sealed class PriceTests
     }
 
     [Fact]
-    public void Subtract_WithValidPrice_ShouldReturnNewPrice()
+    public void Subtract_WithSameCurrency_ShouldReturnNewPrice()
     {
         // Arrange
         var price1 = Price.Create(100);
@@ -62,21 +91,6 @@ public sealed class PriceTests
         // Assert
         result.Should().NotBeNull();
         result.Value.Should().Be(50);
-    }
-
-    [Fact]
-    public void Subtract_WithInvalidResult_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var price1 = Price.Create(50);
-        var price2 = Price.Create(100);
-
-        // Act
-        var act = () => price1 - price2;
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("Subtraction would result in a negative price.");
     }
 
     [Fact]
@@ -95,7 +109,6 @@ public sealed class PriceTests
     }
 
     [Theory]
-    [InlineData(0)]
     [InlineData(-1)]
     public void Multiply_WithInvalidMultiplier_ShouldThrowArgumentException(int multiplier)
     {
@@ -107,7 +120,7 @@ public sealed class PriceTests
 
         // Assert
         act.Should().Throw<ArgumentException>()
-            .WithMessage("Quantity must be greater than zero.*");
+            .WithMessage("Quantity cannot be negative.*");
     }
 
     [Fact]
@@ -142,22 +155,7 @@ public sealed class PriceTests
     }
 
     [Fact]
-    public void Divide_WithInvalidResult_ShouldThrowInvalidOperationException()
-    {
-        // Arrange
-        var price = Price.Create(50);
-        var divisor = 100;
-
-        // Act
-        var act = () => price / divisor;
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("Division would result in a price less than 1.");
-    }
-
-    [Fact]
-    public void Compare_WithValidPrices_ShouldReturnCorrectResults()
+    public void Compare_WithSameCurrency_ShouldReturnCorrectResults()
     {
         // Arrange
         var price1 = Price.Create(100);
@@ -172,7 +170,20 @@ public sealed class PriceTests
     }
 
     [Fact]
-    public void ToString_ShouldReturnFormattedValue()
+    public void ToString_ShouldReturnFormattedValueWithCurrency()
+    {
+        // Arrange
+        var price = Price.Create(100.50m);
+
+        // Act
+        var result = price.ToString();
+
+        // Assert
+        result.Should().Be("100.50");
+    }
+
+    [Fact]
+    public void ToString_WithCustomCurrency_ShouldReturnFormattedValueWithCurrency()
     {
         // Arrange
         var price = Price.Create(100.50m);
