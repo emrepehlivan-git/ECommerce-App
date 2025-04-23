@@ -6,26 +6,17 @@ using FluentValidation;
 
 namespace ECommerce.WebAPI.Middlewares;
 
-public sealed class GlobalExceptionHandlerMiddleware
+public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlerMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
-
-    public GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlerMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
-
     public async Task InvokeAsync(HttpContext context)
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "An error occurred: {Message}", exception.Message);
+            logger.LogError(exception, "An error occurred: {Message}", exception.Message);
             await HandleExceptionAsync(context, exception);
         }
     }

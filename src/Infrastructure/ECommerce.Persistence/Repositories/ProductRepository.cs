@@ -4,9 +4,6 @@ using ECommerce.Persistence.Contexts;
 
 namespace ECommerce.Persistence.Repositories;
 
-public sealed class ProductRepository : BaseRepository<Product>, IProductRepository
+public sealed class ProductRepository(ApplicationDbContext context) : BaseRepository<Product>(context), IProductRepository
 {
-    public ProductRepository(ApplicationDbContext context) : base(context)
-    {
-    }
 }

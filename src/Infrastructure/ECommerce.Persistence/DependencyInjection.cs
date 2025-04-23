@@ -27,6 +27,8 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderItemRepository, OrderItemRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IStockRepository, StockRepository>();
     }
 
     private static void ConfigureDbContext(IServiceCollection services, IConfiguration configuration)
@@ -45,15 +47,16 @@ public static class DependencyInjection
     private static void ConfigureIdentity(IServiceCollection services)
     {
         services.AddIdentity<User, Role>(options =>
-         {
-             options.Password.RequiredLength = 6;
-             options.Password.RequireDigit = false;
-             options.Password.RequireLowercase = false;
-             options.Password.RequireUppercase = false;
-             options.Password.RequireNonAlphanumeric = false;
-             options.User.RequireUniqueEmail = true;
-         })
-         .AddEntityFrameworkStores<ApplicationDbContext>()
-         .AddDefaultTokenProviders();
+        {
+            options.Password.RequiredLength = 6;
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+
+            options.User.RequireUniqueEmail = true;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
     }
 }

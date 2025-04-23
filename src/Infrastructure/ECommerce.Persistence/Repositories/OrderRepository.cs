@@ -5,18 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Persistence.Repositories;
 
-public sealed class OrderRepository : BaseRepository<Order>, IOrderRepository
+public sealed class OrderRepository(ApplicationDbContext context) : BaseRepository<Order>(context), IOrderRepository
 {
-    public OrderRepository(ApplicationDbContext context) : base(context)
-    {
-    }
-
     public async Task<IEnumerable<Order>> GetUserOrdersAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<Order>()
-            .AsNoTracking()
-            .Include(o => o.Items)
-            .Where(o => o.UserId == userId)
+        return await Query(o => o.UserId == userId, isTracking: false, include: o => o.Include(o => o.Items))
             .OrderByDescending(o => o.OrderDate)
             .ToListAsync(cancellationToken);
     }

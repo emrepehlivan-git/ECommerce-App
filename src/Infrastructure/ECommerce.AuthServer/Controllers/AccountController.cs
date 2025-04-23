@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.AuthServer.Models;
-using UserEntity = ECommerce.Domain.Entities.User;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using UserEntity = ECommerce.Domain.Entities.User;
 
-namespace OpenIddictExample.AuthServer.Controllers;
+namespace ECommerce.AuthServer.Controllers;
 
 public class AccountController(
     IIdentityService identityService) : Controller
