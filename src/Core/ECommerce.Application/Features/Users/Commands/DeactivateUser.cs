@@ -15,7 +15,7 @@ public sealed class DeactivateUserCommandHandler(
 {
     public override async Task<Result> Handle(DeactivateUserCommand command, CancellationToken cancellationToken)
     {
-        var user = await identityService.FindByIdAsync(command.UserId.ToString());
+        var user = await identityService.FindByIdAsync(command.UserId);
 
         if (user is null)
             return Result.NotFound(Localizer[UserConsts.NotFound]);

@@ -24,7 +24,7 @@ public sealed class DeactivateUserCommandTests : UserCommandsTestBase
         activeUser.Activate();
 
         IdentityServiceMock
-            .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+            .Setup(x => x.FindByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(activeUser);
 
         IdentityServiceMock
@@ -45,7 +45,7 @@ public sealed class DeactivateUserCommandTests : UserCommandsTestBase
         inactiveUser.Deactivate();
 
         IdentityServiceMock
-            .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+            .Setup(x => x.FindByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(inactiveUser);
 
         var result = await Handler.Handle(Command, CancellationToken.None);
@@ -77,7 +77,7 @@ public sealed class DeactivateUserCommandTests : UserCommandsTestBase
         activeUser.Activate();
 
         IdentityServiceMock
-            .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+            .Setup(x => x.FindByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(activeUser);
 
         IdentityServiceMock

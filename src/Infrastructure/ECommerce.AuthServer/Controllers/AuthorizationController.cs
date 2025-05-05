@@ -223,7 +223,7 @@ public class AuthorizationController(
             var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme) ??
                 throw new InvalidOperationException("The user details cannot be retrieved.");
 
-            var user = await identityService.FindByIdAsync(result.Principal?.GetClaim(Claims.Subject) ?? string.Empty);
+            var user = await identityService.FindByIdAsync(Guid.Parse(result.Principal?.GetClaim(Claims.Subject) ?? string.Empty));
             if (user is null)
             {
                 return Forbid(

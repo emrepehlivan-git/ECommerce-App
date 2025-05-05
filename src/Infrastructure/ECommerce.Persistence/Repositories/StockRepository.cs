@@ -1,15 +1,19 @@
 using ECommerce.Application.Common.Exceptions;
 using ECommerce.Application.Repositories;
+using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Persistence.Repositories;
 
-public sealed class StockRepository(ApplicationDbContext context, ILogger<StockRepository> logger) : IStockRepository
+public sealed class StockRepository(ApplicationDbContext context, ILogger<StockRepository> logger) :
+ BaseRepository<ProductStock>(context),
+  IStockRepository
 {
     public async Task ReserveStockAsync(Guid productId, int quantity, CancellationToken cancellationToken = default)
     {
-        var stock = await context.ProductStocks.FindAsync([productId], cancellationToken);
+        var stock = await Query().FirstOrDefaultAsync(x => x.ProductId == productId, cancellationToken);
         if (stock is null)
         {
             logger.LogError("Stock not found for product {ProductId}", productId);
@@ -24,12 +28,13 @@ public sealed class StockRepository(ApplicationDbContext context, ILogger<StockR
         }
 
         stock.Reserve(quantity);
-        await context.SaveChangesAsync(cancellationToken);
+        Update(stock);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task ReleaseStockAsync(Guid productId, int quantity, CancellationToken cancellationToken = default)
     {
-        var stock = await context.ProductStocks.FindAsync([productId], cancellationToken);
+        var stock = await Query().FirstOrDefaultAsync(x => x.ProductId == productId, cancellationToken);
         if (stock is null)
         {
             logger.LogError("Stock not found for product {ProductId}", productId);
@@ -37,6 +42,7 @@ public sealed class StockRepository(ApplicationDbContext context, ILogger<StockR
         }
 
         stock.Release(quantity);
-        await context.SaveChangesAsync(cancellationToken);
+        Update(stock);
+        await Context.SaveChangesAsync(cancellationToken);
     }
 }

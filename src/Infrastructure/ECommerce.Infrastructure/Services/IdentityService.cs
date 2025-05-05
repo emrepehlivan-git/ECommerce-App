@@ -17,7 +17,7 @@ public sealed class IdentityService(
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
             return SignInResult.Failed;
-    
+
         return await signInManager.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
     }
 
@@ -28,7 +28,7 @@ public sealed class IdentityService(
 
     public Task<User?> FindByEmailAsync(string email) => userManager.FindByEmailAsync(email);
 
-    public Task<User?> FindByIdAsync(string userId) => userManager.FindByIdAsync(userId);
+    public Task<User?> FindByIdAsync(Guid userId) => userManager.FindByIdAsync(userId.ToString());
 
     public async Task<IdentityResult> CreateAsync(User user, string password)
     {

@@ -1,5 +1,6 @@
 using ECommerce.Application.Common.Interfaces;
 using ECommerce.Infrastructure.Services;
+using ECommerce.Persistence.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,5 +25,6 @@ public static class DependencyInjection
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<ICacheService, CacheService>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

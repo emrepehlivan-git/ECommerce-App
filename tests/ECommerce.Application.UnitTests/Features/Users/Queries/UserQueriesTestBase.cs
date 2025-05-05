@@ -25,7 +25,7 @@ public abstract class UserQueriesTestBase
     protected void SetupUserExists(bool exists = true)
     {
         IdentityServiceMock
-            .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+            .Setup(x => x.FindByIdAsync(It.IsAny<Guid>()))
             .ReturnsAsync(exists ? DefaultUser : null);
     }
 

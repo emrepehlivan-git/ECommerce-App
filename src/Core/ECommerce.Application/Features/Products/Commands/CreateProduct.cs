@@ -37,11 +37,16 @@ public sealed class CreateProductCommandValidator : AbstractValidator<CreateProd
             .MustAsync(async (id, ct) =>
                 await categoryRepository.AnyAsync(x => x.Id == id, cancellationToken: ct))
             .WithMessage(localizer[ProductConsts.CategoryNotFound]);
+
+        RuleFor(x => x.StockQuantity)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage(localizer[ProductConsts.StockQuantityMustBeGreaterThanZero]);
     }
 }
 
 public sealed class CreateProductCommandHandler(
     IProductRepository productRepository,
+    IStockRepository stockRepository,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<CreateProductCommand, Result<Guid>>(lazyServiceProvider)
 {
     public override Task<Result<Guid>> Handle(CreateProductCommand command, CancellationToken cancellationToken)
@@ -54,6 +59,7 @@ public sealed class CreateProductCommandHandler(
             command.StockQuantity);
 
         productRepository.Add(product);
+        stockRepository.Add(ProductStock.Create(product.Id, command.StockQuantity));
 
         return Task.FromResult(Result.Success(product.Id));
     }

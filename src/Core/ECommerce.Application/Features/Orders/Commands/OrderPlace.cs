@@ -2,11 +2,13 @@ using Ardalis.Result;
 using ECommerce.Application.Behaviors;
 using ECommerce.Application.Common.CQRS;
 using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Common.Interfaces;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace ECommerce.Application.Features.Orders.Commands;
 
@@ -24,8 +26,14 @@ public sealed class OrderPlaceCommandValidator : AbstractValidator<OrderPlaceCom
 {
     public OrderPlaceCommandValidator(
         IProductRepository productRepository,
+        IIdentityService identityService,
         LocalizationHelper localizer)
     {
+        RuleFor(x => x.UserId)
+            .MustAsync(async (id, ct) =>
+                await identityService.FindByIdAsync(id) != null)
+            .WithMessage(localizer[OrderConsts.UserNotFound]);
+
         RuleFor(x => x.ShippingAddress)
             .NotEmpty()
             .WithMessage(localizer[OrderConsts.ShippingAddressRequired]);
@@ -56,10 +64,17 @@ public sealed class OrderPlaceCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IStockRepository stockRepository,
+    IIdentityService identityService,
     ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderPlaceCommand, Result<Guid>>(lazyServiceProvider)
 {
     public override async Task<Result<Guid>> Handle(OrderPlaceCommand command, CancellationToken cancellationToken)
     {
+        var user = await identityService.FindByIdAsync(command.UserId);
+        if (user is null)
+        {
+            return Result.Error(Localizer[OrderConsts.UserNotFound]);
+        }
+
         var order = Order.Create(
             command.UserId,
             command.ShippingAddress,

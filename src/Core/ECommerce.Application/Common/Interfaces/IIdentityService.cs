@@ -10,7 +10,7 @@ public interface IIdentityService
     Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure);
     Task SignOutAsync();
     Task<User?> FindByEmailAsync(string email);
-    Task<User?> FindByIdAsync(string userId);
+    Task<User?> FindByIdAsync(Guid userId);
     Task<User?> GetUserByPrincipalAsync(ClaimsPrincipal principal);
     Task<IdentityResult> CreateAsync(User user, string password);
     Task<IdentityResult> UpdateAsync(User user);

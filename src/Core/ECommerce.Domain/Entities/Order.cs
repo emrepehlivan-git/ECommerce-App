@@ -8,7 +8,7 @@ public sealed class Order : AuditableEntity
     private readonly List<OrderItem> _items = [];
 
     public Guid UserId { get; private set; }
-    public User User { get; private set; } = new();
+    public User User { get; private set; }
 
     public DateTime OrderDate { get; private set; }
     public OrderStatus Status { get; private set; }

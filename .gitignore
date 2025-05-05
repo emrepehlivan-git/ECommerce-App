@@ -7,6 +7,10 @@
 *.sln.docstates
 *.userprefs
 
+# bash
+start-apps.zsh
+stop-apps.zsh
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

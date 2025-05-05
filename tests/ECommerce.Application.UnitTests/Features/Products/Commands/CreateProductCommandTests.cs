@@ -5,10 +5,10 @@ public sealed class CreateProductCommandTests : ProductCommandsTestBase
     private readonly CreateProductCommandHandler Handler;
     private readonly CreateProductCommand Command;
     private readonly CreateProductCommandValidator Validator;
+    private readonly Mock<IStockRepository> StockRepositoryMock = new();
     public CreateProductCommandTests()
     {
         SetupDefaultLocalizationMessages();
-
         Command = new CreateProductCommand(
             Name: "Test Product",
             Description: "Test Description",
@@ -18,6 +18,7 @@ public sealed class CreateProductCommandTests : ProductCommandsTestBase
 
         Handler = new CreateProductCommandHandler(
             ProductRepositoryMock.Object,
+            StockRepositoryMock.Object,
             LazyServiceProviderMock.Object);
 
         Validator = new CreateProductCommandValidator(

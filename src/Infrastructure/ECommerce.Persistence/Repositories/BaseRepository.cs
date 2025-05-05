@@ -11,12 +11,12 @@ namespace ECommerce.Persistence.Repositories;
 
 public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
 {
-    protected readonly ApplicationDbContext _context;
+    protected readonly ApplicationDbContext Context;
     private readonly DbSet<TEntity> Table;
 
     public BaseRepository(ApplicationDbContext context)
     {
-        _context = context;
+        Context = context;
         Table = context.Set<TEntity>();
     }
 
@@ -26,23 +26,23 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return entity;
     }
 
-    public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public virtual async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         await Table.AddAsync(entity, cancellationToken);
         return entity;
     }
 
-    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return await Table.AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return await Table.CountAsync(predicate, cancellationToken);
     }
 
-    public void Delete(Guid id)
+    public virtual void Delete(Guid id)
     {
         var entity = Table.Find(id);
         if (entity != null)
@@ -51,17 +51,17 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         }
     }
 
-    public void Delete(TEntity entity)
+    public virtual void Delete(TEntity entity)
     {
         Table.Remove(entity);
     }
 
-    public void DeleteRange(IEnumerable<TEntity> entities)
+    public virtual void DeleteRange(IEnumerable<TEntity> entities)
     {
         Table.RemoveRange(entities);
     }
 
-    public async Task<TEntity?> GetByIdAsync(Guid id,
+    public virtual async Task<TEntity?> GetByIdAsync(Guid id,
          Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
          bool isTracking = false,
           CancellationToken cancellationToken = default)
@@ -70,7 +70,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public PagedResult<List<TEntity>> GetPaged(
+    public virtual PagedResult<List<TEntity>> GetPaged(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
@@ -82,7 +82,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return query.ApplyPaging(new PageableRequestParams(page, pageSize));
     }
 
-    public Task<PagedResult<List<TEntity>>> GetPagedAsync(
+    public virtual Task<PagedResult<List<TEntity>>> GetPagedAsync(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
@@ -95,12 +95,12 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return query.ApplyPagingAsync<TEntity, TEntity>(new PageableRequestParams(page, pageSize), predicate: predicate, cancellationToken: cancellationToken);
     }
 
-    public Task<long> LongCountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual Task<long> LongCountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return Table.LongCountAsync(predicate, cancellationToken);
     }
 
-    public IQueryable<TEntity> Query(
+    public virtual IQueryable<TEntity> Query(
         Expression<Func<TEntity, bool>>? predicate = null,
         Expression<Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>>? orderBy = null,
         Expression<Func<IQueryable<TEntity>, IQueryable<TEntity>>>? include = null,
@@ -131,7 +131,7 @@ public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEnti
         return query;
     }
 
-    public void Update(TEntity entity)
+    public virtual void Update(TEntity entity)
     {
         Table.Update(entity);
     }

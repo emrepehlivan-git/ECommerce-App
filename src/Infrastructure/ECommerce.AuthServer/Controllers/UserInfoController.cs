@@ -17,7 +17,7 @@ public sealed class UserInfoController(IIdentityService identityService) : Contr
     public async Task<IActionResult> UserInfo()
     {
 
-        var user = await _identityService.FindByIdAsync(User.GetClaim(Claims.Subject) ?? string.Empty);
+        var user = await _identityService.FindByIdAsync(Guid.Parse(User.GetClaim(Claims.Subject) ?? string.Empty));
         if (user is null)
 
         {

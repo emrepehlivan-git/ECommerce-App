@@ -17,7 +17,7 @@ public sealed class GetUserByIdQueryHandler(
 {
     public override async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
-        var user = await identityService.FindByIdAsync(query.UserId.ToString());
+        var user = await identityService.FindByIdAsync(query.UserId);
 
         if (user is null)
             return Result.NotFound(Localizer[UserConsts.NotFound]);
