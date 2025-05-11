@@ -24,6 +24,7 @@
   "Category.Name.IsRequired": "Category name is required.",
   "Category.Name.MustBeAtLeastCharacters": "Category name must be at least 3 characters long.",
   "Category.Name.MustBeLessThanCharacters": "Category name must be less than 100 characters long.",
+  "Category.CannotDeleteWithProducts": "Category cannot be deleted because it contains products.",
   "Order.NotFound": "Order not found.",
   "Order.UserNotFound": "User not found for this order.",
   "Order.ProductNotFound": "Product not found for this order.",

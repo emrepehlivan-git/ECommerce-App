@@ -24,6 +24,7 @@
   "Category.Name.IsRequired": "Kategori adı gereklidir.",
   "Category.Name.MustBeAtLeastCharacters": "Kategori adı en az 3 karakter olmalıdır.",
   "Category.Name.MustBeLessThanCharacters": "Kategori adı en fazla 100 karakter olmalıdır.",
+  "Category.CannotDeleteWithProducts": "Kategori içinde ürün bulunduğu için silinemez.",
   "Order.NotFound": "Sipariş bulunamadı.",
   "Order.UserNotFound": "Bu sipariş için kullanıcı bulunamadı.",
   "Order.ProductNotFound": "Bu sipariş için ürün bulunamadı.",

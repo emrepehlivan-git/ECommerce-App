@@ -15,7 +15,7 @@ namespace ECommerce.Application.Features.Orders.Commands;
 public sealed record OrderItemAddCommand(
     Guid OrderId,
     Guid ProductId,
-    int Quantity) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
+    int Quantity) : IRequest<Result>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class OrderItemAddCommandValidator : AbstractValidator<OrderItemAddCommand>
 {

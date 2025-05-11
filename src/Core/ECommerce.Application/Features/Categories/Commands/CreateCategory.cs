@@ -10,7 +10,7 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Categories.Commands;
 
-public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
+public sealed record CreateCategoryCommand(string Name) : IRequest<Result<Guid>>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCommand>
 {

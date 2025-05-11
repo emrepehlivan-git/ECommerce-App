@@ -14,7 +14,7 @@ namespace ECommerce.Application.Features.Orders.Commands;
 
 public sealed record OrderItemRemoveCommand(
     Guid OrderId,
-    Guid ProductId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
+    Guid ProductId) : IRequest<Result>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class OrderItemRemoveCommandValidator : AbstractValidator<OrderItemRemoveCommand>
 {

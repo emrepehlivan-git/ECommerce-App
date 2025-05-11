@@ -14,7 +14,7 @@ public sealed record UpdateProductCommand(
     string Name,
     string? Description,
     decimal Price,
-    Guid CategoryId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
+    Guid CategoryId) : IRequest<Result>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {

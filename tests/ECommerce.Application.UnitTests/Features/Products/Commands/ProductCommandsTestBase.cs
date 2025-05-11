@@ -50,6 +50,9 @@ public class ProductCommandsTestBase
         LocalizationServiceMock
             .Setup(x => x.GetLocalizedString(ProductConsts.NameExists))
             .Returns("Product with this name already exists");
+        LocalizationServiceMock
+            .Setup(x => x.GetLocalizedString(ProductConsts.StockQuantityMustBeGreaterThanZero))
+            .Returns("Stock quantity must be greater than or equal to zero");
     }
 
     protected void SetupProductRepositoryAdd(Product capturedProduct)

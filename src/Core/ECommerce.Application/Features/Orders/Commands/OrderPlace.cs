@@ -16,7 +16,7 @@ public sealed record OrderPlaceCommand(
     Guid UserId,
     string ShippingAddress,
     string BillingAddress,
-    List<OrderItemRequest> Items) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
+    List<OrderItemRequest> Items) : IRequest<Result<Guid>>, IValidatableRequest, ITransactionalRequest;
 
 public sealed record OrderItemRequest(
     Guid ProductId,

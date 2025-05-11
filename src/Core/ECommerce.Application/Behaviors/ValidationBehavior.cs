@@ -7,7 +7,7 @@ namespace ECommerce.Application.Behaviors;
 public sealed class ValidationBehavior<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators
     ) : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IValidateRequest
+    where TRequest : IValidatableRequest
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {

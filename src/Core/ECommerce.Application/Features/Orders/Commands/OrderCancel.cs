@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Application.Features.Orders.Commands;
 
-public sealed record OrderCancelCommand(Guid OrderId) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
+public sealed record OrderCancelCommand(Guid OrderId) : IRequest<Result>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class OrderCancelCommandValidator : AbstractValidator<OrderCancelCommand>
 {

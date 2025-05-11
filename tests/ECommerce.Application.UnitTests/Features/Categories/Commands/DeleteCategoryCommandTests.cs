@@ -1,4 +1,11 @@
+using Ardalis.Result;
+using ECommerce.Application.Features.Categories;
 using ECommerce.Application.Features.Categories.Commands;
+using ECommerce.Domain.Entities;
+using ECommerce.SharedKernel;
+using FluentAssertions;
+using Moq;
+using System.Linq.Expressions;
 
 namespace ECommerce.Application.UnitTests.Features.Categories.Commands;
 
@@ -44,7 +51,58 @@ public sealed class DeleteCategoryCommandTests : CategoryCommandsTestBase
         // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().ContainSingle()
-            .Which.Should().Be("Category not found");
+        result.Status.Should().Be(ResultStatus.NotFound);
+    }
+
+    [Fact]
+    public async Task Handle_WithCategoryHavingProducts_ShouldReturnConflict()
+    {
+        // Arrange
+        var existingCategory = Category.Create("Test Category");
+        var product = Product.Create("Test Product", "Description", 100, CategoryId, 10);
+        existingCategory.Products.Add(product);
+        SetupCategoryRepositoryGetByIdAsync(existingCategory);
+
+        // Act
+        var result = await Handler.Handle(Command, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ResultStatus.Conflict);
+    }
+
+    [Fact]
+    public async Task Handle_WithValidCategory_ShouldIncludeProductsInQuery()
+    {
+        // Arrange
+        var existingCategory = Category.Create("Test Category");
+        var product = Product.Create("Test Product", "Description", 100, CategoryId, 10);
+        existingCategory.Products.Add(product);
+
+        CategoryRepositoryMock
+            .Setup(x => x.GetByIdAsync(
+                CategoryId,
+                It.IsAny<Expression<Func<IQueryable<Category>, IQueryable<Category>>>?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(existingCategory);
+
+        // Act
+        var result = await Handler.Handle(Command, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ResultStatus.Conflict);
+
+        // Verify that the category was queried with products included
+        CategoryRepositoryMock.Verify(
+            x => x.GetByIdAsync(
+                CategoryId,
+                It.IsAny<Expression<Func<IQueryable<Category>, IQueryable<Category>>>?>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }

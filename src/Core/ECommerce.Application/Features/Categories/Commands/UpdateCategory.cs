@@ -9,7 +9,7 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Categories.Commands;
 
-public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
+public sealed record UpdateCategoryCommand(Guid Id, string Name) : IRequest<Result>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
 {

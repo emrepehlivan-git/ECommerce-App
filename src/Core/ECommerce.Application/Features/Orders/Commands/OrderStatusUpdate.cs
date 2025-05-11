@@ -13,7 +13,7 @@ namespace ECommerce.Application.Features.Orders.Commands;
 
 public sealed record OrderStatusUpdateCommand(
     Guid OrderId,
-    OrderStatus NewStatus) : IRequest<Result>, IValidateRequest, ITransactionalRequest;
+    OrderStatus NewStatus) : IRequest<Result>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class OrderStatusUpdateCommandValidator : AbstractValidator<OrderStatusUpdateCommand>
 {

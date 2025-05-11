@@ -9,7 +9,7 @@ using MediatR;
 
 namespace ECommerce.Application.Features.Products.Commands;
 
-public record class UpdateProductStock(Guid ProductId, int StockQuantity) : IRequest<Result>, IValidateRequest, ITransactionalRequest
+public record class UpdateProductStock(Guid ProductId, int StockQuantity) : IRequest<Result>, IValidatableRequest, ITransactionalRequest
 ;
 
 public sealed class UpdateProductStockValidator : AbstractValidator<UpdateProductStock>

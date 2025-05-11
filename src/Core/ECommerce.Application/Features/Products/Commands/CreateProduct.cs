@@ -15,7 +15,7 @@ public sealed record CreateProductCommand(
     string? Description,
     decimal Price,
     Guid CategoryId,
-    int StockQuantity) : IRequest<Result<Guid>>, IValidateRequest, ITransactionalRequest;
+    int StockQuantity) : IRequest<Result<Guid>>, IValidatableRequest, ITransactionalRequest;
 
 public sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
@@ -25,9 +25,9 @@ public sealed class CreateProductCommandValidator : AbstractValidator<CreateProd
     {
         RuleFor(x => x.Name)
             .MinimumLength(ProductConsts.NameMinLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeAtLeastCharacters])
+            .WithMessage(string.Format(localizer[ProductConsts.NameMustBeAtLeastCharacters], ProductConsts.NameMinLength))
             .MaximumLength(ProductConsts.NameMaxLength)
-            .WithMessage(localizer[ProductConsts.NameMustBeLessThanCharacters]);
+            .WithMessage(string.Format(localizer[ProductConsts.NameMustBeLessThanCharacters], ProductConsts.NameMaxLength));
 
         RuleFor(x => x.Price)
             .GreaterThan(0)
