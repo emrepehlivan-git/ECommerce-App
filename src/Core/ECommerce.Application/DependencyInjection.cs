@@ -1,8 +1,8 @@
 using ECommerce.Application.Behaviors;
-using ECommerce.Application.Common.Mappings;
 using ECommerce.Application.Features.Categories.Commands;
 using ECommerce.Application.Features.Categories;
-using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Helpers;
+using ECommerce.Application.Mappings;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;

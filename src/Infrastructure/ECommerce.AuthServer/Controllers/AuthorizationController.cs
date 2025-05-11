@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 using ECommerce.AuthServer.Helpers;
 using ECommerce.AuthServer.Models;
 using Microsoft.AspNetCore;
@@ -12,12 +12,11 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace OpenIddictExample.AuthServer.Controllers;
+namespace ECommerce.AuthServer.Controllers;
 
 public class AuthorizationController(
     IOpenIddictApplicationManager applicationManager,
     IOpenIddictAuthorizationManager authorizationManager,
-    IOpenIddictScopeManager scopeManager,
     IIdentityService identityService)
     : Controller
 {
@@ -93,14 +92,6 @@ public class AuthorizationController(
                     nameType: Claims.Name,
                     roleType: Claims.Role);
 
-                identity.SetClaim(Claims.Subject, user.Id.ToString())
-                        .SetClaim(Claims.Email, user.Email)
-                        .SetClaim("fullName", user.FullName.ToString())
-                        .SetClaims(Claims.Role, [.. await identityService.GetRolesAsync(user)]);
-
-                identity.SetScopes(request.GetScopes());
-                identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
-
                 var authorization = authorizations.LastOrDefault();
                 authorization ??= await authorizationManager.CreateAsync(
                     identity: identity,
@@ -110,7 +101,6 @@ public class AuthorizationController(
                     scopes: identity.GetScopes());
 
                 identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
-                identity.SetDestinations(GetDestinations);
 
                 return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 
@@ -171,14 +161,6 @@ public class AuthorizationController(
             nameType: Claims.Name,
             roleType: Claims.Role);
 
-        identity.SetClaim(Claims.Subject, user.Id.ToString())
-                .SetClaim(Claims.Email, user.Email)
-                .SetClaim("fullName", user.FullName.ToString())
-                .SetClaims(Claims.Role, [.. await identityService.GetRolesAsync(user)]);
-
-        identity.SetScopes(request.GetScopes());
-        identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
-
         var authorization = authorizations.LastOrDefault();
         authorization ??= await authorizationManager.CreateAsync(
             identity: identity,
@@ -188,7 +170,6 @@ public class AuthorizationController(
             scopes: identity.GetScopes());
 
         identity.SetAuthorizationId(await authorizationManager.GetIdAsync(authorization));
-        identity.SetDestinations(GetDestinations);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
@@ -251,20 +232,13 @@ public class AuthorizationController(
                 nameType: Claims.Name,
                 roleType: Claims.Role);
 
-            identity.SetClaim(Claims.Subject, user.Id.ToString())
-                    .SetClaim(Claims.Email, user.Email)
-                    .SetClaim("fullName", user.FullName.ToString())
-                    .SetClaims(Claims.Role, [.. await identityService.GetRolesAsync(user)]);
-
-            identity.SetDestinations(GetDestinations);
-
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
         throw new InvalidOperationException("The specified grant type is not supported.");
     }
 
-    private static IEnumerable<string> GetDestinations(Claim claim)
+    public static IEnumerable<string> GetDestinations(Claim claim)
     {
         switch (claim.Type)
         {

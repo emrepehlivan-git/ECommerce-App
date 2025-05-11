@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Ardalis.Result;
-using ECommerce.Application.Common.Exceptions;
+using ECommerce.Application.Exceptions;
 using FluentValidation;
 
 namespace ECommerce.WebAPI.Middlewares;

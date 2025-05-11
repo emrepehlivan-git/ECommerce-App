@@ -1,3 +1,6 @@
+using ECommerce.Application.Helpers;
+using ECommerce.Application.Interfaces;
+
 namespace ECommerce.Application.UnitTests.Features.Users.Queries;
 
 public abstract class UserQueriesTestBase

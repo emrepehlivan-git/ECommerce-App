@@ -1,6 +1,6 @@
-using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Orders.Commands;
 using ECommerce.Application.Features.Orders.Queries;
+using ECommerce.Application.Parameters;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;

@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Ardalis.Result;
-using ECommerce.Application.Common.Extensions;
-using ECommerce.Application.Common.Parameters;
+using ECommerce.Application.Extensions;
+using ECommerce.Application.Parameters;
 using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;
 using ECommerce.SharedKernel;

@@ -1,11 +1,13 @@
+using ECommerce.Application.Interfaces;
 using ECommerce.Persistence.Contexts;
 using ECommerce.Persistence;
 using static OpenIddict.Abstractions.OpenIddictConstants;
-using ECommerce.Application.Common.Interfaces;
 using ECommerce.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ECommerce.AuthServer;
 using ECommerce.AuthServer.Services;
+using static OpenIddict.Server.OpenIddictServerEvents;
+using OpenIddict.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +69,10 @@ builder.Services.AddOpenIddict()
                .EnableEndSessionEndpointPassthrough();
 
         options.IgnoreGrantTypePermissions();
+
+        options.AddEventHandler<ProcessSignInContext>(builder =>
+            builder.UseScopedHandler<AddClaimsToTokenHandler>()
+            .SetType(OpenIddictServerHandlerType.Custom));
     })
     .AddValidation(options =>
     {

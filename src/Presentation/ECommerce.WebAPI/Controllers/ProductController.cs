@@ -1,6 +1,6 @@
-using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Products.Commands;
 using ECommerce.Application.Features.Products.Queries;
+using ECommerce.Application.Parameters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.WebAPI.Controllers;

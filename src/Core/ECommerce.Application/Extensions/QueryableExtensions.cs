@@ -1,12 +1,12 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Ardalis.Result;
-using ECommerce.Application.Common.Parameters;
+using ECommerce.Application.Parameters;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace ECommerce.Application.Common.Extensions;
+namespace ECommerce.Application.Extensions;
 
 public static class QueryableExtensions
 {

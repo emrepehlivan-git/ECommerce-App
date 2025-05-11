@@ -1,4 +1,6 @@
 using ECommerce.Application.Features.Products;
+using ECommerce.Application.Helpers;
+using ECommerce.Application.Interfaces;
 
 namespace ECommerce.Application.UnitTests.Features.Products.Commands;
 

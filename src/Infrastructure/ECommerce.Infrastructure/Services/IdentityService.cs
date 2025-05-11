@@ -1,95 +1,156 @@
-using ECommerce.Application.Common.Interfaces;
+using System.Security.Claims;
+using ECommerce.Application.Interfaces;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Infrastructure.Services;
 
-public sealed class IdentityService(
-    SignInManager<User> signInManager,
-    UserManager<User> userManager,
-    RoleManager<Role> roleManager) : IIdentityService
+public sealed class IdentityService : IIdentityService
 {
-    public IQueryable<User> Users => userManager.Users;
+    private readonly UserManager<User> _userManager;
+    private readonly RoleManager<Role> _roleManager;
+    private readonly SignInManager<User> _signInManager;
+
+    public IdentityService(
+        UserManager<User> userManager,
+        RoleManager<Role> roleManager,
+        SignInManager<User> signInManager)
+    {
+        _userManager = userManager;
+        _roleManager = roleManager;
+        _signInManager = signInManager;
+    }
+
+    public IQueryable<User> Users => _userManager.Users;
 
     public async Task<SignInResult> PasswordSignInAsync(string email, string password, bool isPersistent, bool lockoutOnFailure)
     {
-        var user = await userManager.FindByEmailAsync(email);
-        if (user == null)
-            return SignInResult.Failed;
-
-        return await signInManager.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
+        return await _signInManager.PasswordSignInAsync(email, password, isPersistent, lockoutOnFailure);
     }
 
     public async Task SignOutAsync()
     {
-        await signInManager.SignOutAsync();
+        await _signInManager.SignOutAsync();
     }
 
-    public Task<User?> FindByEmailAsync(string email) => userManager.FindByEmailAsync(email);
+    public async Task<User?> FindByEmailAsync(string email)
+    {
+        return await _userManager.FindByEmailAsync(email);
+    }
 
-    public Task<User?> FindByIdAsync(Guid userId) => userManager.FindByIdAsync(userId.ToString());
+    public async Task<User?> FindByIdAsync(Guid userId)
+    {
+        return await _userManager.FindByIdAsync(userId.ToString());
+    }
+
+    public async Task<User?> GetUserByPrincipalAsync(ClaimsPrincipal principal)
+    {
+        return await _userManager.GetUserAsync(principal);
+    }
 
     public async Task<IdentityResult> CreateAsync(User user, string password)
     {
-        var result = await userManager.CreateAsync(user, password);
-        if (result.Succeeded)
-            await AddToRoleAsync(user, "USER");
-        return result;
+        return await _userManager.CreateAsync(user, password);
     }
 
     public async Task<IdentityResult> UpdateAsync(User user)
     {
-        var result = await userManager.UpdateAsync(user);
-        if (result.Succeeded)
-        {
-            await userManager.UpdateSecurityStampAsync(user);
-            await signInManager.SignOutAsync();
-            await signInManager.SignInAsync(user, isPersistent: false);
-        }
-        return result;
+        return await _userManager.UpdateAsync(user);
     }
 
-    public Task<bool> CheckPasswordAsync(User user, string password) => userManager.CheckPasswordAsync(user, password);
+    public async Task<bool> CheckPasswordAsync(User user, string password)
+    {
+        return await _userManager.CheckPasswordAsync(user, password);
+    }
 
-    public Task<string> GenerateEmailConfirmationTokenAsync(User user) => userManager.GenerateEmailConfirmationTokenAsync(user);
+    public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+    {
+        return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+    }
 
-    public Task<IdentityResult> ConfirmEmailAsync(User user, string token) => userManager.ConfirmEmailAsync(user, token);
+    public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+    {
+        return await _userManager.ConfirmEmailAsync(user, token);
+    }
 
-    public Task<string> GeneratePasswordResetTokenAsync(User user) => userManager.GeneratePasswordResetTokenAsync(user);
+    public async Task<string> GeneratePasswordResetTokenAsync(User user)
+    {
+        return await _userManager.GeneratePasswordResetTokenAsync(user);
+    }
 
     public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword)
     {
-        var result = await userManager.ResetPasswordAsync(user, token, newPassword);
-        if (result.Succeeded)
-        {
-            await userManager.UpdateSecurityStampAsync(user);
-            await signInManager.SignOutAsync();
-            await signInManager.SignInAsync(user, isPersistent: false);
-        }
-        return result;
+        return await _userManager.ResetPasswordAsync(user, token, newPassword);
     }
 
-    public Task<IList<string>> GetRolesAsync(User user) => userManager.GetRolesAsync(user);
+    public async Task<IList<string>> GetRolesAsync()
+    {
+        return await _roleManager.Roles.Select(r => r.Name!).ToListAsync();
+    }
+
+    public async Task<IList<string>> GetUserRolesAsync(User user)
+    {
+        return await _userManager.GetRolesAsync(user);
+    }
 
     public async Task<IdentityResult> AddToRoleAsync(User user, string role)
     {
-        var foundRole = await roleManager.FindByNameAsync(role);
-        if (foundRole is null)
-            return IdentityResult.Failed();
-
-        return await userManager.AddToRoleAsync(user, foundRole.Name!);
+        return await _userManager.AddToRoleAsync(user, role);
     }
 
-    public Task<IdentityResult> RemoveFromRoleAsync(User user, string role) => userManager.RemoveFromRoleAsync(user, role);
-
-    public Task<User?> GetUserByPrincipalAsync(ClaimsPrincipal principal)
+    public async Task<IdentityResult> RemoveFromRoleAsync(User user, string role)
     {
-        return userManager.GetUserAsync(principal);
+        return await _userManager.RemoveFromRoleAsync(user, role);
     }
 
     public async Task<bool> CanSignInAsync(User user)
     {
-        return await signInManager.CanSignInAsync(user);
+        return await _signInManager.CanSignInAsync(user);
+    }
+
+    // Role Management
+    public async Task<Role?> FindRoleByIdAsync(Guid roleId)
+    {
+        return await _roleManager.Roles
+            .Include(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(r => r.Id == roleId);
+    }
+
+    public async Task<Role?> FindRoleByNameAsync(string roleName)
+    {
+        return await _roleManager.Roles
+            .Include(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .FirstOrDefaultAsync(r => r.Name == roleName);
+    }
+
+    public async Task<IdentityResult> CreateRoleAsync(Role role)
+    {
+        return await _roleManager.CreateAsync(role);
+    }
+
+    public async Task<IdentityResult> UpdateRoleAsync(Role role)
+    {
+        return await _roleManager.UpdateAsync(role);
+    }
+
+    public async Task<IdentityResult> DeleteRoleAsync(Role role)
+    {
+        return await _roleManager.DeleteAsync(role);
+    }
+
+    public async Task<IList<Role>> GetAllRolesAsync()
+    {
+        return await _roleManager.Roles
+            .Include(r => r.RolePermissions)
+            .ThenInclude(rp => rp.Permission)
+            .ToListAsync();
+    }
+
+    public async Task<bool> RoleExistsAsync(string roleName)
+    {
+        return await _roleManager.RoleExistsAsync(roleName);
     }
 }

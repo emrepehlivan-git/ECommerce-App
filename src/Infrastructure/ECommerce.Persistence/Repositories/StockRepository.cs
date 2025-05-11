@@ -1,4 +1,4 @@
-using ECommerce.Application.Common.Exceptions;
+using ECommerce.Application.Exceptions;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;

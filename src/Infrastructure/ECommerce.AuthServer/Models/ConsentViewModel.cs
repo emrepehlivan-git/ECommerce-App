@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace ECommerce.AuthServer.Models;
 
 public sealed class ConsentViewModel

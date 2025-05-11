@@ -1,4 +1,4 @@
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 using ECommerce.SharedKernel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;

@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 
 namespace ECommerce.WebAPI.Services;
 

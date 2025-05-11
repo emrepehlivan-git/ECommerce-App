@@ -1,8 +1,8 @@
 using Ardalis.Result;
-using ECommerce.Application.Common.CQRS;
-using ECommerce.Application.Common.Extensions;
-using ECommerce.Application.Common.Parameters;
+using ECommerce.Application.CQRS;
+using ECommerce.Application.Extensions;
 using ECommerce.Application.Features.Orders.DTOs;
+using ECommerce.Application.Parameters;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;

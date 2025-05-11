@@ -1,4 +1,4 @@
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 using MediatR;
 
 namespace ECommerce.Application.Behaviors;

@@ -1,4 +1,4 @@
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +35,7 @@ public sealed class UserInfoController(IIdentityService identityService) : Contr
         {
             [Claims.Subject] = user.Id,
             [Claims.Email] = user.Email!,
-            [Claims.Role] = await _identityService.GetRolesAsync(user),
+            [Claims.Role] = await _identityService.GetUserRolesAsync(user),
             [Claims.Audience] = "api",
             ["fullName"] = user.FullName.ToString(),
         };

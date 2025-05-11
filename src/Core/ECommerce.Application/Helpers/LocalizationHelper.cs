@@ -1,6 +1,6 @@
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 
-namespace ECommerce.Application.Common.Helpers;
+namespace ECommerce.Application.Helpers;
 
 public class LocalizationHelper(ILocalizationService localizationService)
 {

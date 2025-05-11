@@ -4,7 +4,7 @@ using ECommerce.Application.Features.Products;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ECommerce.Application.Common.Mappings;
+namespace ECommerce.Application.Mappings;
 
 public static class MapsterConfig
 {

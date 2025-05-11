@@ -1,8 +1,8 @@
-using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Helpers;
 using ECommerce.SharedKernel;
 using MediatR;
 
-namespace ECommerce.Application.Common.CQRS;
+namespace ECommerce.Application.CQRS;
 
 public abstract class BaseHandler<TRequest, TResponse>(ILazyServiceProvider lazyServiceProvider) : IRequestHandler<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

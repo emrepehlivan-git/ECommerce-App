@@ -1,5 +1,5 @@
-using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Users.Queries;
+using ECommerce.Application.Parameters;
 
 namespace ECommerce.Application.UnitTests.Features.Users.Queries;
 

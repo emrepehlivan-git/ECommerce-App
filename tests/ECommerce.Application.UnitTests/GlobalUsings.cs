@@ -17,8 +17,6 @@ global using ECommerce.Domain.Entities;
 // Application Layer
 global using ECommerce.Application.Features.Products.Commands;
 global using ECommerce.Application.Repositories;
-global using ECommerce.Application.Common.Helpers;
-global using ECommerce.Application.Common.Interfaces;
 
 // Shared Kernel
 global using ECommerce.SharedKernel;

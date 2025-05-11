@@ -1,5 +1,5 @@
 using System.Text.Json;
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace ECommerce.Infrastructure.Services;

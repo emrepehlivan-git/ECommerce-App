@@ -2,7 +2,7 @@ using System.Security.Claims;
 using ECommerce.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace ECommerce.Application.Common.Interfaces;
+namespace ECommerce.Application.Interfaces;
 
 public interface IIdentityService
 {
@@ -19,8 +19,18 @@ public interface IIdentityService
     Task<IdentityResult> ConfirmEmailAsync(User user, string token);
     Task<string> GeneratePasswordResetTokenAsync(User user);
     Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword);
-    Task<IList<string>> GetRolesAsync(User user);
     Task<IdentityResult> AddToRoleAsync(User user, string role);
     Task<IdentityResult> RemoveFromRoleAsync(User user, string role);
     Task<bool> CanSignInAsync(User user);
+
+    // Role Management
+    Task<IList<string>> GetRolesAsync();
+    Task<IList<string>> GetUserRolesAsync(User user);
+    Task<Role?> FindRoleByIdAsync(Guid roleId);
+    Task<Role?> FindRoleByNameAsync(string roleName);
+    Task<IdentityResult> CreateRoleAsync(Role role);
+    Task<IdentityResult> UpdateRoleAsync(Role role);
+    Task<IdentityResult> DeleteRoleAsync(Role role);
+    Task<IList<Role>> GetAllRolesAsync();
+    Task<bool> RoleExistsAsync(string roleName);
 }

@@ -1,6 +1,6 @@
-using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Categories;
 using ECommerce.Application.Features.Categories.Queries;
+using ECommerce.Application.Parameters;
 using Mapster;
 
 namespace ECommerce.Application.UnitTests.Features.Categories.Queries;

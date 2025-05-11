@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using ECommerce.Application.Behaviors;
-using ECommerce.Application.Common.CQRS;
-using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.CQRS;
+using ECommerce.Application.Helpers;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;

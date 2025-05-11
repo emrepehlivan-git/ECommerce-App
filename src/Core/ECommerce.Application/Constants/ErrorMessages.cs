@@ -1,4 +1,4 @@
-namespace ECommerce.Application.Common.Constants;
+namespace ECommerce.Application.Constants;
 
 public static class ErrorMessages
 {

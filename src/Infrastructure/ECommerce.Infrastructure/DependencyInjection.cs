@@ -1,4 +1,5 @@
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.Infrastructure.Services;
 using ECommerce.Persistence.Services;
 using Microsoft.Extensions.Configuration;
@@ -26,5 +27,6 @@ public static class DependencyInjection
         services.AddSingleton<ICacheService, CacheService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IPermissionService, PermissionService>();
     }
 }

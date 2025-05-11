@@ -1,13 +1,13 @@
 using Ardalis.Result;
-using ECommerce.Application.Common.CQRS;
-using ECommerce.Application.Common.Extensions;
-using ECommerce.Application.Common.Parameters;
+using ECommerce.Application.CQRS;
+using ECommerce.Application.Extensions;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Features.Categories.DTOs;
 using ECommerce.SharedKernel;
 using Mapster;
 using MediatR;
 using ECommerce.Application.Features.Products.DTOs;
+using ECommerce.Application.Parameters;
 using Microsoft.EntityFrameworkCore;
 using ECommerce.Domain.Entities;
 

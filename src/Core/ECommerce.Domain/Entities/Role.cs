@@ -4,6 +4,10 @@ namespace ECommerce.Domain.Entities;
 
 public sealed class Role : IdentityRole<Guid>
 {
+    private readonly List<RolePermission> _rolePermissions = [];
+
+    public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions.AsReadOnly();
+
     private Role()
     {
     }
@@ -25,6 +29,22 @@ public sealed class Role : IdentityRole<Guid>
         Validate(name);
 
         Name = name;
+    }
+
+    public void AddPermission(RolePermission rolePermission)
+    {
+        if (rolePermission == null)
+            throw new ArgumentNullException(nameof(rolePermission));
+
+        _rolePermissions.Add(rolePermission);
+    }
+
+    public void RemovePermission(RolePermission rolePermission)
+    {
+        if (rolePermission == null)
+            throw new ArgumentNullException(nameof(rolePermission));
+
+        _rolePermissions.Remove(rolePermission);
     }
 
     private void Validate(string name)

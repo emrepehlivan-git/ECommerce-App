@@ -2,7 +2,7 @@ using ECommerce.Application.Repositories;
 using ECommerce.SharedKernel;
 using MediatR;
 using Ardalis.Result;
-using ECommerce.Application.Common.CQRS;
+using ECommerce.Application.CQRS;
 
 namespace ECommerce.Application.Features.Products.Queries;
 

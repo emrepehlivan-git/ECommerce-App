@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Globalization;
-using ECommerce.Application.Common.Interfaces;
+using ECommerce.Application.Interfaces;
 
 namespace ECommerce.Infrastructure.Services;
 

@@ -1,6 +1,6 @@
 using ECommerce.Application.Features.Products.Queries;
-using ECommerce.Application.Common.Parameters;
 using ECommerce.Application.Features.Products.DTOs;
+using ECommerce.Application.Parameters;
 
 namespace ECommerce.Application.UnitTests.Features.Products.Queries;
 

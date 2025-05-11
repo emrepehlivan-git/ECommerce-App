@@ -1,9 +1,9 @@
 using Ardalis.Result;
-using ECommerce.Application.Common.CQRS;
-using ECommerce.Application.Common.Extensions;
-using ECommerce.Application.Common.Parameters;
+using ECommerce.Application.CQRS;
+using ECommerce.Application.Extensions;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Features.Products.DTOs;
+using ECommerce.Application.Parameters;
 using ECommerce.SharedKernel;
 using Mapster;
 using MediatR;

@@ -1,4 +1,4 @@
-using ECommerce.Application.Common.Helpers;
+using ECommerce.Application.Helpers;
 using ECommerce.SharedKernel;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
