@@ -4,12 +4,14 @@ using ECommerce.Application.Constants;
 using ECommerce.Application.Interfaces;
 using ECommerce.Infrastructure;
 using ECommerce.Persistence;
+using ECommerce.Persistence.Contexts;
 using ECommerce.SharedKernel;
 using ECommerce.WebAPI.Extensions;
 using ECommerce.WebAPI.Middlewares;
 using ECommerce.WebAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.WebAPI;
 
@@ -137,5 +139,14 @@ public static class DependencyInjection
             options.AddPolicy(PermissionConstants.Roles.Manage, policy =>
                 policy.RequirePermission(PermissionConstants.Roles.Manage));
         });
+    }
+
+    public static async Task ApplyMigrations(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+        if (pendingMigrations.Any())
+            await dbContext.Database.MigrateAsync();
     }
 }

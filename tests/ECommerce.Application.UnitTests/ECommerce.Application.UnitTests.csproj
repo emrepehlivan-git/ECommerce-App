@@ -1,8 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
+        <PackageReference Include="Ardalis.Result" />
+    </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\..\src\Core\ECommerce.Application\ECommerce.Application.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="Ardalis.Result" Version="10.1.0" />
     </ItemGroup>
 </Project> 

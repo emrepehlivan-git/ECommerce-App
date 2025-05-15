@@ -1,6 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-#
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BFCF3A9A-3B1F-4A4B-BE3D-86F8E3F6C383}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5C3C1BF4-8E1D-4C9B-B2A3-76CECD8E5337}"
@@ -36,6 +35,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{77BEA46E-D2DB-4258-9864-EFBC90A5CF7A}"
 	ProjectSection(SolutionItems) = preProject
 		compose.yaml = compose.yaml
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Global

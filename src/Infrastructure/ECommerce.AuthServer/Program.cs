@@ -6,8 +6,9 @@ using ECommerce.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using ECommerce.AuthServer;
 using ECommerce.AuthServer.Services;
-using static OpenIddict.Server.OpenIddictServerEvents;
-using OpenIddict.Server;
+using ECommerce.Application.Services;
+using Serilog;
+using ECommerce.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +16,13 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 builder.Services.AddCors(options =>
 {
@@ -70,9 +73,7 @@ builder.Services.AddOpenIddict()
 
         options.IgnoreGrantTypePermissions();
 
-        options.AddEventHandler<ProcessSignInContext>(builder =>
-            builder.UseScopedHandler<AddClaimsToTokenHandler>()
-            .SetType(OpenIddictServerHandlerType.Custom));
+        options.AddEventHandler(AddClaimsToTokenHandler.Descriptor);
     })
     .AddValidation(options =>
     {
@@ -81,6 +82,7 @@ builder.Services.AddOpenIddict()
     });
 
 builder.Services.AddHostedService<Worker>();
+
 
 var app = builder.Build();
 

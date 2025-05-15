@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using ECommerce.Application.Features.Categories.Queries;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.AuthServer.Controllers;
@@ -13,26 +14,31 @@ public class AddClaimsToTokenHandler(IIdentityService identityService, IPermissi
 {
     public async ValueTask HandleAsync(ProcessSignInContext context)
     {
-        var principal = context.Principal ?? throw new InvalidOperationException("The principal is null.");
+        var principal = context.Principal;
 
         if (principal is { Identity: { IsAuthenticated: false } })
             return;
 
-        var userId = principal.GetClaim(Claims.Subject);
-        if (string.IsNullOrWhiteSpace(userId)) return;
+        if (!Guid.TryParse(principal?.GetClaim(Claims.Subject), out var userId)) return;
 
-        var user = await identityService.FindByIdAsync(Guid.Parse(userId));
+        var user = await identityService.FindByIdAsync(userId);
         if (user is null) return;
 
-        var identity = principal?.Identity as ClaimsIdentity ?? throw new InvalidOperationException("The identity is null.");
+        var identity = principal?.Identity as ClaimsIdentity;
 
-        identity.SetClaim(Claims.Subject, user.Id.ToString());
-        identity.SetClaim(Claims.Email, user.Email);
-        identity.SetClaim("fullName", user.FullName.ToString());
-        identity.SetClaims(Claims.Role, [.. await identityService.GetUserRolesAsync(user)]);
-        identity.SetClaims("permissions", [.. await permissionService.GetUserPermissionsAsync(user.Id)]);
-        identity.SetScopes(context.Request.GetScopes());
-        identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
-        identity.SetDestinations(AuthorizationController.GetDestinations);
+        identity?.SetClaim(Claims.Subject, user.Id.ToString());
+        identity?.SetClaim(Claims.Email, user.Email);
+        identity?.SetClaim("fullName", user.FullName.ToString());
+        identity?.SetClaims(Claims.Role, [.. await identityService.GetUserRolesAsync(user)]);
+        identity?.SetClaims("permissions", [.. await permissionService.GetUserPermissionsAsync(user.Id)]);
+        identity?.SetScopes(context.Request.GetScopes());
+        identity?.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+        identity?.SetDestinations(AuthorizationController.GetDestinations);
     }
+
+    public static OpenIddictServerHandlerDescriptor Descriptor { get; }
+          = OpenIddictServerHandlerDescriptor.CreateBuilder<ProcessSignInContext>()
+              .UseScopedHandler<AddClaimsToTokenHandler>()
+              .SetOrder(100_000)
+              .Build();
 }

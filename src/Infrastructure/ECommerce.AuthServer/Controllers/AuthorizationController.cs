@@ -91,7 +91,7 @@ public class AuthorizationController(
                     authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                     nameType: Claims.Name,
                     roleType: Claims.Role);
-
+                identity.SetClaim(Claims.Subject, user.Id.ToString());
                 var authorization = authorizations.LastOrDefault();
                 authorization ??= await authorizationManager.CreateAsync(
                     identity: identity,
@@ -160,6 +160,8 @@ public class AuthorizationController(
             authenticationType: TokenValidationParameters.DefaultAuthenticationType,
             nameType: Claims.Name,
             roleType: Claims.Role);
+
+        identity.SetClaim(Claims.Subject, user.Id.ToString());
 
         var authorization = authorizations.LastOrDefault();
         authorization ??= await authorizationManager.CreateAsync(
@@ -231,6 +233,8 @@ public class AuthorizationController(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
                 roleType: Claims.Role);
+
+            identity.SetClaim(Claims.Subject, user.Id.ToString());
 
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }

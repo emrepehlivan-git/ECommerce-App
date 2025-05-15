@@ -5,12 +5,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenIddict.AspNetCore" Version="6.0.0" />
-    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="6.0.0" />
-    <PackageReference Include="OpenIddict.Server.AspNetCore" Version="6.2.1" />
+    <PackageReference Include="OpenIddict.AspNetCore" />
+    <PackageReference Include="OpenIddict.EntityFrameworkCore" />
+    <PackageReference Include="OpenIddict.Server.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>

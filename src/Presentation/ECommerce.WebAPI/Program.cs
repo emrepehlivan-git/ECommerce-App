@@ -1,21 +1,18 @@
 using ECommerce.WebAPI;
-using Serilog;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateBootstrapLogger();
+ECommerce.Application.Common.Logging.ILogger logger = null!;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseSerilog((context, services, configuration) => configuration
-        .ReadFrom.Configuration(context.Configuration)
-        .ReadFrom.Services(services));
-
     builder.Services.AddPresentation(builder.Configuration);
 
     var app = builder.Build();
+
+    await app.ApplyMigrations();
+
+    logger = app.Services.GetRequiredService<ECommerce.Application.Common.Logging.ILogger>();
 
     app.UsePresentation(app.Environment);
 
@@ -23,9 +20,5 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "Application terminated unexpectedly");
-}
-finally
-{
-    Log.CloseAndFlush();
+    logger.LogCritical("Application terminated unexpectedly: {Message}", ex.Message);
 }

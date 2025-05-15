@@ -4,6 +4,9 @@ using ECommerce.Infrastructure.Services;
 using ECommerce.Persistence.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ECommerce.Infrastructure.Logging;
+using Serilog;
+using ECommerce.SharedKernel.Logging;
 
 namespace ECommerce.Infrastructure;
 
@@ -11,12 +14,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddInfraServices();
+        services.AddLogging(configuration);
+
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = configuration.GetConnectionString("Redis");
         });
-
-        services.AddInfraServices();
 
         return services;
     }
@@ -28,5 +32,24 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPermissionService, PermissionService>();
+    }
+
+    private static void AddLogging(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<LoggingOptions>(configuration.GetSection("LoggingOptions"));
+        var loggingOptions = configuration.GetSection("LoggingOptions").Get<LoggingOptions>() ?? new LoggingOptions();
+
+        var loggerConfig = new LoggerConfiguration()
+            .MinimumLevel.Is(Enum.Parse<Serilog.Events.LogEventLevel>(loggingOptions.MinimumLevel, true));
+
+        if (loggingOptions.EnableConsole)
+            loggerConfig = loggerConfig.WriteTo.Console(outputTemplate: loggingOptions.OutputTemplate);
+
+        if (loggingOptions.EnableFile)
+            loggerConfig = loggerConfig.WriteTo.File(loggingOptions.FilePath, rollingInterval: RollingInterval.Day, outputTemplate: loggingOptions.OutputTemplate);
+
+        Log.Logger = loggerConfig.CreateLogger();
+        services.AddSingleton<Application.Common.Logging.ILogger>(provider =>
+                  new SerilogLogger(Log.Logger));
     }
 }

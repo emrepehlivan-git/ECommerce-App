@@ -9,6 +9,7 @@ using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using ECommerce.Application.Common.Logging;
 
 namespace ECommerce.Application.Features.Orders.Commands;
 
@@ -65,7 +66,8 @@ public sealed class OrderPlaceCommandHandler(
     IProductRepository productRepository,
     IStockRepository stockRepository,
     IIdentityService identityService,
-    ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderPlaceCommand, Result<Guid>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider,
+    ILogger logger) : BaseHandler<OrderPlaceCommand, Result<Guid>>(lazyServiceProvider)
 {
     public override async Task<Result<Guid>> Handle(OrderPlaceCommand command, CancellationToken cancellationToken)
     {
@@ -91,6 +93,8 @@ public sealed class OrderPlaceCommandHandler(
         }
 
         orderRepository.Add(order);
+
+        logger.LogInformation("Order created: {OrderId} for user {UserId}", order.Id, command.UserId);
 
         return Result.Success(order.Id);
     }
