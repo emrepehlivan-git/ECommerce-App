@@ -48,7 +48,10 @@ public static class DependencyInjection
         if (loggingOptions.EnableFile)
             loggerConfig = loggerConfig.WriteTo.File(loggingOptions.FilePath, rollingInterval: RollingInterval.Day, outputTemplate: loggingOptions.OutputTemplate);
 
-        Log.Logger = loggerConfig.CreateLogger();
+        Log.Logger = loggerConfig
+        .WriteTo.Seq(loggingOptions.SeqUrl)
+        .Enrich.FromLogContext()
+        .CreateLogger();
         services.AddSingleton<Application.Common.Logging.ILogger>(provider =>
                   new SerilogLogger(Log.Logger));
     }

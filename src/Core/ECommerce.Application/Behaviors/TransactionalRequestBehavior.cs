@@ -1,11 +1,11 @@
+using ECommerce.Application.Common.Logging;
 using ECommerce.Application.Interfaces;
 using MediatR;
-using Microsoft.Extensions.Logging;
 namespace ECommerce.Application.Behaviors;
 
 public sealed class TransactionalRequestBehavior<TRequest, TResponse>(
     IUnitOfWork unitOfWork,
-    ILogger<TransactionalRequestBehavior<TRequest, TResponse>> logger)
+    ILogger logger)
  : IPipelineBehavior<TRequest, TResponse>
  where TRequest : ITransactionalRequest
 {
@@ -22,7 +22,7 @@ public sealed class TransactionalRequestBehavior<TRequest, TResponse>(
         catch (Exception exception)
         {
             await transaction.RollbackAsync(cancellationToken);
-            logger.LogError(exception, "Transaction failed for request {RequestType}", typeof(TRequest).Name);
+            logger.LogError(exception, $"Transaction failed for request {typeof(TRequest).Name}");
             throw;
         }
     }

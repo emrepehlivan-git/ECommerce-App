@@ -3,7 +3,6 @@ using ECommerce.Application.Behaviors;
 using ECommerce.Application.CQRS;
 using ECommerce.Application.Helpers;
 using ECommerce.Application.Repositories;
-using ECommerce.Domain.Entities;
 using ECommerce.Domain.Enums;
 using ECommerce.SharedKernel;
 using FluentValidation;

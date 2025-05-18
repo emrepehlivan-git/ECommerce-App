@@ -41,11 +41,4 @@ public sealed class CategoryController : BaseApiController
         var category = await Mediator.Send(new DeleteCategoryCommand(id), cancellationToken);
         return Ok(category);
     }
-
-    [HttpDelete("bulk-delete")]
-    public async Task<IActionResult> DeleteBulkCategories(DeleteBulkCategoriesCommand command, CancellationToken cancellationToken)
-    {
-        var categories = await Mediator.Send(command, cancellationToken);
-        return Ok(categories);
-    }
 }

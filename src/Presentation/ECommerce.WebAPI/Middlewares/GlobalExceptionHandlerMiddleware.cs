@@ -6,7 +6,7 @@ using FluentValidation;
 
 namespace ECommerce.WebAPI.Middlewares;
 
-public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlerMiddleware> logger)
+public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, Application.Common.Logging.ILogger logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -16,7 +16,7 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogg
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An error occurred: {Message}", exception.Message);
+            logger.LogError(exception, "An error occurred while processing the request.");
             await HandleExceptionAsync(context, exception);
         }
     }

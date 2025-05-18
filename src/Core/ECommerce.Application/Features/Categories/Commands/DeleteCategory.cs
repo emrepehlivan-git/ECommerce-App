@@ -20,7 +20,7 @@ public sealed class DeleteCategoryCommandHandler(
         if (category is null)
             return Result.NotFound(Localizer[CategoryConsts.NotFound]);
 
-        if (category.Products.Any())
+        if (await categoryRepository.HasProductsAsync(command.Id, cancellationToken))
             return Result.Conflict(Localizer[CategoryConsts.CannotDeleteWithProducts]);
 
         categoryRepository.Delete(category);

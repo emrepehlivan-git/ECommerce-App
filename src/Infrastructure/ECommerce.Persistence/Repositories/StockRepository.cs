@@ -1,13 +1,13 @@
+using ECommerce.Application.Common.Logging;
 using ECommerce.Application.Exceptions;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Persistence.Repositories;
 
-public sealed class StockRepository(ApplicationDbContext context, ILogger<StockRepository> logger) :
+public sealed class StockRepository(ApplicationDbContext context, ILogger logger) :
  BaseRepository<ProductStock>(context),
   IStockRepository
 {

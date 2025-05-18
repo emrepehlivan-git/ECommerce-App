@@ -4,7 +4,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-
   <!-- Framework & Entity Framework -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
@@ -13,8 +12,8 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
     <PackageVersion Include="EFCore.NamingConventions" Version="8.0.3" />
+    <PackageVersion Include="Serilog.Sinks.Seq" Version="8.0.0" />
   </ItemGroup>
-
   <!-- Identity & Authentication -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
@@ -24,7 +23,6 @@
     <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="6.0.0" />
     <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="6.2.1" />
   </ItemGroup>
-
   <!-- Application Layer -->
   <ItemGroup>
     <PackageVersion Include="Ardalis.Result" Version="7.2.0" />
@@ -34,7 +32,6 @@
     <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="Scrutor" Version="4.2.2" />
   </ItemGroup>
-
   <!-- Infrastructure -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
@@ -43,16 +40,14 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.2" />
   </ItemGroup>
-
   <!-- API & Documentation -->
   <ItemGroup>
-    <PackageVersion Include="Serilog" Version="3.1.1" />
+    <PackageVersion Include="Serilog" Version="4.0.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
-
   <!-- Testing -->
   <ItemGroup>
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
@@ -64,4 +59,4 @@
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.2" />
     <PackageVersion Include="Testcontainers" Version="3.7.0" />
   </ItemGroup>
-</Project> 
+</Project>
