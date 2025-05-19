@@ -62,6 +62,9 @@ public sealed class DeleteCategoryCommandTests : CategoryCommandsTestBase
         var product = Product.Create("Test Product", "Description", 100, CategoryId, 10);
         existingCategory.Products.Add(product);
         SetupCategoryRepositoryGetByIdAsync(existingCategory);
+        CategoryRepositoryMock
+            .Setup(x => x.HasProductsAsync(CategoryId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         // Act
         var result = await Handler.Handle(Command, CancellationToken.None);
@@ -87,6 +90,10 @@ public sealed class DeleteCategoryCommandTests : CategoryCommandsTestBase
                 It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(existingCategory);
+
+        CategoryRepositoryMock
+            .Setup(x => x.HasProductsAsync(CategoryId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
         // Act
         var result = await Handler.Handle(Command, CancellationToken.None);

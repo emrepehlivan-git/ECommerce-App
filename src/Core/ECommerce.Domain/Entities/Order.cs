@@ -1,4 +1,5 @@
 using ECommerce.Domain.Enums;
+using ECommerce.Domain.Events.Stock;
 using ECommerce.Domain.ValueObjects;
 
 namespace ECommerce.Domain.Entities;
@@ -6,6 +7,7 @@ namespace ECommerce.Domain.Entities;
 public sealed class Order : AuditableEntity
 {
     private readonly List<OrderItem> _items = [];
+
 
     public Guid UserId { get; private set; }
     public User User { get; private set; } = null!;
@@ -44,16 +46,20 @@ public sealed class Order : AuditableEntity
 
         if (existingItem is not null)
         {
-            existingItem.UpdateQuantity(existingItem.Quantity + quantity);
+            var oldQuantity = existingItem.Quantity;
+            existingItem.UpdateQuantity(oldQuantity + quantity);
+            AddDomainEvent(new StockReservedEvent(productId, quantity));
         }
         else
         {
             var orderItem = OrderItem.Create(Id, productId, unitPrice.Value, quantity);
             _items.Add(orderItem);
+            AddDomainEvent(new StockReservedEvent(productId, quantity));
         }
 
         RecalculateTotalAmount();
     }
+
 
     public void RemoveItem(Guid productId)
     {
@@ -62,6 +68,7 @@ public sealed class Order : AuditableEntity
         if (item is not null)
         {
             _items.Remove(item);
+            AddDomainEvent(new StockNotReservedEvent(productId, item.Quantity));
             RecalculateTotalAmount();
         }
     }
@@ -72,13 +79,26 @@ public sealed class Order : AuditableEntity
 
         if (item is not null)
         {
+            var oldQuantity = item.Quantity;
+
             if (quantity <= 0)
             {
                 _items.Remove(item);
+                AddDomainEvent(new StockNotReservedEvent(productId, oldQuantity));
             }
             else
             {
+                var quantityDifference = quantity - oldQuantity;
                 item.UpdateQuantity(quantity);
+
+                if (quantityDifference > 0)
+                {
+                    AddDomainEvent(new StockReservedEvent(productId, quantityDifference));
+                }
+                else if (quantityDifference < 0)
+                {
+                    AddDomainEvent(new StockNotReservedEvent(productId, Math.Abs(quantityDifference)));
+                }
             }
 
             RecalculateTotalAmount();

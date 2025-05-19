@@ -3,7 +3,7 @@ using ECommerce.SharedKernel;
 using MediatR;
 using Ardalis.Result;
 using ECommerce.Application.CQRS;
-
+using Microsoft.EntityFrameworkCore;
 namespace ECommerce.Application.Features.Products.Queries;
 
 
@@ -14,13 +14,13 @@ public sealed class GetProductStockInfoHandler(
 {
     public override async Task<Result<int>> Handle(GetProductStockInfo request, CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetByIdAsync(request.ProductId, cancellationToken: cancellationToken);
+        var product = await productRepository.GetByIdAsync(
+            request.ProductId,
+            include: x => x.Include(p => p.Stock),
+            cancellationToken: cancellationToken);
 
-        if (product is null)
-        {
-            return Result.NotFound();
-        }
-
-        return Result.Success(product.StockQuantity);
+        return product is null
+            ? Result.NotFound(Localizer[ProductConsts.NotFound])
+            : Result.Success(product.Stock.Quantity);
     }
 }

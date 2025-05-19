@@ -1,5 +1,6 @@
 using ECommerce.Application.Features.Products.Commands;
 using ECommerce.Application.Features.Products.Queries;
+using ECommerce.Application.Features.Stock.Commands;
 using ECommerce.Application.Parameters;
 using Microsoft.AspNetCore.Mvc;
 

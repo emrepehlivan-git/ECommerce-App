@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Scrutor" />
     <PackageReference Include="Ardalis.Result" />
+    <PackageReference Include="MediatR" />
   </ItemGroup>
 
 </Project>

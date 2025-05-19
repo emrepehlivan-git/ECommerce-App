@@ -1,15 +1,20 @@
 using ECommerce.Application.Features.Products.Queries;
+using Ardalis.Result;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using ECommerce.Application.Interfaces;
+using ECommerce.Application.Helpers;
 
-namespace ECommerce.Application.UnitTests.Features.Products.Queries;
+namespace ECommerce.Application.UnitTests.Features.Stock.Queries;
 
-public sealed class GetProductStockInfoTest : ProductQueriesTestsBase
+public sealed class GetProductStockInfoTests : StockTestBase
 {
     private readonly GetProductStockInfoHandler Handler;
     private readonly GetProductStockInfo Query;
 
-    public GetProductStockInfoTest()
+    public GetProductStockInfoTests()
     {
-        Query = new GetProductStockInfo(Guid.NewGuid());
+        Query = new GetProductStockInfo(DefaultProduct.Id);
 
         Handler = new GetProductStockInfoHandler(
             ProductRepositoryMock.Object,
@@ -19,23 +24,28 @@ public sealed class GetProductStockInfoTest : ProductQueriesTestsBase
     [Fact]
     public async Task Handle_WithValidProduct_ShouldReturnStockQuantity()
     {
-        SetupProductExists(true);
-        DefaultProduct.UpdateStock(10);
+        // Arrange
+        SetupProductRepositoryGetById(DefaultProduct);
 
+        // Act
         var result = await Handler.Handle(Query, CancellationToken.None);
 
+        // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(10);
+        result.Value.Should().Be(DefaultStock.Quantity);
     }
 
     [Fact]
     public async Task Handle_WithNonExistentProduct_ShouldReturnNotFound()
     {
-        SetupProductExists(false);
+        // Arrange
+        SetupProductRepositoryGetById(null);
 
+        // Act
         var result = await Handler.Handle(Query, CancellationToken.None);
 
+        // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeFalse();
         result.Status.Should().Be(ResultStatus.NotFound);

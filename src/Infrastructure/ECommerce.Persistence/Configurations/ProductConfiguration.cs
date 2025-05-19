@@ -27,14 +27,15 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasColumnType("decimal(18,2)");
 
-        builder.Property(p => p.StockQuantity)
-            .IsRequired()
-            .HasColumnName("stock_quantity");
-
         builder.HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(p => p.Stock)
+            .WithOne(ps => ps.Product)
+            .HasForeignKey<ProductStock>(ps => ps.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(p => p.CategoryId);
     }

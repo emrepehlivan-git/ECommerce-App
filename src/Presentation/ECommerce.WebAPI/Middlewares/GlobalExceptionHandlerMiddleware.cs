@@ -16,7 +16,9 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, Appli
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An error occurred while processing the request.");
+            if (!IsExpectedException(exception))
+                logger.LogError(exception, "An unexpected error occurred while processing the request.");
+
             await HandleExceptionAsync(context, exception);
         }
     }
@@ -56,4 +58,10 @@ public sealed class GlobalExceptionHandlerMiddleware(RequestDelegate next, Appli
         var jsonResponse = JsonSerializer.Serialize(result);
         await context.Response.WriteAsync(jsonResponse);
     }
+
+    private static bool IsExpectedException(Exception exception) =>
+       exception is ValidationException or
+              UnauthorizedAccessException or
+              NotFoundException or
+              BusinessException;
 }

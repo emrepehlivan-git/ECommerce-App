@@ -50,13 +50,13 @@ public sealed class OrderController() : BaseApiController
         return Ok(result);
     }
 
-    [HttpDelete("{orderId:guid}/items/{itemId:guid}")]
+    [HttpDelete("{orderId:guid}/items/{productId:guid}")]
     public async Task<IActionResult> RemoveOrderItem(
         Guid orderId,
-        Guid itemId,
+        Guid productId,
         CancellationToken cancellationToken)
     {
-        var result = await Mediator.Send(new OrderItemRemoveCommand(orderId, itemId), cancellationToken);
+        var result = await Mediator.Send(new OrderItemRemoveCommand(orderId, productId), cancellationToken);
         return Ok(result);
     }
 

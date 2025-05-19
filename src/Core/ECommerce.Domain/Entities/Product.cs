@@ -7,11 +7,10 @@ public sealed class Product : AuditableEntity
     public string Name { get; private set; } = string.Empty;
     public string? Description { get; set; }
     public Price Price { get; private set; } = Price.Zero;
+    public ProductStock Stock { get; set; } = null!;
 
     public Guid CategoryId { get; private set; }
-    public Category Category { get; set; } = new();
-
-    public int StockQuantity { get; private set; }
+    public Category Category { get; set; } = null!;
 
     internal Product()
     {
@@ -23,7 +22,7 @@ public sealed class Product : AuditableEntity
         SetDescription(description);
         Price = Price.Create(price);
         CategoryId = categoryId;
-        StockQuantity = initialStock;
+        Stock = ProductStock.Create(Id, initialStock);
     }
 
     public static Product Create(string name, string? description, decimal price, Guid categoryId, int initialStock)
@@ -44,12 +43,12 @@ public sealed class Product : AuditableEntity
         if (quantity < 0)
             throw new ArgumentException("Stock quantity cannot be negative.", nameof(quantity));
 
-        StockQuantity = quantity;
+        Stock.UpdateQuantity(quantity);
     }
 
     public bool HasSufficientStock(int requestedQuantity)
     {
-        return StockQuantity >= requestedQuantity;
+        return Stock.Quantity >= requestedQuantity;
     }
 
     private void SetName(string name)

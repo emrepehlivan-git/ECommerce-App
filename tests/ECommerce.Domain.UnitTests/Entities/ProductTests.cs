@@ -80,7 +80,7 @@ public sealed class ProductTests
         product.Price.Should().NotBeNull();
         product.Price.Value.Should().Be(price);
         product.CategoryId.Should().Be(_categoryId);
-        product.StockQuantity.Should().Be(stockQuantity);
+        product.Stock.Quantity.Should().Be(stockQuantity);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public sealed class ProductTests
         product.UpdateStock(quantity);
 
         // Assert
-        product.StockQuantity.Should().Be(quantity);
+        product.Stock.Quantity.Should().Be(quantity);
     }
 
     [Theory]

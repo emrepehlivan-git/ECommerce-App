@@ -1,5 +1,3 @@
-using ECommerce.Application.Features.Products;
-
 namespace ECommerce.Application.UnitTests.Features.Products.Commands;
 
 public sealed class DeleteProductCommandTests : ProductCommandsTestBase

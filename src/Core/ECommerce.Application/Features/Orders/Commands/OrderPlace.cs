@@ -5,11 +5,11 @@ using ECommerce.Application.Helpers;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
+using ECommerce.Domain.Events.Stock;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using ECommerce.Application.Common.Logging;
+using ECommerce.Application.Exceptions;
 
 namespace ECommerce.Application.Features.Orders.Commands;
 
@@ -64,37 +64,27 @@ public sealed class OrderPlaceCommandValidator : AbstractValidator<OrderPlaceCom
 public sealed class OrderPlaceCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
-    IStockRepository stockRepository,
     IIdentityService identityService,
-    ILazyServiceProvider lazyServiceProvider,
-    ILogger logger) : BaseHandler<OrderPlaceCommand, Result<Guid>>(lazyServiceProvider)
+    ILazyServiceProvider lazyServiceProvider) : BaseHandler<OrderPlaceCommand, Result<Guid>>(lazyServiceProvider)
 {
     public override async Task<Result<Guid>> Handle(OrderPlaceCommand command, CancellationToken cancellationToken)
     {
-        var user = await identityService.FindByIdAsync(command.UserId);
-        if (user is null)
-        {
+        if (await identityService.FindByIdAsync(command.UserId) is null)
             return Result.Error(Localizer[OrderConsts.UserNotFound]);
-        }
 
-        var order = Order.Create(
-            command.UserId,
-            command.ShippingAddress,
-            command.BillingAddress);
+        var order = Order.Create(command.UserId, command.ShippingAddress, command.BillingAddress);
 
         foreach (var item in command.Items)
         {
             var product = await productRepository.GetByIdAsync(item.ProductId, cancellationToken: cancellationToken);
-            if (product is not null)
-            {
-                await stockRepository.ReserveStockAsync(item.ProductId, item.Quantity, cancellationToken);
-                order.AddItem(item.ProductId, product.Price, item.Quantity);
-            }
+
+            if (product is null)
+                return Result.Error(Localizer[OrderConsts.ProductNotFound]);
+
+            order.AddItem(item.ProductId, product.Price, item.Quantity);
         }
 
         orderRepository.Add(order);
-
-        logger.LogInformation("Order created: {OrderId} for user {UserId}", order.Id, command.UserId);
 
         return Result.Success(order.Id);
     }
