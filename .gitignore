@@ -174,4 +174,13 @@ logs/
 TestResults/
 [Cc]overage/
 coverage.json
-coverage.info 
+coverage.info
+
+# SSL/TLS Certificates
+*.pfx
+*.key
+*.p12
+*.jks
+*.pem
+**/certs/*.crt
+**/certs/ca.srl 

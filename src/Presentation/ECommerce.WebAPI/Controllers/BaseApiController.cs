@@ -9,7 +9,7 @@ namespace ECommerce.WebAPI.Controllers;
 [ApiController]
 public abstract class BaseApiController : ControllerBase
 {
-    private ILazyServiceProvider LazyServiceProvider => HttpContext.RequestServices.GetRequiredService<ILazyServiceProvider>();
+    protected ILazyServiceProvider LazyServiceProvider => HttpContext.RequestServices.GetRequiredService<ILazyServiceProvider>();
     protected ISender Mediator => LazyServiceProvider.LazyGetRequiredService<ISender>();
     protected LocalizationHelper Localizer => LazyServiceProvider.LazyGetRequiredService<LocalizationHelper>();
 }

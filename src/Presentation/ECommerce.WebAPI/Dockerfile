@@ -24,4 +24,17 @@ RUN dotnet publish "ECommerce.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# CA sertifikasını sistem sertifika deposuna ekle
+USER root
+RUN apt-get update && apt-get install -y ca-certificates
+COPY certs/ca.crt /usr/local/share/ca-certificates/ecommerce-ca.crt
+RUN update-ca-certificates
+USER $APP_UID
+
+ENV ASPNETCORE_URLS=http://+:8080;https://+:8081
+ENV ASPNETCORE_HTTPS_PORT=8081
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/app/webapi.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword
+
 ENTRYPOINT ["dotnet", "ECommerce.WebAPI.dll"]

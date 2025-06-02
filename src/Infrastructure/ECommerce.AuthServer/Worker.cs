@@ -54,6 +54,25 @@ public class Worker : IHostedService
         }
         });
 
+        var apiClient = await manager.FindByClientIdAsync("api");
+        if (apiClient is not null)
+        {
+            await manager.DeleteAsync(apiClient);
+        }
+        _ = await manager.CreateAsync(new OpenIddictApplicationDescriptor
+        {
+            ClientId = "api",
+            ClientSecret = "api-secret",
+            DisplayName = "API Client",
+            ConsentType = ConsentTypes.Implicit,
+            ClientType = ClientTypes.Confidential,
+            Permissions =
+            {
+                Permissions.Endpoints.Introspection,
+                $"{Permissions.Prefixes.Scope}api",
+            }
+        });
+
         var apiScope = await scopeManager.FindByNameAsync("api");
         if (apiScope is not null)
         {

@@ -11,7 +11,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<ProductStock> ProductStocks { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
-
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }

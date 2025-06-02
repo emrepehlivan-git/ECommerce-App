@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ECommerce.Application.Interfaces;
+using ECommerce.Application.Services;
 using ECommerce.AuthServer.Helpers;
 using ECommerce.AuthServer.Models;
 using Microsoft.AspNetCore;
@@ -17,7 +18,9 @@ namespace ECommerce.AuthServer.Controllers;
 public class AuthorizationController(
     IOpenIddictApplicationManager applicationManager,
     IOpenIddictAuthorizationManager authorizationManager,
-    IIdentityService identityService)
+    IIdentityService identityService,
+    IOpenIddictScopeManager scopeManager,
+    IPermissionService permissionService)
     : Controller
 {
     [HttpGet("~/connect/authorize")]
@@ -91,7 +94,17 @@ public class AuthorizationController(
                     authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                     nameType: Claims.Name,
                     roleType: Claims.Role);
+
                 identity.SetClaim(Claims.Subject, user.Id.ToString());
+                identity.SetClaim(Claims.Audience, "api");
+                identity.SetClaim(Claims.Email, user.Email);
+                identity.SetClaim("fullName", user.FullName.ToString());
+                identity.SetClaims(Claims.Role, [.. await identityService.GetUserRolesAsync(user)]);
+                identity.SetClaims("permissions", [.. await permissionService.GetUserPermissionsAsync(user.Id)]);
+                identity.SetScopes(request.GetScopes());
+                identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+                identity.SetDestinations(GetDestinations);
+
                 var authorization = authorizations.LastOrDefault();
                 authorization ??= await authorizationManager.CreateAsync(
                     identity: identity,
@@ -162,6 +175,14 @@ public class AuthorizationController(
             roleType: Claims.Role);
 
         identity.SetClaim(Claims.Subject, user.Id.ToString());
+        identity.SetClaim(Claims.Audience, "api");
+        identity.SetClaim(Claims.Email, user.Email);
+        identity.SetClaim("fullName", user.FullName.ToString());
+        identity.SetClaims(Claims.Role, [.. await identityService.GetUserRolesAsync(user)]);
+        identity.SetClaims("permissions", [.. await permissionService.GetUserPermissionsAsync(user.Id)]);
+        identity.SetScopes(request.GetScopes());
+        identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+        identity.SetDestinations(GetDestinations);
 
         var authorization = authorizations.LastOrDefault();
         authorization ??= await authorizationManager.CreateAsync(
@@ -235,6 +256,15 @@ public class AuthorizationController(
                 roleType: Claims.Role);
 
             identity.SetClaim(Claims.Subject, user.Id.ToString());
+            identity.SetClaim(Claims.Subject, user.Id.ToString());
+            identity.SetClaim(Claims.Audience, "api");
+            identity.SetClaim(Claims.Email, user.Email);
+            identity.SetClaim("fullName", user.FullName.ToString());
+            identity.SetClaims(Claims.Role, [.. await identityService.GetUserRolesAsync(user)]);
+            identity.SetClaims("permissions", [.. await permissionService.GetUserPermissionsAsync(user.Id)]);
+            identity.SetScopes(request.GetScopes());
+            identity.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
+            identity.SetDestinations(GetDestinations);
 
             return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
@@ -269,6 +299,12 @@ public class AuthorizationController(
                     yield return Destinations.IdentityToken;
 
                 yield break;
+
+            case "permissions":
+                yield return Destinations.AccessToken;
+                yield return Destinations.IdentityToken;
+                yield break;
+
             default:
                 yield return Destinations.AccessToken;
                 yield break;

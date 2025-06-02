@@ -1,12 +1,16 @@
+using ECommerce.Application.Constants;
 using ECommerce.Application.Features.Categories.Commands;
 using ECommerce.Application.Features.Categories.Queries;
 using ECommerce.Application.Parameters;
+using ECommerce.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.WebAPI.Controllers;
 
 public sealed class CategoryController : BaseApiController
 {
+    [Authorize(PermissionConstants.Categories.View)]
     [HttpGet]
     public async Task<IActionResult> GetCategories([FromQuery] PageableRequestParams requestParams, [FromQuery] string? orderBy = null, CancellationToken cancellationToken = default)
     {
@@ -14,6 +18,7 @@ public sealed class CategoryController : BaseApiController
         return Ok(categories);
     }
 
+    [Authorize(PermissionConstants.Categories.View)]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken cancellationToken = default)
     {
@@ -21,6 +26,7 @@ public sealed class CategoryController : BaseApiController
         return Ok(category);
     }
 
+    [Authorize(PermissionConstants.Categories.Create)]
     [HttpPost]
     public async Task<IActionResult> CreateCategory(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
@@ -28,6 +34,7 @@ public sealed class CategoryController : BaseApiController
         return Ok(category);
     }
 
+    [Authorize(PermissionConstants.Categories.Update)]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
@@ -35,6 +42,7 @@ public sealed class CategoryController : BaseApiController
         return Ok(category);
     }
 
+    [Authorize(PermissionConstants.Categories.Delete)]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(Guid id, CancellationToken cancellationToken)
     {

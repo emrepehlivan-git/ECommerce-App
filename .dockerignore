@@ -23,3 +23,8 @@
 **/obj
 LICENSE
 README.md
+
+# Except the certificate files we need for our containers
+!certs/webapi.pfx
+!certs/authserver.pfx
+!certs/ca.crt

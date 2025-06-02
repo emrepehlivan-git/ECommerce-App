@@ -1,6 +1,7 @@
 using ECommerce.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ECommerce.Application.Constants;
 
 namespace ECommerce.Persistence.Configurations;
 

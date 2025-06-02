@@ -24,11 +24,10 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Generate development certificate
-RUN apt-get update && \
-    apt-get install -y openssl && \
-    openssl req -x509 -newkey rsa:4096 -keyout /app/auth.key -out /app/auth.crt -days 365 -nodes -subj "/CN=localhost" && \
-    openssl pkcs12 -export -out /app/auth.pfx -inkey /app/auth.key -in /app/auth.crt -passout pass:YourSecurePassword
+# CA sertifikasını sistem sertifika deposuna ekle
+RUN apt-get update && apt-get install -y ca-certificates
+COPY certs/ca.crt /usr/local/share/ca-certificates/ecommerce-ca.crt
+RUN update-ca-certificates
 
 ENV ASPNETCORE_URLS=http://+:8080;https://+:8081
 ENV ASPNETCORE_HTTPS_PORT=8081

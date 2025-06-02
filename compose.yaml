@@ -2,25 +2,38 @@
 
 services:
   ecommerce.webapi:
+    container_name: ecommerce.webapi
     build:
       context: .
       dockerfile: src/Presentation/ECommerce.WebAPI/Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Host=ecommerce.db;Database=ecommerce;Username=postgres;Password=postgres
       - ConnectionStrings__Redis=ecommerce.redis:6379
+      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ASPNETCORE_HTTPS_PORT=8081
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/webapi.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword
       - Serilog__WriteTo__1__Args__serverUrl=http://ecommerce.seq:5341
+      - Authentication__Authority=https://ecommerce.authserver:8081
+      - Authentication__Audience=api
+      - Authentication__ClientId=api
+      - Authentication__ClientSecret=api-secret
     depends_on:
       - ecommerce.db
       - ecommerce.redis
       - ecommerce.seq
+      - ecommerce.authserver
     ports:
       - 4000:8080
       - 4001:8081
     volumes:
       - keys:/root/.aspnet/DataProtection-Keys
+      - ./certs/webapi.pfx:/app/webapi.pfx:ro
+      - ./certs/ca.crt:/app/ca.crt:ro
 
   ecommerce.authserver:
+    container_name: ecommerce.authserver
     build:
       context: .
       dockerfile: src/Infrastructure/ECommerce.AuthServer/Dockerfile
@@ -29,6 +42,8 @@ services:
       - ASPNETCORE_URLS=http://+:8080;https://+:8081
       - ASPNETCORE_HTTPS_PORT=8081
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/auth.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=YourSecurePassword
       - Authentication__UseHttps=true
       - Authentication__Authority=https://ecommerce.authserver:8081
       - Authentication__RequireHttpsMetadata=true
@@ -37,8 +52,12 @@ services:
     ports:
       - 5001:8080
       - 5002:8081
+    volumes:
+      - ./certs/authserver.pfx:/app/auth.pfx:ro
+      - ./certs/ca.crt:/app/ca.crt:ro
 
   ecommerce.db:
+    container_name: ecommerce.db
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
@@ -50,6 +69,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   ecommerce.redis:
+    container_name: ecommerce.redis
     image: redis
     ports:
       - 6379:6379
@@ -57,6 +77,7 @@ services:
       - redisdata:/data
 
   ecommerce.seq:
+    container_name: ecommerce.seq
     image: datalust/seq
     ports:
       - 5341:80

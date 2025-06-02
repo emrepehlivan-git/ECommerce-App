@@ -1,6 +1,6 @@
 using ECommerce.WebAPI;
 
-ECommerce.Application.Common.Logging.ILogger logger = null!;
+ECommerce.Application.Common.Logging.ILogger? logger = null;
 
 try
 {
@@ -12,7 +12,7 @@ try
 
     await app.ApplyMigrations();
 
-    logger = app.Services.GetRequiredService<ECommerce.Application.Common.Logging.ILogger>();
+    logger = app.Services.GetService<ECommerce.Application.Common.Logging.ILogger>();
 
     app.UsePresentation(app.Environment);
 
@@ -20,5 +20,5 @@ try
 }
 catch (Exception ex)
 {
-    logger.LogCritical("Application terminated unexpectedly: {Message}", ex.Message);
+    logger?.LogError(ex, "Application terminated unexpectedly");
 }

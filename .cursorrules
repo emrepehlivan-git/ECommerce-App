@@ -56,6 +56,7 @@ logging:
   sinks:
     - Console
     - File
+    - Seq
   conventions:
     - Use structured logging
     - Include correlation IDs
@@ -103,6 +104,11 @@ file_structure:
   entities: src/Core/ECommerce.Domain/Entities
   controllers: src/Presentation/ECommerce.WebAPI/Controllers
   configurations: src/Infrastructure/ECommerce.Persistence/Configurations
+  services: src/Application/ECommerce.Application/Services
+  repositories: src/Infrastructure/ECommerce.Persistence/Repositories
+  constants: src/Application/ECommerce.Application/Constants
+  exceptions: src/Application/ECommerce.Application/Exceptions
+  extensions: src/Application/ECommerce.Application/Extensions
 
 # Naming Conventions
 naming:

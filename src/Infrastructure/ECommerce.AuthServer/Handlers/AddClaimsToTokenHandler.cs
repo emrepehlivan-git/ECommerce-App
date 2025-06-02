@@ -25,12 +25,14 @@ public class AddClaimsToTokenHandler(IIdentityService identityService, IPermissi
         if (user is null) return;
 
         var identity = principal?.Identity as ClaimsIdentity;
+        var permissions = await permissionService.GetUserPermissionsAsync(user.Id);
 
         identity?.SetClaim(Claims.Subject, user.Id.ToString());
+        identity?.SetClaim(Claims.Audience, "api");
         identity?.SetClaim(Claims.Email, user.Email);
         identity?.SetClaim("fullName", user.FullName.ToString());
         identity?.SetClaims(Claims.Role, [.. await identityService.GetUserRolesAsync(user)]);
-        identity?.SetClaims("permissions", [.. await permissionService.GetUserPermissionsAsync(user.Id)]);
+        identity?.SetClaims("permissions", [.. permissions]);
         identity?.SetScopes(context.Request.GetScopes());
         identity?.SetResources(await scopeManager.ListResourcesAsync(identity.GetScopes()).ToListAsync());
         identity?.SetDestinations(AuthorizationController.GetDestinations);
