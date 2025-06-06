@@ -17,12 +17,17 @@ public sealed class DeleteProductCommandTests : ProductCommandsTestBase
     [Fact]
     public async Task Handle_WithExistingProduct_ShouldDeleteProduct()
     {
-        SetupProductExists(true);
+        // Arrange
+        SetupProductRepositoryGetByIdAsync(DefaultProduct);
 
+        // Act
         var result = await Handler.Handle(Command, CancellationToken.None);
 
+        // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
+        result.IsSuccess.Should().BeTrue();
+
+        ProductRepositoryMock.Verify(x => x.Delete(DefaultProduct), Times.Once);
     }
 
     [Theory]
