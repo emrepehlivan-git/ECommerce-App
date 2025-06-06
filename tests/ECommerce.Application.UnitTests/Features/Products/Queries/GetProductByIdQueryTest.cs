@@ -20,23 +20,33 @@ public sealed class GetProductByIdQueryTest : ProductQueriesTestsBase
     [Fact]
     public async Task Handle_WithValidQuery_ShouldReturnProduct()
     {
+        // Arrange
+        SetupProductExists(true);
+
+        // Act
         var result = await Handler.Handle(Query, CancellationToken.None);
 
+        // Assert
         result.Should().NotBeNull();
-        result.IsSuccess.Should().BeFalse();
-        result.Status.Should().Be(ResultStatus.NotFound);
-        result.Errors.Should().ContainSingle()
-            .Which.Should().Be(Localizer[ProductConsts.NotFound]);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBeNull();
+        result.Value.Id.Should().Be(DefaultProduct.Id);
     }
 
     [Fact]
     public async Task Handle_WithInvalidQuery_ShouldReturnNotFound()
     {
+        // Arrange
         SetupProductExists(false);
+
+        // Act
         var result = await Handler.Handle(Query, CancellationToken.None);
 
+        // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeFalse();
         result.Status.Should().Be(ResultStatus.NotFound);
+        result.Errors.Should().ContainSingle()
+            .Which.Should().Be(Localizer[ProductConsts.NotFound]);
     }
 }
