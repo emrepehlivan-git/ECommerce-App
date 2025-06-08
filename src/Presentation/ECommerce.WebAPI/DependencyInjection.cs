@@ -27,6 +27,7 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
         ConfigureLocalization(services);
+        ConfigureSwagger(services, configuration);
 
         services.AddApplication()
             .AddInfrastructure(configuration)
@@ -37,7 +38,6 @@ public static class DependencyInjection
 
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
         services.AddHttpContextAccessor();
         services.AddProblemDetails();
 
@@ -73,7 +73,13 @@ public static class DependencyInjection
         if (environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce API v1");
+                options.OAuthClientId(app.Configuration["Authentication:SwaggerClientId"]);
+                options.OAuthAppName("ECommerce API");
+                options.OAuthUsePkce();
+            });
         }
 
         app.UseCors("AllowAllOrigins");
@@ -205,6 +211,51 @@ public static class DependencyInjection
                 options.UseAspNetCore();
 
             });
+    }
+
+    private static void ConfigureSwagger(IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            {
+                Title = "ECommerce API",
+                Version = "v1",
+                Description = "ECommerce API with OpenIddict Authentication"
+            });
+
+            options.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.OAuth2,
+                Flows = new Microsoft.OpenApi.Models.OpenApiOAuthFlows
+                {
+                    AuthorizationCode = new Microsoft.OpenApi.Models.OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri($"{configuration["Authentication:Authority"]}/connect/authorize"),
+                        TokenUrl = new Uri($"{configuration["Authentication:Authority"]}/connect/token"),
+                        Scopes = new Dictionary<string, string>
+                        {
+                            { "api", "ECommerce API Access" }
+                        }
+                    }
+                }
+            });
+
+            options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            {
+                {
+                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    {
+                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "oauth2"
+                        }
+                    },
+                    new[] { "api" }
+                }
+            });
+        });
     }
 
     private static void ConfigureLocalization(IServiceCollection services)

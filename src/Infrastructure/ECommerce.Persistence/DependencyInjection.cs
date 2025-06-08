@@ -33,7 +33,7 @@ public static class DependencyInjection
 
     private static void ConfigureDbContext(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+        services.AddDbContextPool<ApplicationDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             options.UseSnakeCaseNamingConvention();

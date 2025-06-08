@@ -43,7 +43,7 @@ public abstract class OrderCommandsTestBase
         OrderRepositoryMock
             .Setup(x => x.GetByIdAsync(
                 It.IsAny<Guid>(),
-                It.IsAny<Expression<Func<IQueryable<Order>, IQueryable<Order>>>>?(),
+                It.IsAny<Expression<Func<IQueryable<Order>, IQueryable<Order>>>>(),
                 It.IsAny<bool>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(order ?? DefaultOrder);
