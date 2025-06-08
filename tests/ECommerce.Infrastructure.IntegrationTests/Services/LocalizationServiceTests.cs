@@ -1,4 +1,4 @@
-namespace ECommerce.Infrastructure.IntegrationTests;
+namespace ECommerce.Infrastructure.IntegrationTests.Services;
 
 public class LocalizationServiceTests
 {
