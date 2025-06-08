@@ -1,4 +1,4 @@
-namespace ECommerce.Infrastructure.IntegrationTests;
+namespace ECommerce.Infrastructure.IntegrationTests.Services;
 
 public class PermissionServiceTests
 {
@@ -20,8 +20,8 @@ public class PermissionServiceTests
         var rolePermission = RolePermission.Create(role.Id, permission.Id);
         role.AddPermission(rolePermission);
         _identityServiceMock.Setup(x => x.FindByIdAsync(userId)).ReturnsAsync(user);
-        _identityServiceMock.Setup(x => x.GetUserRolesAsync(user)).ReturnsAsync(new List<string>{role.Name!});
-        _identityServiceMock.Setup(x => x.GetAllRolesAsync()).ReturnsAsync(new List<Role>{role});
+        _identityServiceMock.Setup(x => x.GetUserRolesAsync(user)).ReturnsAsync(new List<string> { role.Name! });
+        _identityServiceMock.Setup(x => x.GetAllRolesAsync()).ReturnsAsync(new List<Role> { role });
 
         var result = await _permissionService.HasPermissionAsync(userId, permission.Name);
 
@@ -41,11 +41,11 @@ public class PermissionServiceTests
         role.AddPermission(rolePermission1);
         role.AddPermission(rolePermission2);
         _identityServiceMock.Setup(x => x.FindByIdAsync(userId)).ReturnsAsync(user);
-        _identityServiceMock.Setup(x => x.GetUserRolesAsync(user)).ReturnsAsync(new List<string>{role.Name!});
-        _identityServiceMock.Setup(x => x.GetAllRolesAsync()).ReturnsAsync(new List<Role>{role});
+        _identityServiceMock.Setup(x => x.GetUserRolesAsync(user)).ReturnsAsync(new List<string> { role.Name! });
+        _identityServiceMock.Setup(x => x.GetAllRolesAsync()).ReturnsAsync(new List<Role> { role });
 
         var result = await _permissionService.GetUserPermissionsAsync(userId);
 
-        result.Should().BeEquivalentTo(new[]{permission1.Name, permission2.Name});
+        result.Should().BeEquivalentTo(new[] { permission1.Name, permission2.Name });
     }
 }
