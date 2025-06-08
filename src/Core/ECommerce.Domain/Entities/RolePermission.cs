@@ -21,9 +21,23 @@ public sealed class RolePermission : BaseEntity
         IsActive = true;
     }
 
+    internal RolePermission(Role role, Permission permission)
+    {
+        RoleId = role.Id;
+        PermissionId = permission.Id;
+        Role = role;
+        Permission = permission;
+        IsActive = true;
+    }
+
     public static RolePermission Create(Guid roleId, Guid permissionId)
     {
         return new(roleId, permissionId);
+    }
+
+    public static RolePermission Create(Role role, Permission permission)
+    {
+        return new(role, permission);
     }
 
     public void Deactivate() => IsActive = false;

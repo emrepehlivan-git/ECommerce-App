@@ -9,6 +9,6 @@ public sealed class CategoryRepository(ApplicationDbContext context) : BaseRepos
 {
     public async Task<bool> HasProductsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await context.Products.AnyAsync(p => p.CategoryId == id, cancellationToken);
+        return await Context.Products.AnyAsync(p => p.CategoryId == id, cancellationToken);
     }
 }
