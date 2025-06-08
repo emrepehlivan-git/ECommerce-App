@@ -48,40 +48,45 @@ jobs:
         env:
           ConnectionStrings__DefaultConnection: Host=localhost;Database=ecommerce_test;Username=postgres;Password=postgres
 
-  build-and-push:
-    needs: build-and-test
+  docker:
+    name: Build and Push Docker Images
     runs-on: ubuntu-latest
+    needs: build-and-test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push WebAPI image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: src/Presentation/ECommerce.WebAPI/Dockerfile
-          push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}/webapi:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Debug Docker Username
+        run: echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}"
 
-      - name: Build and push AuthServer image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: src/Infrastructure/ECommerce.AuthServer/Dockerfile
-          push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}/authserver:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Build WebAPI Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/ecommerce-webapi:latest -f src/Presentation/ECommerce.WebAPI/Dockerfile .
+
+      - name: Build AuthServer Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/ecommerce-authserver:latest -f src/Infrastructure/ECommerce.AuthServer/Dockerfile .
+
+      - name: Tag WebAPI image with SHA
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/ecommerce-webapi:latest ${{ secrets.DOCKER_USERNAME }}/ecommerce-webapi:${{ github.sha }}
+
+      - name: Tag AuthServer image with SHA
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/ecommerce-authserver:latest ${{ secrets.DOCKER_USERNAME }}/ecommerce-authserver:${{ github.sha }}
+
+      - name: Push WebAPI Docker image (latest)
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/ecommerce-webapi:latest
+
+      - name: Push WebAPI Docker image (SHA)
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/ecommerce-webapi:${{ github.sha }}
+
+      - name: Push AuthServer Docker image (latest)
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/ecommerce-authserver:latest
+
+      - name: Push AuthServer Docker image (SHA)
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/ecommerce-authserver:${{ github.sha }}
