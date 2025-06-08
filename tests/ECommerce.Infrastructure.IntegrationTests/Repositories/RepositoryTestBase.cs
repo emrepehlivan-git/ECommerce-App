@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace ECommerce.Infrastructure.IntegrationTests.Repositories;
 
 public abstract class RepositoryTestBase : IDisposable

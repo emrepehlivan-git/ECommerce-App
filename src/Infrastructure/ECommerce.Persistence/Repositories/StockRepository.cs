@@ -2,6 +2,7 @@ using ECommerce.Application.Exceptions;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
 using ECommerce.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Persistence.Repositories;
 
@@ -13,14 +14,14 @@ public sealed class StockRepository(ApplicationDbContext context) :
     {
         try
         {
-            var stock = Query(x => x.ProductId == productId).FirstOrDefault()
+            var stock = await Query(x => x.ProductId == productId, isTracking: true)
+                .FirstOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException($"Stock not found for product {productId}");
 
             if (stock.Quantity < quantity)
                 throw new BusinessException($"Insufficient stock for product {productId}");
 
             stock.Reserve(quantity);
-            Update(stock);
             await Context.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
@@ -33,11 +34,11 @@ public sealed class StockRepository(ApplicationDbContext context) :
     {
         try
         {
-            var stock = Query(x => x.ProductId == productId).FirstOrDefault()
+            var stock = await Query(x => x.ProductId == productId, isTracking: true)
+                .FirstOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException($"Stock not found for product {productId}");
 
             stock.Release(quantity);
-            Update(stock);
             await Context.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)

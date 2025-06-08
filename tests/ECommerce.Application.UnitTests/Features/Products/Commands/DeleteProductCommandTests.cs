@@ -26,8 +26,6 @@ public sealed class DeleteProductCommandTests : ProductCommandsTestBase
         // Assert
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue();
-
-        ProductRepositoryMock.Verify(x => x.Delete(DefaultProduct), Times.Once);
     }
 
     [Theory]

@@ -1,9 +1,14 @@
 global using Microsoft.Extensions.Caching.Distributed;
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.Extensions.Options;
+global using Microsoft.EntityFrameworkCore;
 global using Moq;
 global using Xunit;
 global using FluentAssertions;
 global using ECommerce.Infrastructure.Services;
 global using ECommerce.Application.Interfaces;
 global using ECommerce.Domain.Entities;
+global using ECommerce.Domain.ValueObjects;
+global using ECommerce.Application.Exceptions;
+global using ECommerce.Persistence.Repositories;
+global using ECommerce.Persistence.Contexts;

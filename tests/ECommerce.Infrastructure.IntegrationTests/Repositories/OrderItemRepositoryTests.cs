@@ -16,11 +16,14 @@ public class OrderItemRepositoryTests : RepositoryTestBase
         category.Id = Guid.NewGuid();
         var product = Product.Create("Book", null, 5m, category.Id, 10);
         var order = Order.Create(Guid.NewGuid(), "s", "b");
-        order.AddItem(product.Id, Price.Create(5m), 2);
 
         Context.Categories.Add(category);
         Context.Products.Add(product);
         Context.Orders.Add(order);
+        await Context.SaveChangesAsync();
+
+        order.AddItem(product.Id, Price.Create(5m), 2);
+        Context.Orders.Update(order);
         await Context.SaveChangesAsync();
 
         var result = await _repository.GetOrderItemsAsync(order.Id);
