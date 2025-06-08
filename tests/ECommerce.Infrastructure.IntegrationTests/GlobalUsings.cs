@@ -11,3 +11,6 @@ using ECommerce.Infrastructure.Services;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Services;
 using ECommerce.Domain.Entities;
+using ECommerce.Persistence.Contexts;
+using ECommerce.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
