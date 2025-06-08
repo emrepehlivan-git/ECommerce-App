@@ -8,5 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Infrastructure\ECommerce.Infrastructure\ECommerce.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\src\Infrastructure\ECommerce.Persistence\ECommerce.Persistence.csproj" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
     </ItemGroup>
 </Project> 
