@@ -9,4 +9,8 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Presentation\ECommerce.WebAPI\ECommerce.WebAPI.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Testcontainers.PostgreSql" />
+    </ItemGroup>
 </Project> 
