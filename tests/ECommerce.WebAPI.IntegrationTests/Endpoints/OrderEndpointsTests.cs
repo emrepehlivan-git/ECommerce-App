@@ -1,4 +1,4 @@
-namespace ECommerce.WebAPI.IntegrationTests;
+namespace ECommerce.WebAPI.IntegrationTests.Endpoints;
 
 public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
@@ -16,10 +16,7 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>, I
         _client = _factory.CreateClient();
     }
 
-    public async Task DisposeAsync()
-    {
-        await (_factory as IAsyncLifetime).DisposeAsync();
-    }
+    public async Task DisposeAsync() => await Task.CompletedTask;
 
     [Fact]
     public async Task GetOrders_ReturnsOk()
@@ -33,10 +30,14 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>, I
         using var scope = _factory.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var user = User.Create("order@example.com", "Order", "User");
-        var category = Category.Create("Orders");
-        var product = Product.Create("Item", "desc", 10m, category.Id, 5);
+        var uniqueCategoryName = "Orders_" + Guid.NewGuid();
+        var category = Category.Create(uniqueCategoryName);
+        category.Id = Guid.NewGuid();
         context.Users.Add(user);
         context.Categories.Add(category);
+        await context.SaveChangesAsync();
+
+        var product = Product.Create("Item", "desc", 10m, category.Id, 5);
         context.Products.Add(product);
         await context.SaveChangesAsync();
 
@@ -105,6 +106,11 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>, I
     {
         var (orderId, _, product) = await CreateOrderAsync();
         var response = await _client.DeleteAsync($"/api/Order/{orderId}/items/{product.Id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"RemoveOrderItem response: {content}");
+        }
         response.EnsureSuccessStatusCode();
 
         using var scope = _factory.Services.CreateScope();

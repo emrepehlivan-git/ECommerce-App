@@ -1,4 +1,4 @@
-namespace ECommerce.WebAPI.IntegrationTests;
+namespace ECommerce.WebAPI.IntegrationTests.Endpoints;
 
 public class CategoryEndpointsTests : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
@@ -16,10 +16,7 @@ public class CategoryEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         _client = _factory.CreateClient();
     }
 
-    public async Task DisposeAsync()
-    {
-        await (_factory as IAsyncLifetime).DisposeAsync();
-    }
+    public async Task DisposeAsync() => await Task.CompletedTask;
 
     [Fact]
     public async Task GetCategories_ReturnsOk()

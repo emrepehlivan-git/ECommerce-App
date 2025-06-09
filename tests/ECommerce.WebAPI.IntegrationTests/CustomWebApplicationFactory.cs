@@ -1,18 +1,15 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Testcontainers.PostgreSql;
 
 namespace ECommerce.WebAPI.IntegrationTests;
 
 public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlTestcontainer _dbContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-        .WithDatabase(new PostgreSqlTestcontainerConfiguration
-        {
-            Database = "ecommerce",
-            Username = "postgres",
-            Password = "postgres"
-        })
-        .WithImage("postgres:16-alpine")
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
+        .WithDatabase("ecommerce")
+        .WithUsername("postgres")
+        .WithPassword("postgres")
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

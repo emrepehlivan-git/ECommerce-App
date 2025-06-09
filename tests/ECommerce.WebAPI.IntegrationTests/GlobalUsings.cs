@@ -1,7 +1,5 @@
-global using System;
-global using System.Net;
 global using System.Net.Http.Json;
-global using System.Threading.Tasks;
+global using System.Net;
 
 // xUnit & FluentAssertions
 global using Xunit;
@@ -13,9 +11,6 @@ global using Microsoft.Extensions.DependencyInjection;
 
 // Data access
 global using Microsoft.EntityFrameworkCore;
-
-global using DotNet.Testcontainers.Builders;
-global using DotNet.Testcontainers.Containers;
 
 // Project namespaces
 global using ECommerce.Persistence.Contexts;
