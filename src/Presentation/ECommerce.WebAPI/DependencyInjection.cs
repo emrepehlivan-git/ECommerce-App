@@ -55,7 +55,7 @@ public static class DependencyInjection
         {
             options.AddPolicy("AllowAllOrigins", builder =>
             {
-                builder.WithOrigins("http://localhost:3000")
+                builder.WithOrigins("http://localhost:3000", "https://localhost:5002")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();
@@ -76,9 +76,10 @@ public static class DependencyInjection
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "ECommerce API v1");
-                options.OAuthClientId(app.Configuration["Authentication:SwaggerClientId"]);
+                options.OAuthClientId("swagger-client");
                 options.OAuthAppName("ECommerce API");
                 options.OAuthUsePkce();
+                options.OAuthScopes(["api", "email", "profile", "roles"]);
             });
         }
 
@@ -95,72 +96,27 @@ public static class DependencyInjection
         return app;
     }
 
-    public static void AddAuthorization(this IServiceCollection services)
+    private static void AddAuthorization(this IServiceCollection services)
     {
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         services.AddAuthorization(options =>
         {
-            // Products
-            options.AddPolicy(PermissionConstants.Products.View, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Products.View)));
-            options.AddPolicy(PermissionConstants.Products.Create, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Products.Create)));
-            options.AddPolicy(PermissionConstants.Products.Update, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Products.Update)));
-            options.AddPolicy(PermissionConstants.Products.Delete, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Products.Delete)));
-            options.AddPolicy(PermissionConstants.Products.Manage, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Products.Manage)));
-
-            // Orders
-            options.AddPolicy(PermissionConstants.Orders.View, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Orders.View)));
-            options.AddPolicy(PermissionConstants.Orders.Create, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Orders.Create)));
-            options.AddPolicy(PermissionConstants.Orders.Update, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Orders.Update)));
-            options.AddPolicy(PermissionConstants.Orders.Delete, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Orders.Delete)));
-            options.AddPolicy(PermissionConstants.Orders.Manage, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Orders.Manage)));
-
-            // Categories
-            options.AddPolicy(PermissionConstants.Categories.View, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Categories.View)));
-            options.AddPolicy(PermissionConstants.Categories.Create, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Categories.Create)));
-            options.AddPolicy(PermissionConstants.Categories.Update, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Categories.Update)));
-            options.AddPolicy(PermissionConstants.Categories.Delete, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Categories.Delete)));
-            options.AddPolicy(PermissionConstants.Categories.Manage, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Categories.Manage)));
-
-            // Users
-            options.AddPolicy(PermissionConstants.Users.View, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Users.View)));
-            options.AddPolicy(PermissionConstants.Users.Create, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Users.Create)));
-            options.AddPolicy(PermissionConstants.Users.Update, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Users.Update)));
-            options.AddPolicy(PermissionConstants.Users.Delete, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Users.Delete)));
-            options.AddPolicy(PermissionConstants.Users.Manage, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Users.Manage)));
-
-            // Roles
-            options.AddPolicy(PermissionConstants.Roles.View, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Roles.View)));
-            options.AddPolicy(PermissionConstants.Roles.Create, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Roles.Create)));
-            options.AddPolicy(PermissionConstants.Roles.Update, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Roles.Update)));
-            options.AddPolicy(PermissionConstants.Roles.Delete, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Roles.Delete)));
-            options.AddPolicy(PermissionConstants.Roles.Manage, policy =>
-                policy.AddRequirements(new PermissionRequirement(PermissionConstants.Roles.Manage)));
+            var permissionTypes = typeof(PermissionConstants).GetNestedTypes();
+            foreach (var type in permissionTypes)
+            {
+                var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                foreach (var field in fields)
+                {
+                    if (field.FieldType == typeof(string))
+                    {
+                        var permissionValue = (string)field.GetValue(null)!;
+                        options.AddPolicy(permissionValue, policy =>
+                            policy.AddRequirements(new PermissionRequirement(permissionValue)));
+                    }
+                }
+            }
         });
     }
 
@@ -223,7 +179,6 @@ public static class DependencyInjection
                 Version = "v1",
                 Description = "ECommerce API with OpenIddict Authentication"
             });
-
             options.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
             {
                 Type = Microsoft.OpenApi.Models.SecuritySchemeType.OAuth2,
@@ -231,8 +186,8 @@ public static class DependencyInjection
                 {
                     AuthorizationCode = new Microsoft.OpenApi.Models.OpenApiOAuthFlow
                     {
-                        AuthorizationUrl = new Uri($"{configuration["Authentication:Authority"]}/connect/authorize"),
-                        TokenUrl = new Uri($"{configuration["Authentication:Authority"]}/connect/token"),
+                        AuthorizationUrl = new Uri($"https://localhost:5002/connect/authorize"),
+                        TokenUrl = new Uri($"https://localhost:5002/connect/token"),
                         Scopes = new Dictionary<string, string>
                         {
                             { "api", "ECommerce API Access" }

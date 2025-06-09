@@ -1,17 +1,25 @@
 using ECommerce.Application.Interfaces;
 using ECommerce.SharedKernel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Persistence.Interceptors;
 
-public sealed class AuditEntityInterceptor(ICurrentUserService currentUserService) : SaveChangesInterceptor
+public sealed class AuditEntityInterceptor(IHttpContextAccessor httpContextAccessor) : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
         var dbContext = eventData.Context;
 
         if (dbContext is null)
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+
+        // Try to get the current user service from the current HTTP context
+        var currentUserService = httpContextAccessor.HttpContext?.RequestServices.GetService<ICurrentUserService>();
+
+        if (currentUserService is null)
             return base.SavingChangesAsync(eventData, result, cancellationToken);
 
         var entries = dbContext.ChangeTracker.Entries()

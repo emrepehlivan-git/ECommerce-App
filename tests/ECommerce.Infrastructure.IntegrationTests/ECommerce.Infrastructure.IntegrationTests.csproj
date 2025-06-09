@@ -10,10 +10,5 @@
         <ProjectReference Include="..\..\src\Infrastructure\ECommerce.Infrastructure\ECommerce.Infrastructure.csproj" />
         <ProjectReference Include="..\..\src\Infrastructure\ECommerce.Persistence\ECommerce.Persistence.csproj" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
-        <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Moq" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="xunit.runner.visualstudio" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
     </ItemGroup>
 </Project> 

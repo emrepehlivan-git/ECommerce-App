@@ -84,6 +84,39 @@ public class Worker : IHostedService
             DisplayName = "API",
             Description = "API scope"
         });
+
+        var swaggerClient = await manager.FindByClientIdAsync("swagger-client");
+        if (swaggerClient is not null)
+        {
+            await manager.DeleteAsync(swaggerClient);
+        }
+        _ = await manager.CreateAsync(new OpenIddictApplicationDescriptor
+        {
+            ClientId = "swagger-client",
+            DisplayName = "Swagger UI",
+            ConsentType = ConsentTypes.Implicit,
+            ClientType = ClientTypes.Public,
+            RedirectUris =
+            {
+                new Uri("https://localhost:4001/swagger/oauth2-redirect.html"),
+                new Uri("http://localhost:4000/swagger/oauth2-redirect.html"),
+            },
+            Permissions =
+            {
+                Permissions.Endpoints.Authorization,
+                Permissions.Endpoints.Token,
+                Permissions.GrantTypes.AuthorizationCode,
+                Permissions.ResponseTypes.Code,
+                Permissions.Scopes.Email,
+                Permissions.Scopes.Profile,
+                Permissions.Scopes.Roles,
+                $"{Permissions.Prefixes.Scope}api",
+            },
+            Requirements =
+            {
+                Requirements.Features.ProofKeyForCodeExchange
+            }
+        });
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

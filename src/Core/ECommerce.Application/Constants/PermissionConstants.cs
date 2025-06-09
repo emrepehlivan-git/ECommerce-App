@@ -4,7 +4,6 @@ public static class PermissionConstants
 {
     public static class Products
     {
-        public const string View = "Products.View";
         public const string Create = "Products.Create";
         public const string Update = "Products.Update";
         public const string Delete = "Products.Delete";
@@ -22,7 +21,6 @@ public static class PermissionConstants
 
     public static class Categories
     {
-        public const string View = "Categories.View";
         public const string Create = "Categories.Create";
         public const string Update = "Categories.Update";
         public const string Delete = "Categories.Delete";

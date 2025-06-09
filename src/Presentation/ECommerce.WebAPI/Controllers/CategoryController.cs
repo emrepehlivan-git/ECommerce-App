@@ -10,7 +10,6 @@ namespace ECommerce.WebAPI.Controllers;
 
 public sealed class CategoryController : BaseApiController
 {
-    [Authorize(PermissionConstants.Categories.View)]
     [HttpGet]
     public async Task<IActionResult> GetCategories([FromQuery] PageableRequestParams requestParams, [FromQuery] string? orderBy = null, CancellationToken cancellationToken = default)
     {
@@ -18,7 +17,6 @@ public sealed class CategoryController : BaseApiController
         return Ok(categories);
     }
 
-    [Authorize(PermissionConstants.Categories.View)]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken cancellationToken = default)
     {

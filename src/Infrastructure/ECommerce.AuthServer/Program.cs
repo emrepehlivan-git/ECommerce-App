@@ -29,9 +29,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        builder.WithOrigins(
+            "http://localhost:4000", // Swagger UI
+            "http://localhost:3000"  // Next.js veya başka bir client
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 

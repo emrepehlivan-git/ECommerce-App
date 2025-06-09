@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 
 namespace ECommerce.Persistence;
 
@@ -39,11 +40,8 @@ public static class DependencyInjection
             options.UseSnakeCaseNamingConvention();
             options.UseOpenIddict();
 
-            var currentUserService = serviceProvider.GetService<ICurrentUserService>();
-            if (currentUserService != null)
-            {
-                options.AddInterceptors(new AuditEntityInterceptor(currentUserService));
-            }
+            var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+            options.AddInterceptors(new AuditEntityInterceptor(httpContextAccessor));
         });
     }
 
