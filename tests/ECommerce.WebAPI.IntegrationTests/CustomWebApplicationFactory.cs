@@ -1,18 +1,16 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Testcontainers.PostgreSql;
 
 namespace ECommerce.WebAPI.IntegrationTests;
 
 public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlTestcontainer _dbContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-        .WithDatabase(new PostgreSqlTestcontainerConfiguration
-        {
-            Database = "ecommerce",
-            Username = "postgres",
-            Password = "postgres"
-        })
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16-alpine")
+        .WithDatabase("ecommerce")
+        .WithUsername("postgres")
+        .WithPassword("postgres")
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -33,8 +31,14 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
         await _dbContainer.StartAsync();
     }
 
-    async Task IAsyncLifetime.DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await _dbContainer.DisposeAsync();
+        await base.DisposeAsync();
+    }
+
+    async Task IAsyncLifetime.DisposeAsync()
+    {
+        await DisposeAsync();
     }
 }

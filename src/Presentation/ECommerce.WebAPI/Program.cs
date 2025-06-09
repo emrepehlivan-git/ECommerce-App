@@ -22,3 +22,5 @@ catch (Exception ex)
 {
     logger?.LogError(ex, "Application terminated unexpectedly");
 }
+
+public partial class Program { }

@@ -16,10 +16,7 @@ public class ProductEndpointsTests : IClassFixture<CustomWebApplicationFactory>,
         _client = _factory.CreateClient();
     }
 
-    public async Task DisposeAsync()
-    {
-        await (_factory as IAsyncLifetime).DisposeAsync();
-    }
+    public async Task DisposeAsync() => await Task.CompletedTask;
 
     [Fact]
     public async Task GetProducts_ReturnsOk()
