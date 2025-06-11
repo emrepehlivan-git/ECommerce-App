@@ -1,3 +1,5 @@
+using ECommerce.Domain.ValueObjects;
+
 namespace ECommerce.WebAPI.IntegrationTests.Endpoints;
 
 public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
@@ -41,15 +43,28 @@ public class OrderEndpointsTests : IClassFixture<CustomWebApplicationFactory>, I
         context.Products.Add(product);
         await context.SaveChangesAsync();
 
+        var address = new
+        {
+            Street = "Test Street",
+            City = "Test City",
+            State = "Test State",
+            ZipCode = "12345",
+            Country = "Test Country"
+        };
         var command = new
         {
             UserId = user.Id,
-            ShippingAddress = "Ship",
-            BillingAddress = "Bill",
+            ShippingAddress = address,
+            BillingAddress = address,
             Items = new[] { new { ProductId = product.Id, Quantity = 1 } }
         };
 
         var response = await _client.PostAsJsonAsync("/api/Order", command);
+        if (!response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"CreateOrderAsync response: {content}");
+        }
         response.EnsureSuccessStatusCode();
 
         var order = await context.Orders.FirstAsync();

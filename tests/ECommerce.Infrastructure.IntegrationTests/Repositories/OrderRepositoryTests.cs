@@ -1,4 +1,5 @@
 namespace ECommerce.Infrastructure.IntegrationTests.Repositories;
+using ECommerce.Domain.ValueObjects;
 
 public class OrderRepositoryTests : RepositoryTestBase
 {
@@ -13,12 +14,12 @@ public class OrderRepositoryTests : RepositoryTestBase
     public async Task GetUserOrdersAsync_ReturnsOrdersOrderedDescending()
     {
         var userId = Guid.NewGuid();
-        var order1 = Order.Create(userId, "s1", "b1");
+        var order1 = Order.Create(userId, new Address("s1", "Istanbul", "Marmara", "34000", "Turkey"), new Address("b1", "Istanbul", "Marmara", "34000", "Turkey"));
         order1.AddItem(Guid.NewGuid(), Price.Create(10m), 1);
         await Task.Delay(10); // ensure later order date
-        var order2 = Order.Create(userId, "s2", "b2");
+        var order2 = Order.Create(userId, new Address("s2", "Istanbul", "Marmara", "34000", "Turkey"), new Address("b2", "Istanbul", "Marmara", "34000", "Turkey"));
         order2.AddItem(Guid.NewGuid(), Price.Create(20m), 2);
-        var otherOrder = Order.Create(Guid.NewGuid(), "s3", "b3");
+        var otherOrder = Order.Create(Guid.NewGuid(), new Address("s3", "Istanbul", "Marmara", "34000", "Turkey"), new Address("b3", "Istanbul", "Marmara", "34000", "Turkey"));
 
         Context.Orders.AddRange(order1, order2, otherOrder);
         await Context.SaveChangesAsync();

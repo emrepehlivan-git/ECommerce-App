@@ -16,8 +16,8 @@ public sealed class Order : AuditableEntity
     public OrderStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }
 
-    public string ShippingAddress { get; private set; } = string.Empty;
-    public string BillingAddress { get; private set; } = string.Empty;
+    public Address ShippingAddress { get; private set; } = null!;
+    public Address BillingAddress { get; private set; } = null!;
 
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
 
@@ -25,7 +25,7 @@ public sealed class Order : AuditableEntity
     {
     }
 
-    private Order(Guid userId, string shippingAddress, string billingAddress)
+    private Order(Guid userId, Address shippingAddress, Address billingAddress)
     {
         UserId = userId;
         OrderDate = DateTime.UtcNow;
@@ -35,7 +35,7 @@ public sealed class Order : AuditableEntity
         BillingAddress = billingAddress;
     }
 
-    public static Order Create(Guid userId, string shippingAddress, string billingAddress)
+    public static Order Create(Guid userId, Address shippingAddress, Address billingAddress)
     {
         return new(userId, shippingAddress, billingAddress);
     }
@@ -115,7 +115,7 @@ public sealed class Order : AuditableEntity
         Status = status;
     }
 
-    public void UpdateAddresses(string shippingAddress, string billingAddress)
+    public void UpdateAddresses(Address shippingAddress, Address billingAddress)
     {
         ShippingAddress = shippingAddress;
         BillingAddress = billingAddress;

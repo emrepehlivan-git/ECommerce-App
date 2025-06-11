@@ -1,11 +1,10 @@
-
 namespace ECommerce.Domain.UnitTests.Entities;
 
 public sealed class OrderTests
 {
     private readonly Guid _userId = new Guid("ef40322b-1946-472c-97b3-7e90e401c872");
-    private const string ValidShippingAddress = "123 Shipping St";
-    private const string ValidBillingAddress = "123 Billing St";
+    private static readonly Address ValidShippingAddress = new Address("123 Shipping St", "Istanbul", "Marmara", "34000", "Turkey");
+    private static readonly Address ValidBillingAddress = new Address("123 Billing St", "Istanbul", "Marmara", "34000", "Turkey");
     private readonly Guid _productId = new Guid("8932467a-3c87-49c9-9726-d9f96ff5c1b2");
     private readonly Price _unitPrice = Price.Create(100m);
     private const int ValidQuantity = 2;
@@ -142,8 +141,8 @@ public sealed class OrderTests
     {
         // Arrange
         var order = Order.Create(_userId, ValidShippingAddress, ValidBillingAddress);
-        var newShippingAddress = "456 New Shipping St";
-        var newBillingAddress = "456 New Billing St";
+        var newShippingAddress = new Address("456 New Shipping St", "Ankara", "Ankara", "06000", "Turkey");
+        var newBillingAddress = new Address("456 New Billing St", "Ankara", "Ankara", "06000", "Turkey");
 
         // Act
         order.UpdateAddresses(newShippingAddress, newBillingAddress);

@@ -1,6 +1,7 @@
 using ECommerce.Application.Features.Orders;
 using ECommerce.Application.Helpers;
 using ECommerce.Application.Interfaces;
+using ECommerce.Domain.ValueObjects;
 
 namespace ECommerce.Application.UnitTests.Features.Orders.Commands;
 
@@ -35,7 +36,7 @@ public abstract class OrderCommandsTestBase
 
         SetupDefaultLocalizationMessages();
 
-        DefaultOrder = Order.Create(UserId, "Test Shipping", "Test Billing");
+        DefaultOrder = Order.Create(UserId, new Address("Test Shipping", "Istanbul", "Marmara", "34000", "Turkey"), new Address("Test Billing", "Istanbul", "Marmara", "34000", "Turkey"));
     }
 
     protected void SetupOrderRepositoryGetByIdAsync(Order? order = null)

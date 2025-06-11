@@ -5,18 +5,17 @@ using ECommerce.Application.Helpers;
 using ECommerce.Application.Interfaces;
 using ECommerce.Application.Repositories;
 using ECommerce.Domain.Entities;
-using ECommerce.Domain.Events.Stock;
 using ECommerce.SharedKernel;
 using FluentValidation;
 using MediatR;
-using ECommerce.Application.Exceptions;
+using ECommerce.Domain.ValueObjects;
 
 namespace ECommerce.Application.Features.Orders.Commands;
 
 public sealed record OrderPlaceCommand(
     Guid UserId,
-    string ShippingAddress,
-    string BillingAddress,
+    Address ShippingAddress,
+    Address BillingAddress,
     List<OrderItemRequest> Items) : IRequest<Result<Guid>>, IValidatableRequest, ITransactionalRequest;
 
 public sealed record OrderItemRequest(
@@ -36,11 +35,11 @@ public sealed class OrderPlaceCommandValidator : AbstractValidator<OrderPlaceCom
             .WithMessage(localizer[OrderConsts.UserNotFound]);
 
         RuleFor(x => x.ShippingAddress)
-            .NotEmpty()
+            .NotNull()
             .WithMessage(localizer[OrderConsts.ShippingAddressRequired]);
 
         RuleFor(x => x.BillingAddress)
-            .NotEmpty()
+            .NotNull()
             .WithMessage(localizer[OrderConsts.BillingAddressRequired]);
 
         RuleFor(x => x.Items)
