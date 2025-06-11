@@ -1,4 +1,6 @@
+using Ardalis.Result.AspNetCore;
 using ECommerce.Application.Features.Products.Commands;
+using ECommerce.Application.Features.Products.DTOs;
 using ECommerce.Application.Features.Products.Queries;
 using ECommerce.Application.Features.Stock.Commands;
 using ECommerce.Application.Parameters;
@@ -9,51 +11,86 @@ namespace ECommerce.WebAPI.Controllers;
 public sealed class ProductController : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetProducts([FromQuery] PageableRequestParams requestParams, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(List<ProductDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] PageableRequestParams requestParams, CancellationToken cancellationToken)
     {
-        var products = await Mediator.Send(new GetAllProductsQuery(requestParams), cancellationToken);
-        return Ok(products);
+        var result = await Mediator.Send(new GetAllProductsQuery(requestParams), cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(Guid id, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProductDto>> GetProductById(Guid id, CancellationToken cancellationToken)
     {
-        var product = await Mediator.Send(new GetProductByIdQuery(id), cancellationToken);
-        return Ok(product);
+        var result = await Mediator.Send(new GetProductByIdQuery(id), cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateProduct(CreateProductCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Guid>> CreateProduct(CreateProductCommand command, CancellationToken cancellationToken)
     {
-        var product = await Mediator.Send(command, cancellationToken);
-        return Ok(product);
+        var result = await Mediator.Send(command, cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(Guid id, UpdateProductCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateProduct(Guid id, UpdateProductCommand command, CancellationToken cancellationToken)
     {
-        var product = await Mediator.Send(command with { Id = id }, cancellationToken);
-        return Ok(product);
+        var result = await Mediator.Send(command with { Id = id }, cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduct(Guid id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteProduct(Guid id, CancellationToken cancellationToken)
     {
-        var product = await Mediator.Send(new DeleteProductCommand(id), cancellationToken);
-        return Ok(product);
+        var result = await Mediator.Send(new DeleteProductCommand(id), cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpGet("{id}/stock")]
-    public async Task<IActionResult> GetProductStockInfo(Guid id, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<int>> GetProductStockInfo(Guid id, CancellationToken cancellationToken)
     {
-        var stockInfo = await Mediator.Send(new GetProductStockInfo(id), cancellationToken);
-        return Ok(stockInfo);
+        var result = await Mediator.Send(new GetProductStockInfo(id), cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpPut("{id}/stock")]
-    public async Task<IActionResult> UpdateProductStock(Guid id, UpdateProductStock command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateProductStock(Guid id, UpdateProductStock command, CancellationToken cancellationToken)
     {
-        var product = await Mediator.Send(command with { ProductId = id }, cancellationToken);
-        return Ok(product);
+        var result = await Mediator.Send(command with { ProductId = id }, cancellationToken);
+        return result.ToActionResult(this);
     }
 }

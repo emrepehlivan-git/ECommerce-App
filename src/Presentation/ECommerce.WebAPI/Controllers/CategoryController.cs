@@ -1,50 +1,76 @@
 using ECommerce.Application.Constants;
 using ECommerce.Application.Features.Categories.Commands;
 using ECommerce.Application.Features.Categories.Queries;
+using ECommerce.Application.Features.Categories.DTOs;
 using ECommerce.Application.Parameters;
-using ECommerce.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ardalis.Result.AspNetCore;
 
 namespace ECommerce.WebAPI.Controllers;
 
 public sealed class CategoryController : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetCategories([FromQuery] PageableRequestParams requestParams, [FromQuery] string? orderBy = null, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(List<CategoryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<List<CategoryDto>>> GetCategories([FromQuery] PageableRequestParams requestParams, [FromQuery] string? orderBy = null, CancellationToken cancellationToken = default)
     {
-        var categories = await Mediator.Send(new GetAllCategoriesQuery(requestParams, orderBy), cancellationToken);
-        return Ok(categories);
+        var result = await Mediator.Send(new GetAllCategoriesQuery(requestParams, orderBy), cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetCategoryById(Guid id, CancellationToken cancellationToken = default)
+    [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CategoryDto>> GetCategoryById(Guid id, CancellationToken cancellationToken = default)
     {
-        var category = await Mediator.Send(new GetCategoryByIdQuery(id), cancellationToken);
-        return Ok(category);
+        var result = await Mediator.Send(new GetCategoryByIdQuery(id), cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [Authorize(PermissionConstants.Categories.Create)]
     [HttpPost]
-    public async Task<IActionResult> CreateCategory(CreateCategoryCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Guid>> CreateCategory(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = await Mediator.Send(command, cancellationToken);
-        return Ok(category);
+        var result = await Mediator.Send(command, cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [Authorize(PermissionConstants.Categories.Update)]
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCategory(Guid id, UpdateCategoryCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateCategory(Guid id, UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = await Mediator.Send(command with { Id = id }, cancellationToken);
-        return Ok(category);
+        var result = await Mediator.Send(command with { Id = id }, cancellationToken);
+        return result.ToActionResult(this);
     }
 
     [Authorize(PermissionConstants.Categories.Delete)]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCategory(Guid id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteCategory(Guid id, CancellationToken cancellationToken)
     {
-        var category = await Mediator.Send(new DeleteCategoryCommand(id), cancellationToken);
-        return Ok(category);
+        var result = await Mediator.Send(new DeleteCategoryCommand(id), cancellationToken);
+        return result.ToActionResult(this);
     }
 }
